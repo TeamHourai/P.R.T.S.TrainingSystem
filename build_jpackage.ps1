@@ -99,4 +99,8 @@ if ($mainClass -eq "") {
 }
 
 $jpackageCmd = "jpackage " + ($jpackageArgs -join " ")
-Write-Host
+Write-Host $jpackageCmd
+Invoke-Expression $jpackageCmd
+if ($LASTEXITCODE -ne 0) { Write-Error "jpackage failed"; exit 5 }
+
+Write-Host "Packaging done. Check .\$OutDir\$AppName for the app-image (including $AppName.exe)."

@@ -7,6 +7,7 @@ import java.io.IOException;
 
 /*
   GET /ping
+  用于检查服务器是否在线
 */
 public class PingHandler implements HttpHandler {
     @Override

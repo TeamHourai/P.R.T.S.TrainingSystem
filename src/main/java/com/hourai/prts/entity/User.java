@@ -1,7 +1,7 @@
 package com.hourai.prts.entity;
 
 /*
-  简单模型类，字段设为 public 方便多文件访问（教学/演示）
+  用户模型
 */
 public class User {
     public long id;
@@ -11,6 +11,10 @@ public class User {
     public String createdAt;
 
     public User(long id, String username, String password, boolean isAdmin, String createdAt) {
-        this.id = id; this.username = username; this.password = password; this.isAdmin = isAdmin; this.createdAt = createdAt;
+        this.id = id;
+        this.username = username;
+        this.password = password;
+        this.isAdmin = isAdmin;
+        this.createdAt = createdAt;
     }
 }

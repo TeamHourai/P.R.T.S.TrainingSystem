@@ -5,7 +5,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.hourai.prts.utils.Utils;
 import com.hourai.prts.entity.*;
-
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
@@ -14,39 +13,27 @@ import java.util.stream.Collectors;
 
 /*
   GET /user/{id}/wrong  -> return user's wrong questions
-  用于获取用户答错的题目列表
 */
 public class UserHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-            Utils.send(exchange, 405, "{\"error\":\"GET required\"}");
+            Utils.send(exchange,405,"{\"error\":\"GET required\"}");
             return;
         }
-        // 解析路径
         String path = exchange.getRequestURI().getPath(); // /user/2/wrong
         String[] segs = path.split("/");
-        if (segs.length < 4) {
-            Utils.send(exchange, 400, "{\"error\":\"bad path\"}");
-            return;
-        }
+        if (segs.length < 4) { Utils.send(exchange,400,"{\"error\":\"bad path\"}"); return; }
         try {
             long userId = Long.parseLong(segs[2]);
             String action = segs[3];
-            if (!"wrong".equals(action)) {
-                Utils.send(exchange, 404, "{\"error\":\"unknown action\"}");
-                return;
-            }
-            // 获取用户答错的题目ID列表
-            List<UserAnswer> uas = DataStore.loadUserAnswers().stream().filter(a -> a.userId == userId && !a.isCorrect).collect(Collectors.toList());
-            // 提取题目ID并去重
-            Set<Long> qids = uas.stream().map(a -> a.questionId).collect(Collectors.toCollection(LinkedHashSet::new));
-            // 加载题目列表
-            List<Question> qs = DataStore.loadQuestions().stream().filter(q -> qids.contains(q.id)).collect(Collectors.toList());
-            // 返回题目列表
-            Utils.send(exchange, 200, Utils.questionsToJson(qs));
+            if (!"wrong".equals(action)) { Utils.send(exchange,404,"{\"error\":\"unknown action\"}"); return; }
+            List<UserAnswer> uas = DataStore.loadUserAnswers().stream().filter(a->a.userId==userId && !a.isCorrect).collect(Collectors.toList());
+            Set<Long> qids = uas.stream().map(a->a.questionId).collect(Collectors.toCollection(LinkedHashSet::new));
+            List<Question> qs = DataStore.loadQuestions().stream().filter(q->qids.contains(q.id)).collect(Collectors.toList());
+            Utils.send(exchange,200, Utils.questionsToJson(qs));
         } catch (NumberFormatException nfe) {
-            Utils.send(exchange, 400, "{\"error\":\"invalid user id\"}");
+            Utils.send(exchange,400,"{\"error\":\"invalid user id\"}");
         }
     }
 }

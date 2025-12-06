@@ -1,3 +1,4 @@
+
 package com.hourai.prts.data;
 
 import java.io.IOException;
@@ -75,7 +76,7 @@ public class DataStore {
      * 将新用户信息追加写入用户数据文件
      */
     public static synchronized void appendUser(User u) throws IOException {
-        String line = u.id + "," + u.username + "," + u.password + "," + u.isAdmin + "," + u.createdAt + System.lineSeparator();
+        String line = u.getId() + "," + u.getUsername() + "," + u.getPassword() + "," + u.isAdmin() + "," + u.getCreatedAt() + System.lineSeparator();
         Files.write(USERS_FILE, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
     }
 
@@ -136,7 +137,7 @@ public class DataStore {
      * 将新用户答案信息追加写入用户答案数据文件
      */
     public static synchronized void appendUserAnswer(UserAnswer ua) throws IOException {
-        String line = ua.id + "," + ua.userId + "," + ua.questionId + "," + ua.questionType + "," + ua.isCorrect + "," + ua.selectedOption + "," + ua.answeredAt + System.lineSeparator();
+        String line = ua.getId() + "," + ua.getUserId() + "," + ua.getQuestionId() + "," + ua.getSelectedAnswer() + "," + ua.isCorrect() + "," + ua.getAnswerTime() + "," + ua.getCreatedAt() + System.lineSeparator();
         Files.write(USER_ANSWERS_FILE, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
     }
 
@@ -165,7 +166,7 @@ public class DataStore {
      * 将新考试记录信息追加写入考试记录数据文件
      */
     public static synchronized void appendExamRecord(ExamRecord er) throws IOException {
-        String line = er.id + "," + er.userId + "," + er.score + "," + er.completedAt + System.lineSeparator();
+        String line = er.getId() + "," + er.getUserId() + "," + er.getScore() + "," + er.getCreatedAt() + System.lineSeparator();
         Files.write(EXAM_RECORDS_FILE, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
     }
 

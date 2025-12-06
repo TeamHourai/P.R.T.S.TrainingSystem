@@ -180,19 +180,20 @@ public class Utils {
             if (!first) sb.append(",");
             first = false;
             sb.append("{");
-            sb.append("\"id\":").append(q.id).append(",");
-            sb.append("\"type\":").append(q.type).append(",");
-            sb.append("\"difficulty\":").append(q.difficulty).append(",");
-            sb.append("\"question\":\"").append(escapeJson(q.question)).append("\",");
+            sb.append("\"id\":").append(q.getId()).append(",");
+            sb.append("\"type\":").append(q.getType()).append(",");
+            sb.append("\"difficulty\":").append(q.getDifficulty()).append(",");
+            sb.append("\"question\":\"").append(escapeJson(q.getQuestion())).append("\",");
             sb.append("\"options\":[");
             boolean f2 = true;
-            for (String opt : q.options) {
+            String[] optionsArr = q.getOptions() != null ? q.getOptions().split("\\|") : new String[0];
+            for (String opt : optionsArr) {
                 if (!f2) sb.append(",");
                 f2 = false;
                 sb.append("\"").append(escapeJson(opt)).append("\"");
             }
             sb.append("],");
-            sb.append("\"answer\":").append(q.answer);
+            sb.append("\"answer\":\"").append(q.getAnswer()).append("\"");
             sb.append("}");
         }
         sb.append("]");

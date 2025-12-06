@@ -27,7 +27,7 @@ public class RegisterHandler implements HttpHandler {
             return;
         }
         List<User> users = DataStore.loadUsers();
-        boolean exists = users.stream().anyMatch(u -> u.username.equals(username));
+        boolean exists = users.stream().anyMatch(u -> u.getUsername().equals(username));
         if (exists) {
             Utils.send(exchange,400,"{\"error\":\"username exists\"}");
             return;

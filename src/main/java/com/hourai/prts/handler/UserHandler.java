@@ -28,9 +28,9 @@ public class UserHandler implements HttpHandler {
             long userId = Long.parseLong(segs[2]);
             String action = segs[3];
             if (!"wrong".equals(action)) { Utils.send(exchange,404,"{\"error\":\"unknown action\"}"); return; }
-            List<UserAnswer> uas = DataStore.loadUserAnswers().stream().filter(a->a.userId==userId && !a.isCorrect).collect(Collectors.toList());
-            Set<Long> qids = uas.stream().map(a->a.questionId).collect(Collectors.toCollection(LinkedHashSet::new));
-            List<Question> qs = DataStore.loadQuestions().stream().filter(q->qids.contains(q.id)).collect(Collectors.toList());
+            List<UserAnswer> uas = DataStore.loadUserAnswers().stream().filter(a->a.getUserId() == userId && !a.isCorrect()).collect(Collectors.toList());
+            Set<Long> qids = uas.stream().map(a->a.getQuestionId()).collect(Collectors.toCollection(LinkedHashSet::new));
+            List<Question> qs = DataStore.loadQuestions().stream().filter(q->qids.contains(q.getId())).collect(Collectors.toList());
             Utils.send(exchange,200, Utils.questionsToJson(qs));
         } catch (NumberFormatException nfe) {
             Utils.send(exchange,400,"{\"error\":\"invalid user id\"}");

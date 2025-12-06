@@ -24,10 +24,10 @@ public class LoginHandler implements HttpHandler {
         String username = params.get("username");
         String password = params.get("password");
         List<User> users = DataStore.loadUsers();
-        Optional<User> ou = users.stream().filter(u->u.username.equals(username) && u.password.equals(password)).findFirst();
+        Optional<User> ou = users.stream().filter(u->u.getUsername().equals(username) && u.getPassword().equals(password)).findFirst();
         if (ou.isPresent()) {
             User u = ou.get();
-            Utils.send(exchange,200,"{\"id\":"+u.id+",\"username\":\""+ Utils.escapeJson(u.username)+"\"}");
+            Utils.send(exchange,200,"{\"id\":"+u.getId()+",\"username\":\""+ Utils.escapeJson(u.getUsername())+"\"}");
         } else {
             Utils.send(exchange,401,"{\"error\":\"invalid credentials\"}");
         }

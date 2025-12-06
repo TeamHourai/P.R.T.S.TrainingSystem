@@ -3,7 +3,6 @@ package com.hourai.prts.handler;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.hourai.prts.utils.Utils;
-import com.hourai.prts.entity.*;
 import java.io.IOException;
 
 /*

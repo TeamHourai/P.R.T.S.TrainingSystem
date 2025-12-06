@@ -31,14 +31,14 @@ public class ExamSubmitHandler implements HttpHandler {
         try { userId = Long.parseLong(userIdS); } catch (Exception e) { Utils.send(exchange,400,"{\"error\":\"userId invalid\"}"); return; }
         Map<Long,Integer> answers = Utils.parseAnswers(answersS);
         List<Question> questions = DataStore.loadQuestions();
-        Map<Long, Question> qm = questions.stream().collect(java.util.stream.Collectors.toMap(q->q.id, q->q));
+        Map<Long, Question> qm = questions.stream().collect(java.util.stream.Collectors.toMap(q->q.getId(), q->q));
         int score = 0;
         List<UserAnswer> ualist = DataStore.loadUserAnswers();
         long uaNext = DataStore.nextId(ualist);
         for (Map.Entry<Long,Integer> e : answers.entrySet()){
             Long qid = e.getKey(); Integer sel = e.getValue();
             Question qObj = qm.get(qid);
-            boolean correct = qObj != null && qObj.answer == sel;
+            boolean correct = qObj != null && qObj.getAnswer().equals(String.valueOf(sel));
             if (correct) score += 1;
             UserAnswer ua = new UserAnswer(uaNext++, userId, qid, "normal", correct, sel, Utils.now());
             DataStore.appendUserAnswer(ua);

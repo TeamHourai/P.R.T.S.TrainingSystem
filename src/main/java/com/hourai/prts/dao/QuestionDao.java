@@ -1,4 +1,3 @@
-
 /**
  * 试题数据访问对象（DAO），负责对 question 表进行增删改查操作。
  */
@@ -64,7 +63,7 @@ public class QuestionDao {
     public int insert(Question q) throws SQLException {
         String sql = "INSERT INTO question (type, difficulty, category, resource, question, options, answer, analysis, has_picture, picture_url, view_count, error_count) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, q.getType());
             ps.setInt(2, q.getDifficulty());
             ps.setString(3, q.getCategory());
@@ -77,7 +76,13 @@ public class QuestionDao {
             ps.setString(10, q.getPictureUrl());
             ps.setInt(11, q.getViewCount());
             ps.setInt(12, q.getErrorCount());
-            return ps.executeUpdate();
+            int result = ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    q.setId(rs.getLong(1));
+                }
+            }
+            return result;
         }
     }
 

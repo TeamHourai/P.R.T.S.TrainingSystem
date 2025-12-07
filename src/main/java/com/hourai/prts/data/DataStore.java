@@ -126,7 +126,7 @@ public class DataStore {
             long questionId = Long.parseLong(p[2]);
             String qt = p[3];
             boolean isCorrect = Boolean.parseBoolean(p[4]);
-            int selected = Integer.parseInt(p[5]);
+            int selected = "null".equals(p[5]) ? -1 : Integer.parseInt(p[5]);
             String at = p[6];
             out.add(new UserAnswer(id, userId, questionId, qt, isCorrect, selected, at));
         }

@@ -35,6 +35,15 @@ public class RegisterHandler implements HttpHandler {
         long id = DataStore.nextId(users);
         User u = new User(id, username, password, false, Utils.now());
         DataStore.appendUser(u);
+        // 自动修复：同步写入数据库
+        try {
+            com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
+            userService.register(u);
+        } catch (Exception e) {
+            // 数据库写入失败也返回注册成功，但附加警告
+            Utils.send(exchange,200,"{\"id\":"+id+",\"username\":\""+ Utils.escapeJson(username)+"\",\"warning\":\"db write failed: "+Utils.escapeJson(e.getMessage())+"\"}");
+            return;
+        }
         Utils.send(exchange,200,"{\"id\":"+id+",\"username\":\""+ Utils.escapeJson(username)+"\"}");
     }
 }

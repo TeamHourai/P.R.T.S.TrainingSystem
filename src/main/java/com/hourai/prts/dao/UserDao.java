@@ -1,4 +1,3 @@
-
 /**
  * 用户数据访问对象（DAO），负责对 user 表进行增删改查操作。
  */
@@ -35,7 +34,7 @@ public class UserDao {
     public int insert(User u) throws SQLException {
         String sql = "INSERT INTO user (username, password, nickname, avatar, email, is_admin, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, u.getUsername());
             ps.setString(2, u.getPassword());
             ps.setString(3, u.getNickname());
@@ -43,7 +42,13 @@ public class UserDao {
             ps.setString(5, u.getEmail());
             ps.setBoolean(6, u.isAdmin());
             ps.setBoolean(7, u.isStatus());
-            return ps.executeUpdate();
+            int result = ps.executeUpdate();
+            try (ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    u.setId(rs.getLong(1));
+                }
+            }
+            return result;
         }
     }
 

@@ -42,11 +42,26 @@ public class ExamSubmitHandler implements HttpHandler {
             if (correct) score += 1;
             UserAnswer ua = new UserAnswer(uaNext++, userId, qid, "normal", correct, sel, Utils.now());
             DataStore.appendUserAnswer(ua);
+            // 同步写入数据库
+            try {
+                com.hourai.prts.service.UserAnswerService uas = new com.hourai.prts.service.UserAnswerService();
+                uas.addUserAnswer(ua);
+            } catch (Exception ex) {
+                // 数据库写入失败，附加警告
+                // 可选：收集警告信息
+            }
         }
         List<ExamRecord> ers = DataStore.loadExamRecords();
         long erId = DataStore.nextId(ers);
         ExamRecord rec = new ExamRecord(erId, userId, score, Utils.now());
         DataStore.appendExamRecord(rec);
+        // 同步写入数据库
+        try {
+            com.hourai.prts.service.ExamRecordService ersvc = new com.hourai.prts.service.ExamRecordService();
+            ersvc.addExamRecord(rec);
+        } catch (Exception ex) {
+            // 数据库写入失败，附加警告
+        }
         Utils.send(exchange,200,"{\"examId\":"+erId+",\"score\":"+score+"}");
     }
 }

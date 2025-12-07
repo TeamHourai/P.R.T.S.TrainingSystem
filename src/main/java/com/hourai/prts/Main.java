@@ -40,7 +40,7 @@ public class Main {
         server.createContext("/api/questions", HandlerRegistry.getWrapped("questions"));
         server.createContext("/api/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
         server.createContext("/api/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
-        server.createContext("/api/user", HandlerRegistry.getWrapped("user"));
+        server.createContext("/api/user", new ApiHandler()); // handles /api/user
         server.createContext("/api/ping", HandlerRegistry.getWrapped("ping"));
 
         server.createContext("/api/v1/register", HandlerRegistry.getWrapped("register"));
@@ -50,6 +50,10 @@ public class Main {
         server.createContext("/api/v1/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
         server.createContext("/api/v1/user", HandlerRegistry.getWrapped("user"));
         server.createContext("/api/v1/ping", HandlerRegistry.getWrapped("ping"));
+        // 注册统一数据导入接口
+        server.createContext("/api/question", new ApiHandler());
+        server.createContext("/api/exam_record", new ApiHandler());
+        server.createContext("/api/user_answer", new ApiHandler());
         // ======================================================
 
         server.setExecutor(null);

@@ -1,3 +1,4 @@
+D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\CorsFilter.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\dao\ExamDetailDao.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\dao\ExamRecordDao.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\dao\QuestionDao.java
@@ -11,6 +12,7 @@ D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\e
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\entity\UserAnswer.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\handler\ExamPaperHandler.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\handler\ExamSubmitHandler.java
+D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\handler\HandlerRegistry.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\handler\LoginHandler.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\handler\PingHandler.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\handler\QuestionsHandler.java

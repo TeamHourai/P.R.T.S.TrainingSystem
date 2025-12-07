@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="PRTS.TRAININGSYSTEM" />
+        <module name="P.R.T.S.TrainingSystem" />
       </profile>
     </annotationProcessing>
   </component>

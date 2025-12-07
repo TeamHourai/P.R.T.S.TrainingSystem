@@ -1,3 +1,7 @@
+
+/**
+ * 考试记录数据访问对象（DAO），负责对 exam_record 表进行增删改查操作。
+ */
 package com.hourai.prts.dao;
 
 import com.hourai.prts.entity.ExamRecord;
@@ -5,7 +9,45 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ExamRecordDao 提供对考试记录表的数据库操作方法。
+ */
 public class ExamRecordDao {
+    // ...existing code...
+    /**
+     * 新增考试记录
+     * @param examRecord 实体
+     * @return 影响的行数
+     * @throws SQLException 数据库异常
+     */
+    // public int insert(ExamRecord examRecord) throws SQLException { ... }
+    /**
+     * 根据主键查询考试记录
+     * @param id 考试记录ID
+     * @return 实体或 null
+     * @throws SQLException 数据库异常
+     */
+    // public ExamRecord selectById(Long id) throws SQLException { ... }
+    /**
+     * 查询所有考试记录
+     * @return 实体列表
+     * @throws SQLException 数据库异常
+     */
+    // public List<ExamRecord> selectAll() throws SQLException { ... }
+    /**
+     * 更新考试记录信息
+     * @param examRecord 实体
+     * @return 影响的行数
+     * @throws SQLException 数据库异常
+     */
+    // public int update(ExamRecord examRecord) throws SQLException { ... }
+    /**
+     * 删除考试记录
+     * @param id 考试记录ID
+     * @return 影响的行数
+     * @throws SQLException 数据库异常
+     */
+    // public int delete(Long id) throws SQLException { ... }
     private final String url = "jdbc:mysql://localhost:3306/p.r.t.s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private final String user = "root";
     private final String password = "p.r.t.s.data115";

@@ -11,34 +11,28 @@
         // 【答题记录模块-14】提交答案
         // 新参数说明：submitAnswer(questionId, questionType, selectedOption, examId = null, userId = null, timeSpent = 0)
         submitAnswer: function (questionId, questionType, selectedOption, examId = null, userId = null, timeSpent = 0) {
-            // 优先尝试后台 /answers 接口（如果实现）
-            const payload = {
-                questionId,
-                questionType,
-                selectedOption,
-                timeSpent: timeSpent || 0
-            };
-            if (examId) payload.examId = examId;
-            if (userId) payload.userId = userId;
+            // 直接以 form 表单提交到 /exam/submit，后端 parseForm 接受该格式
+            if (!userId) {
+                return Promise.reject(new Error('请先登录后提交答案'));
+            }
+            const answersStr = `${questionId}:${selectedOption}`;
+            const body = new URLSearchParams();
+            body.append('userId', userId);
+            body.append('answers', answersStr);
+            // 若有 examId 或 timeSpent 可附加
+            if (examId) body.append('examId', examId);
+            if (timeSpent) body.append('timeSpent', String(timeSpent));
 
-            return http.post('/answers', payload).catch(async (err) => {
-                // 如果 /answers 不可用，尝试将该单题以 exam/submit 格式提交（需要 userId）
-                if (!userId) {
-                    return Promise.reject(err);
-                }
-                const answersStr = `${questionId}:${selectedOption}`;
-                const body = new URLSearchParams();
-                body.append('userId', userId);
-                body.append('answers', answersStr);
-                const resp = await fetch((window.API_BASE_URL || 'http://localhost:8888') + '/exam/submit', {
-                    method: 'POST',
-                    mode: 'cors',
-                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: body.toString()
-                });
+            return fetch((window.API_BASE_URL || 'http://localhost:8888') + '/exam/submit', {
+                method: 'POST',
+                mode: 'cors',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: body.toString()
+            }).then(async resp => {
                 const text = await resp.text();
+                if (!resp.ok) throw new Error(text || resp.statusText);
                 try { return JSON.parse(text); } catch (e) { return text; }
-            });
+            }).catch(err => Promise.reject(err));
         },
 
         // 【答题记录模块-15】获取答题历史

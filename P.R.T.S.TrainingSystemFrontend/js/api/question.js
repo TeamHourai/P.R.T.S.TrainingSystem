@@ -19,6 +19,74 @@
         1: '常识', 2: '基操', 3: '娴熟', 4: '明智', 5: '深邃'
     };
 
+    // Helper：使用 fetch 强制以 UTF-8 解码 JSON 响应，避免后端未声明 charset 导致乱码
+    function fetchJsonUtf8(path, params = {}) {
+        // 处理 query string（简单处理）
+        const urlBase = (window.API_BASE_URL || 'http://localhost:8888').replace(/\/+$/, '');
+        const url = new URL(path, urlBase);
+        Object.keys(params || {}).forEach(k => {
+            if (params[k] !== undefined && params[k] !== null) url.searchParams.set(k, params[k]);
+        });
+        return fetch(url.toString(), { method: 'GET', mode: 'cors' })
+            .then(resp => {
+                if (!resp.ok) return resp.text().then(t => { throw new Error(t || resp.statusText); });
+                return resp.arrayBuffer();
+            })
+            .then(buf => {
+                const text = new TextDecoder('utf-8').decode(buf);
+                try { return JSON.parse(text); } catch (e) { throw new Error('解析后端返回 JSON 失败: ' + e.message); }
+            });
+    }
+
+    // -------- 新增：规范化后端题目对象，保证 options 为数组、answer 为数字等 --------
+    function normalizeQuestion(raw) {
+        if (!raw) return raw;
+        const q = Object.assign({}, raw);
+
+        // 确保 question/analysis/resource 为字符串
+        q.question = (q.question === undefined || q.question === null) ? '' : String(q.question);
+        q.analysis = (q.analysis === undefined || q.analysis === null) ? '' : String(q.analysis);
+        q.resource = (q.resource === undefined || q.resource === null) ? '' : String(q.resource);
+
+        // options 可能为字符串（"A|B|C|D"）或数组；统一为数组
+        if (Array.isArray(q.options)) {
+            q.options = q.options.map(o => o === null || o === undefined ? '' : String(o));
+        } else if (typeof q.options === 'string') {
+            // 允许后端用 | 分隔或以 JSON 字符串形式返回数组
+            if (q.options.indexOf('|') !== -1) {
+                q.options = q.options.split('|').map(s => s.trim());
+            } else {
+                try {
+                    const parsed = JSON.parse(q.options);
+                    if (Array.isArray(parsed)) q.options = parsed.map(String);
+                    else q.options = [String(q.options)];
+                } catch (e) {
+                    q.options = [String(q.options)];
+                }
+            }
+        } else {
+            // 兜底：确保长度至少4
+            q.options = (q.options == null) ? ['', '', '', ''] : [String(q.options)];
+        }
+        // 保证至少4个选项（填充空字符串）
+        while (q.options.length < 4) q.options.push('');
+
+        // answer 可能为字符串，统一为整数（1-based）
+        if (q.answer === undefined || q.answer === null || q.answer === '') {
+            q.answer = 0;
+        } else {
+            const parsed = parseInt(q.answer);
+            q.answer = isNaN(parsed) ? 0 : parsed;
+        }
+
+        // type / difficulty 也尽量转为数字
+        q.type = q.type ? Number(q.type) : 0;
+        q.difficulty = q.difficulty ? Number(q.difficulty) : 0;
+
+        return q;
+    }
+    // -------- 规范化结束 --------
+
     // 题目管理 API
     window.questionApi = {
         // 【题目管理模块-5】获取所有题目
@@ -30,14 +98,19 @@
                 difficulty: undefined,
                 keyword: ''
             };
-            return http.get('/questions', { ...defaultParams, ...params }, {
-                showLoading: false
-            });
+            // 优先使用强制 UTF-8 的 fetch 实现以避免乱码
+            return fetchJsonUtf8('/questions', { ...defaultParams, ...params })
+                .then(data => {
+                    if (!Array.isArray(data)) return data;
+                    return data.map(q => normalizeQuestion(q));
+                });
         },
 
         // 【题目管理模块-6】获取单题详情
         getQuestionById: function (id, includeAnalysis = true) {
-            return http.get(`/questions/${id}`, { includeAnalysis });
+            // 优先使用强制 UTF-8 的 fetch 实现
+            return fetchJsonUtf8(`/questions/${id}`, { includeAnalysis })
+                .then(q => normalizeQuestion(q));
         },
 
         // 获取题目统计数据
@@ -62,7 +135,11 @@
 
         // 【题目管理模块-10】搜索题目
         searchQuestions: function (keyword, field = 'question') {
-            return http.get('/questions/search', { keyword, field });
+            // 搜索结果也通过 UTF-8 解码以保证显示正确
+            return fetchJsonUtf8('/questions/search', { keyword, field }).then(data => {
+                if (!Array.isArray(data)) return data;
+                return data.map(q => normalizeQuestion(q));
+            });
         }
     };
 
@@ -70,23 +147,25 @@
     window.trainingQuestionApi = {
         // 【培训题目模块-1】获取培训题目列表
         getTrainingQuestions: function (params = {}) {
-            // 优先请求 /training/questions（若后端提供培训题接口）
-            return http.get('/training/questions', {
+            // 先尝试 /training/questions（UTF-8 解码），失败降级到 /questions
+            return fetchJsonUtf8('/training/questions', {
                 page: params.page || 1,
                 size: params.size || 20
+            }).then(data => {
+                if (Array.isArray(data)) return data.map(q => normalizeQuestion(q));
+                return data;
             }).catch(err => {
-                // 若 /training/questions 不可用（404 或网络错误），降级到 /questions 获取题库数据
-                console.warn('/training/questions 请求失败，尝试降级到 /questions', err);
-                return http.get('/questions', {
+                console.warn('/training/questions 请求失败或不可用，降级到 /questions', err);
+                return fetchJsonUtf8('/questions', {
                     page: params.page || 1,
                     size: params.size || 20
-                });
+                }).then(data => Array.isArray(data) ? data.map(q => normalizeQuestion(q)) : data);
             });
         },
 
         // 【培训题目模块-2】获取指定培训题目详情
         getTrainingQuestionById: function (id) {
-            return http.get(`/training/questions/${id}`);
+            return fetchJsonUtf8(`/training/questions/${id}`).then(q => normalizeQuestion(q)).catch(() => fetchJsonUtf8(`/questions/${id}`).then(q => normalizeQuestion(q)));
         },
 
         // 【培训题目模块-3.1】创建培训题目（管理员操作）
@@ -94,12 +173,12 @@
             return http.post('/training/questions', question);
         },
 
-        // 【培训题目模块-3.2】更新培训题目（管理员操作）
+        // 【培训题目模块-3.2】更新培训题目（管理员操作)
         updateTrainingQuestion: function (id, question) {
             return http.put(`/training/questions/${id}`, question);
         },
 
-        // 【培训题目模块-3.3】删除培训题目（管理员操作）
+        // 【培训题目模块-3.3】删除培训题目（管理员操作)
         deleteTrainingQuestion: function (id) {
             return http.delete(`/training/questions/${id}`);
         }
@@ -110,6 +189,11 @@
         // 格式化题目显示：转换换行符和添加类型/难度文本
         formatQuestionForDisplay: function (question) {
             if (!question) return null;
+
+            // 若传入未经 normalize 的对象，先做一次规范化，保证 options/answer 可用
+            if (question && (question.options === undefined || typeof question.answer === 'string')) {
+                question = normalizeQuestion(question);
+            }
 
             const fmtText = (str) => (str || '').replace(/\n/g, '<br>').replace(/\r\n/g, '<br>');
 

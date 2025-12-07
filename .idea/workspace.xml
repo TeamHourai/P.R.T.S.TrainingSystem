@@ -5,61 +5,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="在未接入数据库中的分支中，添加简单的前端示例代码，成功测试了前后端的连接">
-      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/.vscode/c_cpp_properties.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/base.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/components.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/layout.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/question.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/responsive.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/result.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/全真模拟页CSS规范.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/admin.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/base.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/components.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/exam-pages.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/layout.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/responsive.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/search-pages.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/study-pages.css" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/首页CSS规范.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/API规范.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/admin.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/answer.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/exam.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/export.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/notifications.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/question.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/request.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/stats.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/system.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/upload.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/user.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/apiapp.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/auth-manager.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/config.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/package.json" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/PRTS.TRAININGSYSTEM.iml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/users.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/users.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/testfrontend/app.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/testfrontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/ExamRecord.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/ExamRecord.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/Question.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/Question.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/UserAnswer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/UserAnswer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamSubmitHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamSubmitHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/PingHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/PingHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/RegisterHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/RegisterHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/UserHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/UserHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/utils/Utils.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/utils/Utils.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/answer.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/answer.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/question.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/question.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/apiapp.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/apiapp.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/exam_records.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/exam_records.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/user_answers.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/user_answers.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -67,7 +19,14 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$" value="main" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RESET_MODE" value="HARD" />
+    <option name="SWAP_SIDES_IN_COMPARE_BRANCHES" value="true" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -99,7 +58,7 @@
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "无数据库",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/新建文件夹/cc/P.R.T.S.TrainingSystem",
     "node.js.detected.package.eslint": "true",
@@ -185,7 +144,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765017637676</updated>
     </task>
-    <option name="localTasksCounter" value="5" />
+    <task id="LOCAL-00005" summary="上传了正式前端，现在在不加数据库的情况下实现了前后端的连接，用户注册和登陆的功能，无法成功答题，答案显示为乱码，无法保存错题">
+      <option name="closed" value="true" />
+      <created>1765092823098</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1765092823098</updated>
+    </task>
+    <option name="localTasksCounter" value="6" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -217,6 +184,7 @@
   <component name="VcsManagerConfiguration">
     <MESSAGE value="更新" />
     <MESSAGE value="合并注释更改和数据库更新" />
-    <option name="LAST_COMMIT_MESSAGE" value="合并注释更改和数据库更新" />
+    <MESSAGE value="上传了正式前端，现在在不加数据库的情况下实现了前后端的连接，用户注册和登陆的功能，无法成功答题，答案显示为乱码，无法保存错题" />
+    <option name="LAST_COMMIT_MESSAGE" value="上传了正式前端，现在在不加数据库的情况下实现了前后端的连接，用户注册和登陆的功能，无法成功答题，答案显示为乱码，无法保存错题" />
   </component>
 </project>

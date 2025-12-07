@@ -124,19 +124,35 @@
         // 答题记录模块（保留原定义，具体实现可能降级）
         answers: {
             submit: function (data) {
-                // 优先尝试 /answers（若后端实现），否则降级到 /exam/submit（将尝试把 data 转成 answers 字符串）
-                return http.post(`${API_PREFIX}/answers`, data).catch(async () => {
-                    // 如果 data 包含 { userId, answers } 则直接提交 form
+                // 若已包含 userId 与 answers，优先以 application/x-www-form-urlencoded 提交到 /exam/submit（兼容后端 parseForm）
+                try {
                     if (data && (data.userId || data.answers)) {
+                        // 标准化 answers：支持字符串/数组/对象
+                        let answersStr = '';
+                        if (typeof data.answers === 'string') answersStr = data.answers;
+                        else if (Array.isArray(data.answers)) answersStr = data.answers.join(',');
+                        else if (typeof data.answers === 'object' && data.answers !== null) {
+                            answersStr = Object.keys(data.answers).map(k => `${k}:${data.answers[k]}`).join(',');
+                        }
                         const body = new URLSearchParams();
                         if (data.userId) body.append('userId', data.userId);
-                        if (data.answers) body.append('answers', data.answers);
-                        const resp = await fetch(`${API_PREFIX}/exam/submit`, { method: 'POST', mode: 'cors', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: body.toString() });
-                        const txt = await resp.text();
-                        try { return JSON.parse(txt); } catch (e) { return txt; }
+                        body.append('answers', answersStr);
+                        return fetch(`${API_PREFIX}/exam/submit`, {
+                            method: 'POST',
+                            mode: 'cors',
+                            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                            body: body.toString()
+                        }).then(async resp => {
+                            const txt = await resp.text();
+                            if (!resp.ok) throw new Error(txt || resp.statusText);
+                            try { return JSON.parse(txt); } catch (e) { return txt; }
+                        });
                     }
-                    throw new Error('answers submit failed');
-                });
+                } catch (e) {
+                    return Promise.reject(e);
+                }
+                // 否则尝试 /answers 接口（若实现）
+                return http.post(`${API_PREFIX}/answers`, data).catch(err => Promise.reject(err));
             },
 
             getHistory: function (params = {}) {

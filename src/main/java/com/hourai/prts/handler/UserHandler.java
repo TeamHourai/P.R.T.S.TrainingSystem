@@ -28,10 +28,17 @@ public class UserHandler implements HttpHandler {
             long userId = Long.parseLong(segs[2]);
             String action = segs[3];
             if (!"wrong".equals(action)) { Utils.send(exchange,404,"{\"error\":\"unknown action\"}"); return; }
-            List<UserAnswer> uas = DataStore.loadUserAnswers().stream().filter(a->a.getUserId() == userId && !a.isCorrect()).collect(Collectors.toList());
-            Set<Long> qids = uas.stream().map(a->a.getQuestionId()).collect(Collectors.toCollection(LinkedHashSet::new));
-            List<Question> qs = DataStore.loadQuestions().stream().filter(q->qids.contains(q.getId())).collect(Collectors.toList());
-            Utils.send(exchange,200, Utils.questionsToJson(qs));
+            // 数据库独立存储
+            com.hourai.prts.service.UserAnswerService uasvc = new com.hourai.prts.service.UserAnswerService();
+            com.hourai.prts.service.QuestionService qsvc = new com.hourai.prts.service.QuestionService();
+            try {
+                List<UserAnswer> uas = uasvc.getAllUserAnswers().stream().filter(a->a.getUserId() == userId && !a.isCorrect()).collect(Collectors.toList());
+                Set<Long> qids = uas.stream().map(a->a.getQuestionId()).collect(Collectors.toCollection(LinkedHashSet::new));
+                List<Question> qs = qsvc.getAllQuestions().stream().filter(q->qids.contains(q.getId())).collect(Collectors.toList());
+                Utils.send(exchange,200, Utils.questionsToJson(qs));
+            } catch (Exception e) {
+                Utils.send(exchange,500,"{\"error\":\"db error: "+Utils.escapeJson(e.getMessage())+"\"}");
+            }
         } catch (NumberFormatException nfe) {
             Utils.send(exchange,400,"{\"error\":\"invalid user id\"}");
         }

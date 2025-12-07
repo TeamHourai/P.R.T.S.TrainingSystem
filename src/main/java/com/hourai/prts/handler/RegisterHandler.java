@@ -26,24 +26,21 @@ public class RegisterHandler implements HttpHandler {
             Utils.send(exchange,400,"{\"error\":\"username & password required\"}");
             return;
         }
-        List<User> users = DataStore.loadUsers();
-        boolean exists = users.stream().anyMatch(u -> u.getUsername().equals(username));
-        if (exists) {
-            Utils.send(exchange,400,"{\"error\":\"username exists\"}");
-            return;
-        }
-        long id = DataStore.nextId(users);
-        User u = new User(id, username, password, false, Utils.now());
-        DataStore.appendUser(u);
-        // 自动修复：同步写入数据库
+        // 数据库独立存储
+        com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
         try {
-            com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
+            List<User> users = userService.getAllUsers();
+            boolean exists = users.stream().anyMatch(u -> u.getUsername().equals(username));
+            if (exists) {
+                Utils.send(exchange,400,"{\"error\":\"username exists\"}");
+                return;
+            }
+            // id由数据库自增
+            User u = new User(null, username, password, false, Utils.now());
             userService.register(u);
+            Utils.send(exchange,200,"{\"id\":"+u.getId()+",\"username\":\""+ Utils.escapeJson(username)+"\"}");
         } catch (Exception e) {
-            // 数据库写入失败也返回注册成功，但附加警告
-            Utils.send(exchange,200,"{\"id\":"+id+",\"username\":\""+ Utils.escapeJson(username)+"\",\"warning\":\"db write failed: "+Utils.escapeJson(e.getMessage())+"\"}");
-            return;
+            Utils.send(exchange,500,"{\"error\":\"db error: "+Utils.escapeJson(e.getMessage())+"\"}");
         }
-        Utils.send(exchange,200,"{\"id\":"+id+",\"username\":\""+ Utils.escapeJson(username)+"\"}");
     }
 }

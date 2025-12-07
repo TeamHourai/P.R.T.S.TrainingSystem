@@ -23,13 +23,19 @@ public class LoginHandler implements HttpHandler {
         Map<String,String> params = Utils.parseForm(exchange);
         String username = params.get("username");
         String password = params.get("password");
-        List<User> users = DataStore.loadUsers();
-        Optional<User> ou = users.stream().filter(u->u.getUsername().equals(username) && u.getPassword().equals(password)).findFirst();
-        if (ou.isPresent()) {
-            User u = ou.get();
-            Utils.send(exchange,200,"{\"id\":"+u.getId()+",\"username\":\""+ Utils.escapeJson(u.getUsername())+"\"}");
-        } else {
-            Utils.send(exchange,401,"{\"error\":\"invalid credentials\"}");
+        // 数据库校验
+        try {
+            com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
+            List<User> users = userService.getAllUsers();
+            Optional<User> ou = users.stream().filter(u->u.getUsername().equals(username) && u.getPassword().equals(password)).findFirst();
+            if (ou.isPresent()) {
+                User u = ou.get();
+                Utils.send(exchange,200,"{\"id\":"+u.getId()+",\"username\":\""+ Utils.escapeJson(u.getUsername())+"\"}");
+            } else {
+                Utils.send(exchange,401,"{\"error\":\"invalid credentials\"}");
+            }
+        } catch (Exception e) {
+            Utils.send(exchange,500,"{\"error\":\"db error: "+Utils.escapeJson(e.getMessage())+"\"}");
         }
     }
 }

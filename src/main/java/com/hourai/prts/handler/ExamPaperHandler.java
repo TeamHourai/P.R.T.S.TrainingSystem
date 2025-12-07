@@ -37,11 +37,15 @@ public class ExamPaperHandler implements HttpHandler {
                 }
             }
         }
-        List<Question> all = DataStore.loadQuestions();
-        // 打乱顺序
-        Collections.shuffle(all);
-        // 取前count题
-        List<Question> sel = all.size() <= count ? all : all.subList(0, count);
-        Utils.send(exchange, 200, Utils.questionsToJson(sel));
+        // 数据库独立存储
+        com.hourai.prts.service.QuestionService qsvc = new com.hourai.prts.service.QuestionService();
+        try {
+            List<Question> all = qsvc.getAllQuestions();
+            Collections.shuffle(all);
+            List<Question> sel = all.size() <= count ? all : all.subList(0, count);
+            Utils.send(exchange, 200, Utils.questionsToJson(sel));
+        } catch (Exception e) {
+            Utils.send(exchange,500,"{\"error\":\"db error: "+Utils.escapeJson(e.getMessage())+"\"}");
+        }
     }
 }

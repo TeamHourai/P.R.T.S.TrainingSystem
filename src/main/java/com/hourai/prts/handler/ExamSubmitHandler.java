@@ -30,38 +30,28 @@ public class ExamSubmitHandler implements HttpHandler {
         long userId;
         try { userId = Long.parseLong(userIdS); } catch (Exception e) { Utils.send(exchange,400,"{\"error\":\"userId invalid\"}"); return; }
         Map<Long,Integer> answers = Utils.parseAnswers(answersS);
-        List<Question> questions = DataStore.loadQuestions();
-        Map<Long, Question> qm = questions.stream().collect(java.util.stream.Collectors.toMap(q->q.getId(), q->q));
-        int score = 0;
-        List<UserAnswer> ualist = DataStore.loadUserAnswers();
-        long uaNext = DataStore.nextId(ualist);
-        for (Map.Entry<Long,Integer> e : answers.entrySet()){
-            Long qid = e.getKey(); Integer sel = e.getValue();
-            Question qObj = qm.get(qid);
-            boolean correct = qObj != null && qObj.getAnswer().equals(String.valueOf(sel));
-            if (correct) score += 1;
-            UserAnswer ua = new UserAnswer(uaNext++, userId, qid, "normal", correct, sel, Utils.now());
-            DataStore.appendUserAnswer(ua);
-            // 同步写入数据库
-            try {
-                com.hourai.prts.service.UserAnswerService uas = new com.hourai.prts.service.UserAnswerService();
-                uas.addUserAnswer(ua);
-            } catch (Exception ex) {
-                // 数据库写入失败，附加警告
-                // 可选：收集警告信息
-            }
-        }
-        List<ExamRecord> ers = DataStore.loadExamRecords();
-        long erId = DataStore.nextId(ers);
-        ExamRecord rec = new ExamRecord(erId, userId, score, Utils.now());
-        DataStore.appendExamRecord(rec);
-        // 同步写入数据库
+        // 数据库独立存储
+        com.hourai.prts.service.QuestionService qsvc = new com.hourai.prts.service.QuestionService();
+        com.hourai.prts.service.UserAnswerService uasvc = new com.hourai.prts.service.UserAnswerService();
+        com.hourai.prts.service.ExamRecordService ersvc = new com.hourai.prts.service.ExamRecordService();
         try {
-            com.hourai.prts.service.ExamRecordService ersvc = new com.hourai.prts.service.ExamRecordService();
+            List<Question> questions = qsvc.getAllQuestions();
+            Map<Long, Question> qm = questions.stream().collect(java.util.stream.Collectors.toMap(q->q.getId(), q->q));
+            int score = 0;
+            // id由数据库自增
+            for (Map.Entry<Long,Integer> e : answers.entrySet()){
+                Long qid = e.getKey(); Integer sel = e.getValue();
+                Question qObj = qm.get(qid);
+                boolean correct = qObj != null && qObj.getAnswer().equals(String.valueOf(sel));
+                if (correct) score += 1;
+                UserAnswer ua = new UserAnswer(null, userId, qid, "normal", correct, sel, Utils.now());
+                uasvc.addUserAnswer(ua);
+            }
+            ExamRecord rec = new ExamRecord(null, userId, score, Utils.now());
             ersvc.addExamRecord(rec);
-        } catch (Exception ex) {
-            // 数据库写入失败，附加警告
+            Utils.send(exchange,200,"{\"examId\":"+rec.getId()+",\"score\":"+score+"}");
+        } catch (Exception e) {
+            Utils.send(exchange,500,"{\"error\":\"db error: "+Utils.escapeJson(e.getMessage())+"\"}");
         }
-        Utils.send(exchange,200,"{\"examId\":"+erId+",\"score\":"+score+"}");
     }
 }

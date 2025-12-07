@@ -20,7 +20,13 @@ public class QuestionsHandler implements HttpHandler {
             Utils.send(exchange,405,"{\"error\":\"GET required\"}");
             return;
         }
-        List<Question> qs = DataStore.loadQuestions();
-        Utils.send(exchange,200, Utils.questionsToJson(qs));
+        // 数据库独立存储
+        com.hourai.prts.service.QuestionService qsvc = new com.hourai.prts.service.QuestionService();
+        try {
+            List<Question> qs = qsvc.getAllQuestions();
+            Utils.send(exchange,200, Utils.questionsToJson(qs));
+        } catch (Exception e) {
+            Utils.send(exchange,500,"{\"error\":\"db error: "+Utils.escapeJson(e.getMessage())+"\"}");
+        }
     }
 }

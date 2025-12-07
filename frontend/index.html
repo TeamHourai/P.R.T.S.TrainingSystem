@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>P.R.T.S. 前后端连接测试</title>
+    <style>
+        body { margin: 30px; font-size: 15px; font-family: Arial, sans-serif }
+        .container { margin: 12px 0; }
+        button { padding: 6px 12px; cursor: pointer; }
+        input, textarea { padding: 6px; }
+        #result { margin-top: 18px; padding: 10px; border: 1px solid #ccc; background: #fafafa; }
+        label { display: inline-block; width: 90px; }
+        /* 新增题目区域样式 */
+        #questions { margin-top: 12px; }
+        .question { padding:8px 6px; border-bottom:1px dashed #e6e6e6; }
+        .question-block { padding:8px 6px; border:1px solid #eee; margin-bottom:8px; background:#fff; }
+    </style>
+</head>
+<body>
+    <h1>P.R.T.S. 前后端连接测试</h1>
+
+    <div class="container">
+        <button onclick="ping()">Ping 后端</button>
+    </div>
+
+    <h3>注册</h3>
+    <div class="container">
+        <label>用户名</label><input id="reg_username" placeholder="username">
+        <label style="margin-left:10px">密码</label><input id="reg_password" placeholder="password" type="password">
+        <button onclick="registerUser()">注册</button>
+    </div>
+
+    <h3>登录</h3>
+    <div class="container">
+        <label>用户名</label><input id="login_username" placeholder="username">
+        <label style="margin-left:10px">密码</label><input id="login_password" placeholder="password" type="password">
+        <button onclick="loginUser()">登录</button>
+    </div>
+
+    <h3>题目与试卷</h3>
+    <div class="container">
+        <button onclick="getQuestions()">获取所有题目</button>
+        <label style="margin-left:10px">试卷题数</label><input id="paper_count" value="10" style="width:60px"> <button onclick="getExamPaper()">生成试卷</button>
+    </div>
+
+    <!-- 添加题目渲染容器（修复 renderQuestionList / renderExam 的 null 错误） -->
+    <div id="questions"></div>
+
+    <h3>提交试卷</h3>
+    <div class="container">
+        <label>userId</label><input id="submit_userId" placeholder="2" style="width:80px">
+        <label style="margin-left:10px">answers</label>
+        <input id="submit_answers" placeholder="1:3,2:2,3:1" style="width:360px">
+        <button onclick="submitExam()">提交</button>
+        <div style="margin-top:6px;color:#666">answers 格式: questionId:selectedOption,questionId:selectedOption</div>
+    </div>
+
+    <h3>用户错题</h3>
+    <div class="container">
+        <label>userId</label><input id="wrong_userId" placeholder="2" style="width:80px"> <button onclick="getUserWrongs()">获取错题</button>
+    </div>
+
+    <div id="result"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>

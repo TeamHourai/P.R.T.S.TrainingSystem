@@ -5,7 +5,7 @@ package com.hourai.prts;/*
   运行：
     java Main
 
-  启动后（端口 8080）：
+  启动后（端口 8888）：
     POST /register      username=xx&password=yy
     POST /login         username=xx&password=yy
     GET  /questions
@@ -23,18 +23,18 @@ public class Main {
     public static void main(String[] args) throws Exception {
         DataStore.ensureDataFiles();
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(8888), 0);
 
-        server.createContext("/register", new RegisterHandler());
-        server.createContext("/login", new LoginHandler());
-        server.createContext("/questions", new QuestionsHandler());
-        server.createContext("/exam/paper", new ExamPaperHandler());
-        server.createContext("/exam/submit", new ExamSubmitHandler());
-        server.createContext("/user", new UserHandler()); // handles /user/{id}/wrong
-        server.createContext("/ping", new PingHandler());
+        server.createContext("/register", new CorsFilter(new RegisterHandler()));
+        server.createContext("/login", new CorsFilter(new LoginHandler()));
+        server.createContext("/questions", new CorsFilter(new QuestionsHandler()));
+        server.createContext("/exam/paper", new CorsFilter(new ExamPaperHandler()));
+        server.createContext("/exam/submit", new CorsFilter(new ExamSubmitHandler()));
+        server.createContext("/user", new CorsFilter(new UserHandler())); // handles /user/{id}/wrong
+        server.createContext("/ping", new CorsFilter(new PingHandler()));
 
         server.setExecutor(null);
-        System.out.println("Server started at http://localhost:8080");
+        System.out.println("Server started at http://localhost:8888");
         server.start();
     }
 }

@@ -1,0 +1,342 @@
+/*
+ * /css/exam/responsive.css - 考试页面响应式适配
+ * 包含：所有媒体查询，移动端适配
+ */
+
+/* 大屏设备 (1024px以上) */
+@media (min-width: 1025px) {
+    .exam-container {
+        max-width: 1400px;
+    }
+
+    .answer-sheet {
+        position: sticky;
+        top: 100px;
+    }
+}
+
+/* 中等屏幕 (769px - 1024px) */
+@media (max-width: 1024px) {
+    .exam-container {
+        flex-direction: column;
+        max-width: 100%;
+    }
+
+    .question-area {
+        max-width: 100%;
+        margin-right: 0;
+    }
+
+    .answer-sheet {
+        position: static;
+        width: 100%;
+        margin-bottom: 20px;
+        order: -1;
+    }
+
+    .score-charts {
+        grid-template-columns: 1fr;
+    }
+
+    .result-actions {
+        flex-wrap: wrap;
+    }
+}
+
+/* 平板设备 (577px - 768px) */
+@media (max-width: 768px) {
+    .exam-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px 20px;
+    }
+
+    .exam-container {
+        padding: 15px;
+    }
+
+    .question-section {
+        padding: 20px;
+    }
+
+    .question-card {
+        padding: 20px;
+    }
+
+    .question-meta {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .result-card {
+        padding: 25px;
+    }
+
+    .score-details {
+        grid-template-columns: 1fr;
+    }
+
+    .result-actions {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .action-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .mobile-sheet-toggle {
+        display: flex;
+    }
+
+    .answer-sheet {
+        display: none;
+    }
+
+    .mobile-sheet-panel {
+        display: block;
+    }
+
+    .panel-content {
+        padding-bottom: 80px;
+        /* 为底部按钮留出空间 */
+    }
+
+    .question-review-items {
+        grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    }
+
+    .share-buttons {
+        flex-direction: column;
+    }
+
+    .share-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}
+
+/* 手机设备 (480px - 576px) */
+@media (max-width: 576px) {
+    .header-left h1 {
+        font-size: 1.5rem;
+    }
+
+    .timer {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+
+    .question-text {
+        font-size: 1rem;
+    }
+
+    .option {
+        padding: 12px 15px;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .option-label {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .option:hover {
+        transform: translateY(-2px);
+    }
+
+    .submit-btn {
+        padding: 14px 30px;
+        font-size: 1rem;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .question-number-item {
+        width: 35px;
+        height: 35px;
+        font-size: 0.9rem;
+    }
+
+    .score-value {
+        font-size: 2.5rem;
+    }
+
+    .review-summary {
+        flex-direction: column;
+    }
+
+    .summary-item {
+        min-width: 100%;
+    }
+
+    .modal-content {
+        margin: 10px;
+        max-height: 85vh;
+    }
+
+    .modal-header {
+        padding: 20px;
+    }
+
+    .modal-body {
+        padding: 20px;
+    }
+
+    .mobile-sheet-toggle {
+        bottom: 20px;
+        right: 20px;
+        width: 50px;
+        height: 50px;
+        font-size: 1.3rem;
+    }
+
+    .mobile-sheet-toggle .answered-count {
+        width: 20px;
+        height: 20px;
+        font-size: 0.7rem;
+    }
+}
+
+/* 小手机设备 (小于480px) */
+@media (max-width: 480px) {
+    .exam-header {
+        padding: 12px 15px;
+    }
+
+    .exam-container {
+        padding: 10px;
+    }
+
+    .question-section {
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+
+    .section-header h2 {
+        font-size: 1.3rem;
+    }
+
+    .question-card {
+        padding: 15px;
+    }
+
+    .result-card {
+        padding: 20px;
+    }
+
+    .result-header h1 {
+        font-size: 2rem;
+    }
+
+    .score-display {
+        padding: 20px;
+    }
+
+    .score-value {
+        font-size: 2rem;
+    }
+
+    .question-review-items {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+        gap: 8px;
+    }
+
+    .question-review-item {
+        padding: 8px 10px;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .review-number {
+        font-size: 0.9rem;
+    }
+
+    .review-status {
+        font-size: 0.8rem;
+    }
+
+    .panel-header h3 {
+        font-size: 1.3rem;
+    }
+
+    .question-grid-mobile .section-group {
+        margin-bottom: 20px;
+    }
+
+    .question-numbers {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+/* 横屏模式适配 */
+@media (max-height: 600px) and (orientation: landscape) {
+    .exam-header {
+        padding: 10px 20px;
+    }
+
+    .exam-container {
+        min-height: calc(100vh - 60px);
+    }
+
+    .question-section {
+        padding: 20px;
+        margin-bottom: 20px;
+    }
+
+    .question-card {
+        padding: 15px;
+        margin-bottom: 15px;
+    }
+
+    .mobile-sheet-panel {
+        max-height: 100vh;
+        overflow-y: auto;
+    }
+
+    .panel-content {
+        padding-bottom: 60px;
+    }
+}
+
+/* 打印样式 */
+@media print {
+
+    .exam-header,
+    .answer-sheet,
+    .mobile-sheet-toggle,
+    .mobile-sheet-panel,
+    .result-actions,
+    .result-share {
+        display: none !important;
+    }
+
+    .exam-container {
+        display: block;
+        max-width: 100%;
+        padding: 0;
+    }
+
+    .question-area {
+        max-width: 100%;
+    }
+
+    body {
+        background: white !important;
+        color: black !important;
+    }
+
+    .question-card,
+    .result-card {
+        box-shadow: none !important;
+        border: 1px solid #ddd !important;
+        break-inside: avoid;
+    }
+
+    .score-value {
+        color: black !important;
+    }
+}

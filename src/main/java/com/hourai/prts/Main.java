@@ -25,13 +25,32 @@ public class Main {
 
         HttpServer server = HttpServer.create(new InetSocketAddress(8888), 0);
 
-        server.createContext("/register", new CorsFilter(new RegisterHandler()));
-        server.createContext("/login", new CorsFilter(new LoginHandler()));
-        server.createContext("/questions", new CorsFilter(new QuestionsHandler()));
-        server.createContext("/exam/paper", new CorsFilter(new ExamPaperHandler()));
-        server.createContext("/exam/submit", new CorsFilter(new ExamSubmitHandler()));
-        server.createContext("/user", new CorsFilter(new UserHandler())); // handles /user/{id}/wrong
-        server.createContext("/ping", new CorsFilter(new PingHandler()));
+        // 用 HandlerRegistry.getWrapped(...) 统一获取已包裹 CORS 的 handler
+        server.createContext("/register", HandlerRegistry.getWrapped("register"));
+        server.createContext("/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/questions", HandlerRegistry.getWrapped("questions"));
+        server.createContext("/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
+        server.createContext("/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
+        server.createContext("/user", HandlerRegistry.getWrapped("user")); // handles /user/{id}/wrong
+        server.createContext("/ping", HandlerRegistry.getWrapped("ping"));
+
+        // ===== 为兼容前端，增加带 /api 和 /api/v1 前缀的路由 =====
+        server.createContext("/api/register", HandlerRegistry.getWrapped("register"));
+        server.createContext("/api/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/api/questions", HandlerRegistry.getWrapped("questions"));
+        server.createContext("/api/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
+        server.createContext("/api/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
+        server.createContext("/api/user", HandlerRegistry.getWrapped("user"));
+        server.createContext("/api/ping", HandlerRegistry.getWrapped("ping"));
+
+        server.createContext("/api/v1/register", HandlerRegistry.getWrapped("register"));
+        server.createContext("/api/v1/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/api/v1/questions", HandlerRegistry.getWrapped("questions"));
+        server.createContext("/api/v1/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
+        server.createContext("/api/v1/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
+        server.createContext("/api/v1/user", HandlerRegistry.getWrapped("user"));
+        server.createContext("/api/v1/ping", HandlerRegistry.getWrapped("ping"));
+        // ======================================================
 
         server.setExecutor(null);
         System.out.println("Server started at http://localhost:8888");

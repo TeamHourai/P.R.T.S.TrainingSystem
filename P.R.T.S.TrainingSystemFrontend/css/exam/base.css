@@ -1,0 +1,106 @@
+/*
+ * /css/exam/base.css - 考试模块基础样式
+ * 包含：考试专用变量、全局重置、基础元素样式
+ */
+
+/* 考试专用CSS变量 - 扩展全局变量 */
+:root {
+    /* 考试状态色 */
+    --exam-submitted: #43A047;
+    --exam-current: #FF7043;
+    --exam-answered: #4CAF50;
+    --exam-unanswered: #757575;
+
+    /* 计时器颜色 */
+    --time-critical: #F44336;
+    --time-warning: #FFA726;
+    --time-normal: #26A69A;
+}
+
+/* 考试全局重置 */
+.exam-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, rgba(30, 30, 60, 0.9) 0%, rgba(10, 10, 30, 0.95) 100%);
+    background-attachment: fixed;
+    background-size: cover;
+    font-family: 'Segoe UI', 'Microsoft YaHei', Tahoma, Geneva, Verdana, sans-serif;
+    line-height: 1.6;
+}
+
+/* 滚动条样式 - 考试页面专用 */
+.exam-wrapper::-webkit-scrollbar {
+    width: 10px;
+}
+
+.exam-wrapper::-webkit-scrollbar-track {
+    background: var(--bg-card-light);
+}
+
+.exam-wrapper::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 5px;
+}
+
+.exam-wrapper::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}
+
+/* 考试页面动画 */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.7;
+    }
+}
+
+@keyframes shake {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    10%,
+    30%,
+    50%,
+    70%,
+    90% {
+        transform: translateX(-5px);
+    }
+
+    20%,
+    40%,
+    60%,
+    80% {
+        transform: translateX(5px);
+    }
+}
+
+.exam-fade-in {
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.exam-pulse {
+    animation: pulse 2s infinite;
+}
+
+.exam-shake {
+    animation: shake 0.5s ease-in-out;
+}

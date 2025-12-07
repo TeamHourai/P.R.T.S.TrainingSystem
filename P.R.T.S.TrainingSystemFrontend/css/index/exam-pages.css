@@ -1,0 +1,217 @@
+/*
+ * exam-pages.css - 考试相关页面样式
+ * 包含：考试信息、答题页面、考试统计、认证、题目统计等考试功能
+ */
+
+/* 考试信息样式 */
+.exam-info {
+    margin: 30px auto;
+    max-width: 400px;
+    text-align: left;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.info-item:last-child {
+    border-bottom: none;
+}
+
+.info-item i {
+    width: 24px;
+    margin-right: 15px;
+    color: var(--primary-color);
+}
+
+/* 题源样式 */
+.question-source {
+    background: linear-gradient(135deg, var(--secondary-color), #26C6DA);
+    color: white;
+    padding: 12px 20px;
+    border-radius: var(--border-radius);
+    margin-bottom: 25px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 4px 12px rgba(38, 166, 154, 0.3);
+}
+
+.question-source i {
+    font-size: 1rem;
+}
+
+/* 答题页面样式 */
+.question-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.question-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    padding: 30px;
+    box-shadow: var(--shadow);
+    margin-bottom: 25px;
+    border: 1px solid var(--border-color);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.question-meta {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.question-text {
+    font-size: 1.2rem;
+    line-height: 1.7;
+    margin-bottom: 30px;
+    color: var(--text-primary);
+}
+
+.options-container {
+    margin-bottom: 30px;
+}
+
+.option {
+    display: flex;
+    align-items: flex-start;
+    padding: 18px 20px;
+    margin-bottom: 15px;
+    background: var(--bg-card-light);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+}
+
+.option:hover {
+    background: rgba(94, 53, 177, 0.1);
+    border-color: var(--primary-color);
+}
+
+.option.selected {
+    background: rgba(94, 53, 177, 0.2);
+    border-color: var(--primary-color);
+}
+
+.option.correct {
+    background: rgba(67, 160, 71, 0.2);
+    border-color: var(--success-color);
+}
+
+.option.wrong {
+    background: rgba(244, 67, 54, 0.2);
+    border-color: var(--wrong-color);
+}
+
+.option-label {
+    font-weight: 700;
+    margin-right: 15px;
+    min-width: 24px;
+    color: var(--primary-color);
+}
+
+.option-text {
+    flex: 1;
+    line-height: 1.6;
+}
+
+.navigation-buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.answer-analysis {
+    border-left: 5px solid var(--accent-color);
+}
+
+/* 考试相关样式 */
+.exam-card {
+    text-align: center;
+    padding: 60px 40px;
+}
+
+.exam-start-btn {
+    margin-top: 30px;
+    justify-content: center;
+}
+
+.exam-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin: 20px 0;
+    padding: 20px;
+    background: var(--bg-card-light);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+/* 题目统计样式 */
+.question-stats {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid var(--border-color);
+}
+
+.question-stats h4 {
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    text-align: center;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 15px;
+    margin-bottom: 15px;
+}
+
+.stats-grid .stat-item {
+    text-align: center;
+    padding: 15px;
+    background: var(--bg-card-light);
+    border-radius: var(--border-radius);
+    border: 1px solid var(--border-color);
+}
+
+.stats-grid .stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary-color);
+    margin-bottom: 5px;
+}
+
+.stats-grid .stat-label {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+}
+
+/* 认证相关样式 */
+.auth-btn {
+    width: 100%;
+    margin: 15px 0;
+    justify-content: center;
+}
+
+.auth-switch {
+    text-align: center;
+    cursor: pointer;
+    color: var(--primary-color);
+    font-weight: 500;
+    margin-top: 15px;
+    transition: var(--transition);
+}
+
+.auth-switch:hover {
+    color: var(--primary-light);
+}

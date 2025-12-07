@@ -4,9 +4,62 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="合并注释更改和数据库更新">
+    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="在未接入数据库中的分支中，添加简单的前端示例代码，成功测试了前后端的连接">
+      <change afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/.vscode/c_cpp_properties.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/base.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/components.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/layout.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/question.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/responsive.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/result.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/全真模拟页CSS规范.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/admin.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/base.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/components.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/exam-pages.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/layout.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/responsive.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/search-pages.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/study-pages.css" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/首页CSS规范.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/API规范.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/admin.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/answer.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/exam.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/export.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/notifications.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/question.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/request.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/stats.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/system.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/upload.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/user.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/apiapp.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/auth-manager.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/config.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/PRTS.TRAININGSYSTEM.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/users.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/users.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/testfrontend/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/testfrontend/index.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/ExamRecord.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/ExamRecord.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/Question.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/Question.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/User.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/UserAnswer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/UserAnswer.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamSubmitHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamSubmitHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/PingHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/PingHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/RegisterHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/RegisterHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/UserHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/UserHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/utils/Utils.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/utils/Utils.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -39,31 +92,37 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;ASKED_SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;D:/Code/Java/big work/new/P.R.T.S.TrainingSystem&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;settings.sync&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "ASKED_SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "ModuleVcsDetector.initialDetectionPerformed": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
+    "git-widget-placeholder": "main",
+    "kotlin-language-version-configured": "true",
+    "last_opened_file_path": "D:/新建文件夹/cc/P.R.T.S.TrainingSystem",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "settings.editor.selected.configurable": "settings.sync",
+    "vue.rearranger.settings.migration": "true",
+    "应用程序.Main.executor": "Run"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;DatabaseDriversLRU&quot;: [
-      &quot;mysql&quot;,
-      &quot;sqlserver&quot;
+  "keyToStringList": {
+    "DatabaseDriversLRU": [
+      "mysql",
+      "sqlserver"
     ]
   }
-}</component>
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="D:\新建文件夹\cc\P.R.T.S.TrainingSystem" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <module name="P.R.T.S.TrainingSystem" />

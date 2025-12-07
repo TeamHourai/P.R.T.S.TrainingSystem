@@ -1,0 +1,271 @@
+/*
+ * /css/exam/question.css - 题目显示与交互样式
+ * 包含：题目卡片、选项、元数据、答案分析等
+ */
+
+/* 题目卡片样式 */
+.question-card {
+    background: var(--bg-card-light);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+}
+
+.question-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+/* 题目元数据 */
+.question-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.question-number {
+    font-weight: 600;
+    color: var(--text-primary);
+    font-size: 1.1rem;
+}
+
+.question-difficulty {
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+}
+
+.question-difficulty.easy {
+    color: var(--success-color);
+}
+
+.question-difficulty.medium {
+    color: var(--warning-color);
+}
+
+.question-difficulty.hard {
+    color: var(--error-color);
+}
+
+.question-points {
+    color: var(--accent-color);
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* 题目文本 */
+.question-text {
+    font-size: 1.1rem;
+    line-height: 1.7;
+    margin-bottom: 25px;
+    color: var(--text-primary);
+}
+
+.question-text pre {
+    background: var(--bg-card);
+    padding: 15px;
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+    margin: 15px 0;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+}
+
+.question-text code {
+    background: var(--bg-card);
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 0.9em;
+    color: var(--accent-color);
+}
+
+/* 题目图片 */
+.question-image {
+    max-width: 100%;
+    margin: 20px 0;
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    display: block;
+}
+
+.question-image-container {
+    text-align: center;
+    margin: 20px 0;
+}
+
+.image-caption {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* 选项容器 */
+.options-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* 选项样式 */
+.option {
+    display: flex;
+    align-items: flex-start;
+    padding: 15px 20px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    border: 2px solid transparent;
+    user-select: none;
+}
+
+.option:hover {
+    background: var(--primary-dark);
+    transform: translateX(5px);
+}
+
+.option.selected {
+    border-color: var(--primary-color);
+    background: rgba(94, 53, 177, 0.2);
+}
+
+.option.correct {
+    border-color: var(--success-color);
+    background: rgba(67, 160, 71, 0.2);
+}
+
+.option.wrong {
+    border-color: var(--error-color);
+    background: rgba(244, 67, 54, 0.2);
+}
+
+.option.user-selected {
+    border-color: var(--accent-color);
+    background: rgba(255, 112, 67, 0.2);
+}
+
+/* 选项标签 */
+.option-label {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card-light);
+    margin-right: 15px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+.option.selected .option-label,
+.option.correct .option-label {
+    background: var(--primary-color);
+    color: white;
+}
+
+.option.wrong .option-label {
+    background: var(--error-color);
+    color: white;
+}
+
+.option.user-selected .option-label {
+    background: var(--accent-color);
+    color: white;
+}
+
+/* 选项文本 */
+.option-text {
+    flex: 1;
+    line-height: 1.6;
+    color: var(--text-primary);
+}
+
+.option-text img {
+    max-width: 100%;
+    border-radius: 8px;
+    margin-top: 10px;
+    box-shadow: var(--shadow);
+}
+
+/* 提交区域 */
+.submit-section {
+    text-align: center;
+    margin-top: 40px;
+    padding: 30px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+}
+
+/* 答案分析 */
+.answer-analysis {
+    margin-top: 30px;
+    padding: 20px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    border-left: 4px solid var(--primary-color);
+    animation: fadeInUp 0.5s ease-out;
+}
+
+.answer-analysis h4 {
+    font-size: 1.2rem;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.answer-analysis-content {
+    color: var(--text-secondary);
+    line-height: 1.7;
+}
+
+.answer-analysis-content p {
+    margin-bottom: 15px;
+}
+
+.answer-analysis-content ul,
+.answer-analysis-content ol {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.answer-analysis-content li {
+    margin-bottom: 8px;
+}
+
+.user-answer {
+    margin-top: 15px;
+    padding: 12px 16px;
+    background: var(--bg-card-light);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--accent-color);
+}
+
+.user-answer strong {
+    color: var(--accent-color);
+}
+
+.correct-answer {
+    margin-top: 15px;
+    padding: 12px 16px;
+    background: rgba(67, 160, 71, 0.1);
+    border-radius: var(--border-radius);
+    border-left: 3px solid var(--success-color);
+}
+
+.correct-answer strong {
+    color: var(--success-color);
+}

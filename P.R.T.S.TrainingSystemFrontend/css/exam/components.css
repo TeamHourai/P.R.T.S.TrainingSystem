@@ -1,0 +1,280 @@
+/*
+ * /css/exam/components.css - 考试专用组件
+ * 包含：计时器、按钮、答题卡题目项、切换按钮等
+ */
+
+/* 计时器组件 */
+.timer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    background: var(--bg-card-light);
+    padding: 10px 20px;
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.timer.critical {
+    background: var(--time-critical);
+    color: white;
+    animation: exam-pulse 1s infinite;
+}
+
+.timer.warning {
+    background: var(--time-warning);
+    color: white;
+}
+
+.timer.normal {
+    background: var(--time-normal);
+    color: white;
+}
+
+/* 时间信息组件 */
+.time-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.time-elapsed,
+.time-remaining {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.time-remaining {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.time-info-mobile {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* 按钮组件 */
+.submit-btn {
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 16px 40px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.1rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    transition: var(--transition);
+    box-shadow: 0 4px 12px rgba(94, 53, 177, 0.3);
+}
+
+.submit-btn:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(94, 53, 177, 0.4);
+}
+
+.submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* 操作按钮 */
+.action-btn {
+    padding: 14px 28px;
+    border-radius: var(--border-radius);
+    border: none;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.action-btn.primary {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(94, 53, 177, 0.3);
+}
+
+.action-btn.primary:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(94, 53, 177, 0.4);
+}
+
+.action-btn.secondary {
+    background: var(--bg-card-light);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.action-btn.secondary:hover {
+    background: var(--bg-card);
+    transform: translateY(-2px);
+}
+
+/* 答题卡题目项组件 */
+.question-number-item {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--bg-card-light);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 600;
+    color: var(--text-secondary);
+    border: 2px solid transparent;
+}
+
+.question-number-item:hover {
+    background: var(--primary-dark);
+    color: white;
+}
+
+.question-number-item.answered {
+    background: var(--exam-answered);
+    color: white;
+}
+
+.question-number-item.current {
+    border-color: var(--exam-current);
+    background: var(--bg-card-light);
+    color: var(--exam-current);
+    box-shadow: 0 0 0 2px rgba(255, 112, 67, 0.3);
+}
+
+.question-number-item.unanswered {
+    background: var(--exam-unanswered);
+    color: white;
+}
+
+.question-number-item.flagged {
+    background: var(--warning-color);
+    color: white;
+}
+
+/* 移动端答题卡切换按钮 */
+.mobile-sheet-toggle {
+    display: none;
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--primary-color);
+    color: white;
+    box-shadow: var(--shadow-lg);
+    cursor: pointer;
+    z-index: 1500;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    transition: var(--transition);
+}
+
+.mobile-sheet-toggle:hover {
+    background: var(--primary-dark);
+    transform: scale(1.1);
+}
+
+.mobile-sheet-toggle .answered-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--accent-color);
+    color: white;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+/* 关闭按钮组件 */
+.close-panel,
+.close-modal {
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: var(--transition);
+}
+
+.close-panel:hover,
+.close-modal:hover {
+    background: var(--bg-card-light);
+}
+
+/* 模态框组件 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    z-index: 4000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    width: 100%;
+    max-width: 800px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: var(--shadow-lg);
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 25px 30px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    background: var(--bg-card);
+    z-index: 10;
+}
+
+.modal-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.modal-body {
+    padding: 30px;
+}

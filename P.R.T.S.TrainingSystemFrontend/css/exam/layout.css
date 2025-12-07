@@ -1,0 +1,191 @@
+/*
+ * /css/exam/layout.css - 考试页面布局结构
+ * 包含：头部、容器、答题区域、答题卡区域布局
+ */
+
+/* 考试头部布局 */
+.exam-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: var(--bg-card);
+    box-shadow: var(--shadow);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.header-left {
+    flex: 1;
+}
+
+.header-left h1 {
+    font-size: 1.8rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 5px;
+}
+
+.header-left p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* 考试容器布局 */
+.exam-container {
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 20px;
+    position: relative;
+    min-height: calc(100vh - 80px);
+}
+
+/* 答题区域布局 */
+.question-area {
+    flex: 1;
+    max-width: 900px;
+    min-width: 0;
+    /* 防止flex item溢出 */
+}
+
+.question-section {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+}
+
+.section-header {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.section-header h2 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+}
+
+.section-header p {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+/* 答题卡区域布局 */
+.answer-sheet {
+    width: 300px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+    height: fit-content;
+    position: sticky;
+    top: 100px;
+}
+
+.sheet-header {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.sheet-header h3 {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin-bottom: 15px;
+    color: var(--text-primary);
+}
+
+.sheet-content {
+    padding: 20px;
+}
+
+/* 移动端答题卡面板布局 */
+.mobile-sheet-panel {
+    display: none;
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-card);
+    z-index: 2000;
+    transform: translateX(100%);
+    transition: var(--transition);
+    overflow-y: auto;
+}
+
+.mobile-sheet-panel.active {
+    transform: translateX(0);
+}
+
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    background: var(--bg-card);
+    z-index: 10;
+}
+
+.panel-header h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+}
+
+.panel-content {
+    padding: 20px;
+}
+
+/* 成绩页面布局 */
+.result-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-dark);
+    z-index: 3000;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.result-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    padding: 40px;
+    box-shadow: var(--shadow-lg);
+}
+
+.result-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.result-header h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 15px;
+}
+
+.result-header p {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+}

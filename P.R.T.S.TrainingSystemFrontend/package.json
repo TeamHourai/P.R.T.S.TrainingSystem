@@ -1,0 +1,53 @@
+{
+    "name": "prts-frontend",
+    "version": "2.0.0",
+    "description": "明日方舟博士考核系统前端 - 多页面应用",
+    "author": "Java大作业小组——蓬莱人形",
+    "license": "MIT",
+    "private": true,
+    "scripts": {
+        "dev": "http-server . -p 8888 -c-1 --proxy http://localhost:8889?",
+        "api": "json-server --watch db.json --port 8889",
+        "dev:full": "concurrently \"npm run api\" \"npm run dev\"",
+        "build": "echo '多页面应用，无需构建，直接部署即可'",
+        "deploy": "echo '部署到服务器'",
+        "format": "prettier --write \"**/*.{js,html,css}\" --ignore-path .prettierignore",
+        "lint": "eslint js/**/*.js --fix",
+        "clean": "rm -rf node_modules",
+        "test": "echo '无测试配置'",
+        "start": "npm run dev:full"
+    },
+    "dependencies": {
+        "axios": "^1.6.0"
+    },
+    "devDependencies": {
+        "http-server": "^14.1.1",
+        "json-server": "^1.0.0-alpha.23",
+        "concurrently": "^8.2.2",
+        "prettier": "^3.0.3",
+        "eslint": "^8.53.0"
+    },
+    "browserslist": [
+        "> 1%",
+        "last 2 versions",
+        "not ie <= 11"
+    ],
+    "engines": {
+        "node": ">=14.0.0",
+        "npm": ">=6.0.0"
+    },
+    "keywords": [
+        "arknights",
+        "exam",
+        "training-system",
+        "multi-page"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/by-be-young/P.R.T.S.TrainingSystemFrontend.git"
+    },
+    "bugs": {
+        "url": "https://github.com/by-be-young/P.R.T.S.TrainingSystemFrontend/issues"
+    },
+    "homepage": "https://github.com/by-be-young/P.R.T.S.TrainingSystemFrontend#readme"
+}

@@ -1,0 +1,85 @@
+/* 
+ * base.css - 基础样式与变量定义
+ * 包含：全局重置、CSS自定义属性（变量）、基础元素样式、动画效果
+ * 这是所有样式的基础，应首先加载
+ */
+
+/* 全局样式重置与优化 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* CSS自定义属性（设计变量） */
+:root {
+    /* 主色调 - 深蓝紫色系 */
+    --primary-color: #5E35B1;
+    --primary-dark: #4527A0;
+    --primary-light: #7E57C2;
+    --secondary-color: #26A69A;
+    --accent-color: #FF7043;
+    --success-color: #43A047;
+    --warning-color: #FFA726;
+    --wrong-color: #F44336;
+
+    /* 背景和文字色 */
+    --bg-dark: #121212;
+    --bg-card: #1E1E2E;
+    --bg-card-light: #2A2A3A;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B0B0C0;
+    --text-muted: #888899;
+    --border-color: rgba(255, 255, 255, 0.1);
+
+    /* 效果变量 */
+    --border-radius: 12px;
+    --border-radius-lg: 20px;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+/* 基础元素样式 */
+body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', Tahoma, Geneva, Verdana, sans-serif;
+    background:
+        linear-gradient(135deg, rgba(30, 30, 60, 0.9) 0%, rgba(10, 10, 30, 0.95) 100%),
+        url('../images/bg-3.png') no-repeat center center fixed;
+    background-size: cover;
+    background-attachment: fixed;
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 滚动条样式 */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--bg-card-light);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-dark);
+}

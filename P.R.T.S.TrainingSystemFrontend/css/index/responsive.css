@@ -1,0 +1,219 @@
+/*
+ * responsive.css - 响应式设计适配
+ * 包含：所有媒体查询，针对不同屏幕尺寸的样式调整
+ * 注意：此文件应最后加载，以覆盖前面的样式
+ */
+
+/* 平板电脑和中等屏幕 (max-width: 1024px) */
+@media (max-width: 1024px) {
+    .sidebar {
+        transform: translateX(-100%);
+    }
+
+    .sidebar.active {
+        transform: translateX(0);
+    }
+
+    .main-content {
+        margin-left: 0;
+    }
+
+    .mobile-menu-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .dashboard-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quickjump-container {
+        grid-template-columns: 1fr;
+    }
+
+    .categories-container {
+        grid-template-columns: 1fr;
+    }
+
+    .update-container {
+        flex-direction: column;
+        height: auto;
+        max-height: 70vh;
+    }
+
+    .updates-content {
+        flex-direction: column;
+    }
+
+    .version-list {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--border-color);
+        max-height: 150px;
+    }
+
+    .version-list {
+        display: flex;
+        overflow-x: auto;
+    }
+
+    .version-item {
+        min-width: 120px;
+        border-bottom: none;
+        border-right: 1px solid var(--border-color);
+    }
+}
+
+/* 手机和小屏幕 (max-width: 768px) */
+@media (max-width: 768px) {
+    .results-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .search-input-section {
+        padding: 20px;
+    }
+
+    .search-input {
+        font-size: 1rem;
+        padding: 15px 50px 15px 20px;
+    }
+
+    .result-card {
+        padding: 20px;
+    }
+
+    .result-meta {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+
+    .result-footer {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+
+    .result-action-btn {
+        align-self: stretch;
+        justify-content: center;
+    }
+
+    .tips-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .search-tips-section {
+        padding: 25px;
+    }
+
+    .main-content {
+        padding: 15px 10px;
+    }
+
+    .exam-stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .quickjump-btn,
+    .exam-start-btn,
+    .auth-btn {
+        padding: 12px 20px;
+    }
+
+    .delete-question-btn {
+        display: flex;
+        top: -4px;
+        right: -4px;
+        width: 18px;
+        height: 18px;
+        font-size: 0.6rem;
+    }
+
+    .page-title {
+        font-size: 1.8rem;
+    }
+
+    .page-subtitle {
+        font-size: 1rem;
+    }
+
+    .card-title {
+        font-size: 1.3rem;
+    }
+
+    .card-description {
+        font-size: 0.9rem;
+    }
+
+    .question-text {
+        font-size: 1.1rem;
+    }
+
+    .option-text {
+        font-size: 0.95rem;
+    }
+
+    .nav-btn {
+        font-size: 0.9rem;
+        padding: 12px 20px;
+    }
+
+    .category-title {
+        font-size: 1.1rem;
+    }
+
+    .meta-tag {
+        font-size: 0.85rem;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+    }
+
+    .back-btn {
+        align-self: stretch;
+        justify-content: center;
+    }
+
+    .wrong-controls {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+
+    .wrong-stats {
+        justify-content: center;
+    }
+
+    .navigation-buttons {
+        flex-direction: column;
+    }
+
+    .question-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .modal-content {
+        margin: 10px;
+    }
+
+    .modal-header {
+        padding: 20px;
+    }
+
+    .tips-content,
+    .updates-content {
+        padding: 20px;
+    }
+}

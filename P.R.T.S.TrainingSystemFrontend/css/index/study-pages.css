@@ -1,0 +1,275 @@
+/*
+ * study-pages.css - 学习相关页面样式
+ * 包含：仪表盘、分类管理、练习选项、错题管理、培训控制等学习功能
+ */
+
+/* 仪表盘样式 */
+.dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 25px;
+    margin-top: 20px;
+}
+
+/* 分类样式 */
+.categories-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 25px;
+}
+
+.category-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: var(--transition);
+    animation: fadeIn 0.5s ease-out;
+}
+
+.category-card:hover {
+    transform: translateY(-5px);
+    box-shadow: var(--shadow-lg);
+}
+
+.category-header {
+    padding: 25px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+}
+
+.category-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.category-count {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+}
+
+/* 练习选项样式 */
+.mode-selector {
+    display: flex;
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: 10px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+}
+
+.mode-option {
+    flex: 1;
+    text-align: center;
+    padding: 15px;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    font-weight: 500;
+}
+
+.mode-option.active {
+    background: var(--primary-color);
+    color: white;
+    box-shadow: 0 4px 12px rgba(94, 53, 177, 0.3);
+}
+
+/* 入职培训控制按钮 */
+.training-controls {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+/* 快速跳题容器 */
+.quickjump-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+}
+
+.quickjump-card {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    padding: 40px;
+    box-shadow: var(--shadow);
+    text-align: center;
+    border: 1px solid var(--border-color);
+}
+
+.quickjump-btn {
+    width: 100%;
+    justify-content: center;
+}
+
+/* 错题辑录控制区域 */
+.wrong-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    padding: 20px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow);
+}
+
+.wrong-stats {
+    display: flex;
+    gap: 30px;
+}
+
+/* 问题网格样式 */
+.questions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    gap: 12px;
+    padding: 25px;
+}
+
+.training-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+}
+
+.question-item {
+    position: relative;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    border: 2px solid transparent;
+}
+
+.question-item:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.question-item:hover .delete-question-btn {
+    display: flex;
+}
+
+/* 系统公告按钮样式 */
+.update-notice-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, var(--accent-color), #FF5722);
+    color: white;
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition);
+    margin-bottom: 15px;
+    font-weight: 500;
+    box-shadow: 0 4px 12px rgba(255, 112, 67, 0.3);
+}
+
+.update-notice-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 112, 67, 0.4);
+}
+
+.update-notice-btn i {
+    font-size: 1.1rem;
+}
+
+/* 系统公告模态框内容 */
+.update-container {
+    display: flex;
+    height: 500px;
+    flex-direction: column;
+}
+
+.tips-content {
+    padding: 30px;
+    overflow-y: auto;
+    height: 100%;
+}
+
+.updates-content {
+    display: flex;
+    height: 100%;
+}
+
+.tips-content h4,
+.update-content h4 {
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    color: var(--text-primary);
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 10px;
+}
+
+.content-text {
+    line-height: 1.7;
+    color: var(--text-secondary);
+}
+
+.content-text h5 {
+    color: var(--text-primary);
+    margin: 20px 0 10px;
+    font-size: 1.1rem;
+}
+
+.content-text ul {
+    margin-left: 20px;
+    margin-bottom: 15px;
+}
+
+.content-text li {
+    margin-bottom: 8px;
+}
+
+/* 版本列表 */
+.version-list {
+    width: 200px;
+    border-right: 1px solid var(--border-color);
+    overflow-y: auto;
+    background: var(--bg-card-light);
+}
+
+.version-item {
+    padding: 20px;
+    border-bottom: 1px solid var(--border-color);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.version-item:hover {
+    background: var(--bg-card-light);
+}
+
+.version-item.active {
+    background: var(--primary-color);
+    color: white;
+}
+
+.version-number {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-bottom: 5px;
+}
+
+.version-date {
+    font-size: 0.85rem;
+    opacity: 0.8;
+}
+
+.update-content {
+    flex: 1;
+    padding: 30px;
+    overflow-y: auto;
+}

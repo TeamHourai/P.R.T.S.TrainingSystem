@@ -33,22 +33,22 @@
             return http.put(`/notifications/${notificationId}/read`);
         },
 
-        // 标记所有通知已读
+        // 【UPD1.1-1】标记所有通知已读
         markAllAsRead: function () {
             return http.put('/notifications/read-all');
         },
 
-        // 删除通知
+        // 【UPD1.1-2】删除单个通知
         deleteNotification: function (notificationId) {
             return http.delete(`/notifications/${notificationId}`);
         },
 
-        // 清空所有通知
+        // 【UPD1.1-3】清空所有通知
         clearAllNotifications: function () {
             return http.delete('/notifications');
         },
 
-        // 获取未读通知数量
+        // 【UPD1.1-4】获取未读通知数量
         getUnreadCount: function () {
             return http.get('/notifications/unread-count');
         }

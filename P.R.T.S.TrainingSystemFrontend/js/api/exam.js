@@ -6,21 +6,22 @@
         return;
     }
 
+    // 统一API前缀
+    const BASE = ((window.API_BASE_URL && String(window.API_BASE_URL)) || 'http://localhost:8888').replace(/\/+$/, '');
+    const API_PREFIX = BASE + '/api/v1';
+
     // 考试管理 API
     window.examApi = {
-        // 【考试模块-18】生成考试试卷（改为 GET /exam/paper?count=...）
+        // 【考试模块-18】生成考试试卷
         generateExamPaper: function (questionCount = 25) {
-            // 使用后端已实现的 /exam/paper
-            return http.get('/exam/paper', { count: questionCount }).catch(() => {
+            return http.get(`${API_PREFIX}/exam/paper`, { count: questionCount }).catch(() => {
                 // 兼容旧接口
                 return http.post('/exams/generate', { questionCount }).catch(() => Promise.resolve([]));
             });
         },
 
-        // 【考试模块-19】提交考试答案（改为 form POST 到 /exam/submit）
-        // 参数：userId（必需或可为空），answers（可以是字符串 "qid:opt,..." 或对象/数组）
+        // 【考试模块-19】提交考试答案
         submitExamAnswers: function (userId, answers) {
-            // 规范化 answers 为字符串
             let answersStr = '';
             if (typeof answers === 'string') answersStr = answers;
             else if (Array.isArray(answers)) answersStr = answers.join(',');
@@ -30,7 +31,7 @@
             if (userId) body.append('userId', userId);
             body.append('answers', answersStr);
 
-            return fetch((window.API_BASE_URL || 'http://localhost:8888') + '/exam/submit', {
+            return fetch(`${API_PREFIX}/exam/submit`, {
                 method: 'POST',
                 mode: 'cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -47,17 +48,17 @@
 
         // 【考试模块-20】获取考试历史
         getExamHistory: function (params = {}) {
-            return http.get('/exams/history', { page: params.page || 1, size: params.size || 10 }).catch(() => Promise.resolve([]));
+            return http.get(`${API_PREFIX}/exam/history`, { page: params.page || 1, size: params.size || 10 }).catch(() => Promise.resolve([]));
         },
 
         // 【考试模块-21】获取考试详情
         getExamResult: function (examId) {
-            return http.get(`/exams/${examId}`).catch(() => Promise.resolve(null));
+            return http.get(`${API_PREFIX}/exam/${examId}`).catch(() => Promise.resolve(null));
         },
 
         // 【考试模块-22】获取考试排行榜
         getExamLeaderboard: function (type = 'all', limit = 10) {
-            return http.get('/exams/leaderboard', { type, limit }).catch(() => Promise.resolve([]));
+            return http.get(`${API_PREFIX}/exams/leaderboard`, { type, limit }).catch(() => Promise.resolve([]));
         }
     };
 

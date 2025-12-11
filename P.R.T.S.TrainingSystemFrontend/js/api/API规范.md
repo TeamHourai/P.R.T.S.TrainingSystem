@@ -433,17 +433,11 @@
 ## 🏆 考试模块
 
 ### 18. 生成考试试卷
-- **接口**: `POST /exams/generate`
+- **接口**: `GET /api/v1/exam/paper`
 - **描述**: 生成新的考试试卷
 - **请求头**: `Authorization: Bearer {token}`
-- **请求体**:
-```json
-{
-  "type": "full",           // full: 全真模拟
-  "questionCount": 25,      // 题目数量
-  "timeLimit": 900          // 时间限制（秒）
-}
-```
+- **查询参数**:
+  - `count`: 题目数量（如25）
 - **响应**:
 ```json
 {
@@ -473,20 +467,14 @@
 ```
 
 ### 19. 提交考试答案
-- **接口**: `POST /exams/{examId}/submit`
+- **接口**: `POST /api/v1/exam/submit`
 - **描述**: 提交整场考试的答案
 - **请求头**: `Authorization: Bearer {token}`
 - **请求体**:
 ```json
 {
-  "answers": [
-    {
-      "examQuestionId": 1,
-      "selectedOption": 3,
-      "timeSpent": 45
-    }
-  ],
-  "submitTime": "2024-01-01T10:14:30Z"
+  "userId": 1,
+  "answers": "1:3,2:2,3:1" // 或数组/对象，后端支持多种格式
 }
 ```
 - **响应**:
@@ -529,7 +517,7 @@
 ```
 
 ### 20. 获取考试历史
-- **接口**: `GET /exams/history`
+- **接口**: `GET /api/v1/exam/history`
 - **描述**: 获取用户的考试历史
 - **请求头**: `Authorization: Bearer {token}`
 - **查询参数**:
@@ -577,13 +565,13 @@
 ```
 
 ### 21. 获取考试详情
-- **接口**: `GET /exams/{examId}`
+- **接口**: `GET /api/v1/exam/{examId}`
 - **描述**: 获取考试详情和答案解析
 - **请求头**: `Authorization: Bearer {token}`
 - **响应**: 同考试提交响应
 
 ### 22. 获取考试排行榜
-- **接口**: `GET /exams/leaderboard`
+- **接口**: `GET /api/v1/exams/leaderboard`
 - **描述**: 获取考试排行榜
 - **查询参数**:
   - `type`: 排行榜类型（daily/weekly/monthly/all，默认all）
@@ -927,6 +915,71 @@
 }
 ```
 
+---
+
+### 【UPD1.1-1】标记所有通知已读
+- **接口**: `PUT /notifications/read-all`
+- **描述**: 标记所有通知为已读
+- **请求头**: `Authorization: Bearer {token}`
+- **响应**:
+```json
+{
+  "code": 200,
+  "message": "全部标记成功",
+  "data": {
+    "readCount": 10,
+    "readAt": "2024-01-01T12:00:00Z"
+  }
+}
+```
+
+### 【UPD1.1-2】删除通知
+- **接口**: `DELETE /notifications/{id}`
+- **描述**: 删除指定通知
+- **请求头**: `Authorization: Bearer {token}`
+- **响应**:
+```json
+{
+  "code": 200,
+  "message": "删除成功",
+  "data": {
+    "notificationId": 1,
+    "deletedAt": "2024-01-01T12:00:00Z"
+  }
+}
+```
+
+### 【UPD1.1-3】清空所有通知
+- **接口**: `DELETE /notifications`
+- **描述**: 清空所有通知
+- **请求头**: `Authorization: Bearer {token}`
+- **响应**:
+```json
+{
+  "code": 200,
+  "message": "全部通知已清空",
+  "data": {
+    "deletedCount": 10,
+    "deletedAt": "2024-01-01T12:00:00Z"
+  }
+}
+```
+
+### 【UPD1.1-4】获取未读通知数量
+- **接口**: `GET /notifications/unread-count`
+- **描述**: 获取未读通知数量
+- **请求头**: `Authorization: Bearer {token}`
+- **响应**:
+```json
+{
+  "code": 200,
+  "message": "获取成功",
+  "data": {
+    "unreadCount": 3
+  }
+}
+```
+
 ## 📄 导出模块
 
 ### 33. 导出答题记录
@@ -971,7 +1024,7 @@
 ## 🚀 工具接口
 
 ### 35. 健康检查
-- **接口**: `GET /health`
+- **接口**: `GET /ping`
 - **描述**: 检查服务是否正常
 - **响应**:
 ```json
@@ -1020,11 +1073,11 @@
 | 统计模块 | 3 | 用户、题目、系统统计 |
 | 系统管理 | 3 | 用户管理、系统配置 |
 | 文件上传 | 2 | 图片、头像上传 |
-| 通知模块 | 2 | 通知获取、标记已读 |
+| 通知模块 | 6 | 通知获取、标记已读、删除、清空、获取未读数量 |
 | 导出模块 | 2 | 数据导出 |
 | 工具接口 | 2 | 健康检查、系统信息 |
 
-**总计：36个接口**
+**总计：38个接口**
 
 ## 🔧 注意事项
 

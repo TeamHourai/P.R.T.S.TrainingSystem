@@ -35,21 +35,24 @@ public class Main {
         server.createContext("/ping", HandlerRegistry.getWrapped("ping"));
 
         // ===== 为兼容前端，增加带 /api 和 /api/v1 前缀的路由 =====
-        server.createContext("/api/register", HandlerRegistry.getWrapped("register"));
-        server.createContext("/api/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/api/auth/register", HandlerRegistry.getWrapped("register"));
+        server.createContext("/api/auth/login", HandlerRegistry.getWrapped("login"));
         server.createContext("/api/questions", HandlerRegistry.getWrapped("questions"));
         server.createContext("/api/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
         server.createContext("/api/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
         server.createContext("/api/user", HandlerRegistry.getWrapped("user"));
         server.createContext("/api/ping", HandlerRegistry.getWrapped("ping"));
 
-        server.createContext("/api/v1/register", HandlerRegistry.getWrapped("register"));
-        server.createContext("/api/v1/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/api/v1/auth/register", HandlerRegistry.getWrapped("register"));
+        server.createContext("/api/v1/auth/login", HandlerRegistry.getWrapped("login"));
         server.createContext("/api/v1/questions", HandlerRegistry.getWrapped("questions"));
         server.createContext("/api/v1/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
         server.createContext("/api/v1/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
         server.createContext("/api/v1/user", HandlerRegistry.getWrapped("user"));
         server.createContext("/api/v1/ping", HandlerRegistry.getWrapped("ping"));
+
+        server.createContext("/api/v1/training/questions", HandlerRegistry.getWrapped("questions"));
+
         // ======================================================
 
         server.setExecutor(null);

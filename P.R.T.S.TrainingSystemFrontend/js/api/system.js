@@ -10,11 +10,11 @@
     window.systemApi = {
         // 【工具接口-35】健康检查
         healthCheck: function () {
-            return http.get('/health', {}, { showLoading: false })
+            return http.get('/ping', {}, { showLoading: false })
                 .then(data => {
-                    console.log('服务健康状态:', data);
+                    // 返回后端原始数据，并附加客户端时间戳
                     return {
-                        ...data,
+                        status: data.status || 'UP',
                         timestamp: new Date().toISOString(),
                         clientTime: Date.now()
                     };

@@ -24,6 +24,9 @@
         sessionStorage.removeItem('userInfo');
     };
 
+    // 统一API前缀
+    const API_PREFIX = ((window.API_BASE_URL && String(window.API_BASE_URL)) || 'http://localhost:8080').replace(/\/+$/, '') + '/api/v1';
+
     // 用户认证和资料管理 API
     window.userApi = {
         // 【认证模块-1】用户注册
@@ -56,7 +59,7 @@
             body.append('password', password);
             if (email) body.append('email', email);
 
-            return fetch((window.API_BASE_URL || 'http://localhost:8080') + '/register', {
+            return fetch((window.API_BASE_URL || 'http://localhost:8080') + '/api/v1/auth/register', {
                 method: 'POST',
                 mode: 'cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -102,7 +105,7 @@
             body.append('username', username);
             body.append('password', password);
 
-            return fetch((window.API_BASE_URL || 'http://localhost:8080') + '/login', {
+            return fetch((window.API_BASE_URL || 'http://localhost:8080') + '/api/v1/auth/login', {
                 method: 'POST',
                 mode: 'cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -146,13 +149,13 @@
                     });
             }
 
-            // 降级：尝试 /user/me 或 /user/{id} 或返回 null
+            // 降级：/api/v1/auth/profile
             const token = getToken();
             if (!token) return Promise.resolve(null);
 
             // 尝试 /user/me
             const base = (window.API_BASE_URL || 'http://localhost:8080');
-            return fetch(base + '/user/me', { method: 'GET', mode: 'cors', headers: { 'Authorization': 'Bearer ' + token } })
+            return fetch(base + '/api/v1/auth/profile', { method: 'GET', mode: 'cors', headers: { 'Authorization': 'Bearer ' + token } })
                 .then(async resp => {
                     if (!resp.ok) {
                         // 尝试 /user/{id} 需要从本地 userInfo 读取
@@ -176,7 +179,7 @@
 
         // 【认证模块-4】用户退出登录
         logout: function () {
-            return http.post('/auth/logout')
+            return http.post('/api/v1/auth/logout')
                 .then(() => {
                     removeAuthData();
                     console.log('退出登录成功');

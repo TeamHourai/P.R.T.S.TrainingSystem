@@ -1,4 +1,3 @@
-
 package com.hourai.prts.data;
 
 import java.io.IOException;
@@ -175,14 +174,36 @@ public class DataStore {
      * 遍历列表中的每个实体，获取其ID字段的值
      * 找出最大ID值并返回其加一作为下一个可用ID
      */
-    public static long nextId(List<?> list) {
+    public static synchronized long nextId(List<?> list) {
         long max = 0;
+        if (list == null || list.isEmpty()) return 1;
         for (Object o : list) {
+            if (o == null) continue;
             try {
-                // 获取最大ID值
-                long id = (long) o.getClass().getField("id").get(o);
-                if (id > max) max = id;
+                // 优先尝试 public getId() 方法
+                try {
+                    java.lang.reflect.Method m = o.getClass().getMethod("getId");
+                    Object v = m.invoke(o);
+                    if (v instanceof Number) {
+                        long id = ((Number) v).longValue();
+                        if (id > max) max = id;
+                        continue;
+                    }
+                } catch (NoSuchMethodException ignored) { }
+
+                // 其次尝试访问声明字段 "id"（可访问 private）
+                try {
+                    java.lang.reflect.Field f = o.getClass().getDeclaredField("id");
+                    f.setAccessible(true);
+                    Object v = f.get(o);
+                    if (v instanceof Number) {
+                        long id = ((Number) v).longValue();
+                        if (id > max) max = id;
+                        continue;
+                    }
+                } catch (NoSuchFieldException ignored) { }
             } catch (Exception ignored) {
+                // 单个读取错误忽略，继续下一个对象
             }
         }
         return max + 1;

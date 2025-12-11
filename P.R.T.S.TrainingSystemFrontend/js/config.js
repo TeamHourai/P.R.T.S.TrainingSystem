@@ -399,7 +399,7 @@
         const hostname = window.location.hostname;
 
         if (hostname === 'localhost' || hostname === '127.0.0.1') {
-            return 'http://localhost:8888';
+            return 'http://localhost:8080';
         } else if (hostname.includes('test.')) {
             return 'https://test-api.arknights-exam.com';
         } else if (hostname.includes('staging.')) {

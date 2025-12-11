@@ -4,7 +4,7 @@
     // 创建 axios 实例
     const service = axios.create({
         // 将 baseURL 改为后端地址优先（避免默认 '/api' 指向静态服务器）
-        baseURL: (window.API_BASE_URL || 'http://localhost:8888'),
+        baseURL: (window.API_BASE_URL || 'http://localhost:8080'),
         timeout: 15000,
         headers: {
             'Content-Type': 'application/json;charset=UTF-8'

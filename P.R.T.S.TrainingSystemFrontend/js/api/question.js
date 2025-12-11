@@ -22,7 +22,7 @@
     // Helper：使用 fetch 强制以 UTF-8 解码 JSON 响应，避免后端未声明 charset 导致乱码
     function fetchJsonUtf8(path, params = {}) {
         // 处理 query string（简单处理）
-        const urlBase = (window.API_BASE_URL || 'http://localhost:8888').replace(/\/+$/, '');
+        const urlBase = (window.API_BASE_URL || 'http://localhost:8080').replace(/\/+$/, '');
         const url = new URL(path, urlBase);
         Object.keys(params || {}).forEach(k => {
             if (params[k] !== undefined && params[k] !== null) url.searchParams.set(k, params[k]);

@@ -56,7 +56,7 @@
             body.append('password', password);
             if (email) body.append('email', email);
 
-            return fetch((window.API_BASE_URL || 'http://localhost:8888') + '/register', {
+            return fetch((window.API_BASE_URL || 'http://localhost:8080') + '/register', {
                 method: 'POST',
                 mode: 'cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -102,7 +102,7 @@
             body.append('username', username);
             body.append('password', password);
 
-            return fetch((window.API_BASE_URL || 'http://localhost:8888') + '/login', {
+            return fetch((window.API_BASE_URL || 'http://localhost:8080') + '/login', {
                 method: 'POST',
                 mode: 'cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -151,7 +151,7 @@
             if (!token) return Promise.resolve(null);
 
             // 尝试 /user/me
-            const base = (window.API_BASE_URL || 'http://localhost:8888');
+            const base = (window.API_BASE_URL || 'http://localhost:8080');
             return fetch(base + '/user/me', { method: 'GET', mode: 'cors', headers: { 'Authorization': 'Bearer ' + token } })
                 .then(async resp => {
                     if (!resp.ok) {

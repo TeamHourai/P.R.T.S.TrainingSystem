@@ -30,7 +30,7 @@
             if (userId) body.append('userId', userId);
             body.append('answers', answersStr);
 
-            return fetch((window.API_BASE_URL || 'http://localhost:8888') + '/exam/submit', {
+            return fetch((window.API_BASE_URL || 'http://localhost:8080') + '/exam/submit', {
                 method: 'POST',
                 mode: 'cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

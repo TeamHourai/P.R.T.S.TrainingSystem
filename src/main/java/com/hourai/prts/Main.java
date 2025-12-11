@@ -5,7 +5,7 @@ package com.hourai.prts;/*
   运行：
     java Main
 
-  启动后（端口 8888）：
+  启动后（端口 8080）：
     POST /register      username=xx&password=yy
     POST /login         username=xx&password=yy
     GET  /questions
@@ -23,7 +23,7 @@ public class Main {
     public static void main(String[] args) throws Exception {
         DataStore.ensureDataFiles();
 
-        HttpServer server = HttpServer.create(new InetSocketAddress(8888), 0);
+        HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
 
         // 用 HandlerRegistry.getWrapped(...) 统一获取已包裹 CORS 的 handler
         server.createContext("/register", HandlerRegistry.getWrapped("register"));
@@ -53,7 +53,7 @@ public class Main {
         // ======================================================
 
         server.setExecutor(null);
-        System.out.println("Server started at http://localhost:8888");
+        System.out.println("Server started at http://localhost:8080");
         server.start();
     }
 }

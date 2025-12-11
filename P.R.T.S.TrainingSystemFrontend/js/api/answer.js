@@ -23,7 +23,7 @@
             if (examId) body.append('examId', examId);
             if (timeSpent) body.append('timeSpent', String(timeSpent));
 
-            return fetch((window.API_BASE_URL || 'http://localhost:8888') + '/exam/submit', {
+            return fetch((window.API_BASE_URL || 'http://localhost:8080') + '/exam/submit', {
                 method: 'POST',
                 mode: 'cors',
                 headers: { 'Content-Type': 'application/x-www-form-urlencoded' },

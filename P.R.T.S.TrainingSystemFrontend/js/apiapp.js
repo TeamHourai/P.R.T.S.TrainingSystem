@@ -8,7 +8,7 @@
     }
 
     // 统一API前缀，优先使用 window.API_BASE_URL（由 config.js 设置），否则回退到后端默认端口
-    const BASE = ((window.API_BASE_URL && String(window.API_BASE_URL)) || 'http://localhost:8888').replace(/\/+$/, '');
+    const BASE = ((window.API_BASE_URL && String(window.API_BASE_URL)) || 'http://localhost:8080').replace(/\/+$/, '');
     // 后端 Main.java 在根路径注册接口（并兼容 /api 与 /api/v1）
     const API_PREFIX = BASE;
 

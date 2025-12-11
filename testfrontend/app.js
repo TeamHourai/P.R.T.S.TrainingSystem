@@ -1,5 +1,5 @@
 // 固定后端地址（移除自动探测）
-const BASE_URL = "http://localhost:8888";
+const BASE_URL = "http://localhost:8080";
 
 // ping 后端，检查在线状态（直接请求固定 BASE_URL）
 function pingServer() {

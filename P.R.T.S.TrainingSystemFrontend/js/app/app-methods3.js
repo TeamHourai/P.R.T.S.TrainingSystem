@@ -60,6 +60,37 @@ window._appMethods3 = {
         }
         this.wrongCategories = newCategories;
     },
+    // ================= 入职培训相关辅助函数 =================
+    // 训练题目格子颜色：如果已答对 -> 绿色，答错 -> 红色，未答过 -> 灰色
+    getTrainingQuestionColor(id) {
+        const rec = this.trainingRecords[id];
+        if (!rec) return '#efefef';
+        if (rec.correct) return '#43A047';
+        return '#F44336';
+    },
+    // 清除培训本地记录
+    clearTrainingRecords() {
+        if (confirm('确定要清除所有入职培训练习记录吗？')) {
+            this.trainingRecords = {};
+            localStorage.removeItem('trainingRecords');
+            this.showSuccess('已清除入职培训记录');
+        }
+    },
+    // 保存单题培训记录到本地
+    saveTrainingRecord(questionId, correct) {
+        const now = Date.now();
+        const prev = this.trainingRecords[questionId] || { attempts: 0, correct: false, lastAt: 0 };
+        prev.attempts = (prev.attempts || 0) + 1;
+        prev.correct = correct || prev.correct;
+        prev.lastAt = now;
+        this.$set(this.trainingRecords, questionId, prev);
+        try {
+            localStorage.setItem('trainingRecords', JSON.stringify(this.trainingRecords));
+        } catch (e) {
+            console.warn('无法写入 trainingRecords 到 localStorage', e);
+        }
+    },
+
     toggleSidebar() {
         this.sidebarOpen = !this.sidebarOpen;
     },
@@ -156,6 +187,15 @@ window._appMethods3 = {
             return;
         }
         this.showAnswer = true;
+        // 如果是培训题目，把结果保存到本地 trainingRecords
+        const isCorrect = this.currentQuestion && this.selectedOption === this.currentQuestion.answer;
+        if (this.questionMode === 'training') {
+            try {
+                this.saveTrainingRecord(this.currentQuestion.id, !!isCorrect);
+            } catch (e) {
+                console.warn('保存培训记录失败', e);
+            }
+        }
         if (window.answerApi && this.isLoggedIn) {
             await answerApi.submitAnswer(
                 this.currentQuestion.id,
@@ -200,4 +240,3 @@ window._appMethods3 = {
         }
     }
 };
-

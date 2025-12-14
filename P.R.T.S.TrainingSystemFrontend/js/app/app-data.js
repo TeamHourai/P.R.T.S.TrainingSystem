@@ -8,6 +8,8 @@ window._appData = {
     wrongCategories: {},
     rawQuestions: [],
     trainingQuestions: [],
+    // 培训答题本地记录： { [id]: { attempts: number, correct: boolean, lastAt: timestamp } }
+    trainingRecords: {},
     // 当前答题状态
     currentQuestion: null,
     currentQuestionIndex: 0,
@@ -54,4 +56,3 @@ window._appData = {
     confirmMessage: '',
     confirmAction: null,
 };
-

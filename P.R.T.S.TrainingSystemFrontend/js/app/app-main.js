@@ -17,6 +17,15 @@ new Vue({
             await this.checkLoginStatus();
             await this.loadQuestions();
             await this.loadTrainingQuestions();
+            // 从 localStorage 恢复入职培训记录（如果有）
+            try {
+                const raw = localStorage.getItem('trainingRecords');
+                if (raw) {
+                    this.trainingRecords = JSON.parse(raw);
+                }
+            } catch (e) {
+                console.warn('恢复 trainingRecords 失败', e);
+            }
             this.updateCategories();
             await this.loadExamStats();
             this.loadSystemData();
@@ -38,4 +47,3 @@ new Vue({
         }
     }
 });
-

@@ -4,11 +4,20 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="在未接入数据库分支中，把端口更改为8080，同时数据文件中前面的userid会随着注册用户而递增">
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-3.png" afterDir="false" />
+    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="完善了系统公告界面">
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/notification.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/trainingQuestionApi.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-computed.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-main.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods1.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods2.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-watch.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/answer.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/answer.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -183,7 +192,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765448688580</updated>
     </task>
-    <option name="localTasksCounter" value="11" />
+    <task id="LOCAL-00011" summary="完善了系统公告界面">
+      <option name="closed" value="true" />
+      <created>1765703647234</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1765703647234</updated>
+    </task>
+    <option name="localTasksCounter" value="12" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -245,7 +262,8 @@
     <MESSAGE value="合并注释更改和数据库更新" />
     <MESSAGE value="上传了正式前端，现在在不加数据库的情况下实现了前后端的连接，用户注册和登陆的功能，无法成功答题，答案显示为乱码，无法保存错题" />
     <MESSAGE value="在未接入数据库分支中，把端口更改为8080，同时数据文件中前面的userid会随着注册用户而递增" />
-    <option name="LAST_COMMIT_MESSAGE" value="在未接入数据库分支中，把端口更改为8080，同时数据文件中前面的userid会随着注册用户而递增" />
+    <MESSAGE value="完善了系统公告界面" />
+    <option name="LAST_COMMIT_MESSAGE" value="完善了系统公告界面" />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

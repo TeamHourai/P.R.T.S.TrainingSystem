@@ -5,17 +5,19 @@
 
 /* 题目卡片样式 */
 .question-card {
-    background: var(--bg-card-light);
-    border-radius: var(--border-radius);
+    background: var(--bg-card-light, #23234a);
+    border-radius: var(--border-radius, 16px);
     padding: 25px;
     margin-bottom: 20px;
-    box-shadow: var(--shadow);
-    transition: var(--transition);
+    box-shadow: 0 4px 24px 0 rgba(30,30,60,0.12), 0 1.5px 4px 0 rgba(30,30,60,0.10);
+    transition: box-shadow 0.2s, transform 0.2s;
+    z-index: 1;
+    position: relative;
 }
 
 .question-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 8px 32px 0 rgba(30,30,60,0.18), 0 2px 8px 0 rgba(30,30,60,0.12);
 }
 
 /* 题目元数据 */

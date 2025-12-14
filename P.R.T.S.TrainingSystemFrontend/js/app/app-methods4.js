@@ -3,6 +3,33 @@ window._appMethods4 = {
     prevQuestion() {
         // ...existing code...
         if (this.questionMode === 'practice') {
+            // 如果已建立 practiceContext，则在分组内/组间导航
+            const ctx = this.practiceContext || {};
+            if (ctx && Array.isArray(ctx.groups) && ctx.groups.length > 0) {
+                let g = ctx.currentGroupIndex || 0;
+                let i = ctx.indexInGroup || 0;
+                if (i > 0) {
+                    i--;
+                } else if (g > 0) {
+                    g--;
+                    i = (ctx.groups[g].questions.length || 1) - 1;
+                } else {
+                    // 已经是该分类的第一题，保持不变
+                    this.showInfo('已经是本分类的第一题了');
+                    return;
+                }
+                const q = ctx.groups[g].questions[i];
+                if (q) {
+                    this.practiceContext.currentGroupIndex = g;
+                    this.practiceContext.indexInGroup = i;
+                    this.loadQuestionForDisplay(q, 'practice');
+                    // 更新 global index
+                    this.currentQuestionIndex = this.rawQuestions.findIndex(r=>r.id===q.id);
+                    this.resetQuestionState();
+                }
+                return;
+            }
+            // 兜底回退到原有行为
             if (this.currentQuestionIndex > 0) {
                 this.currentQuestionIndex--;
                 const question = this.rawQuestions[this.currentQuestionIndex];
@@ -29,11 +56,48 @@ window._appMethods4 = {
             if (prevId !== null) {
                 this.goToWrongQuestion(prevId);
             }
+        } else if (this.questionMode === 'search') {
+            // 在搜索练习模式下使用 searchResults 和 searchCurrentIndex
+            if (Array.isArray(this.searchResults) && this.searchCurrentIndex > 0) {
+                this.searchCurrentIndex--;
+                const q = this.searchResults[this.searchCurrentIndex];
+                if (q) {
+                    this.loadQuestionForDisplay(q, 'practice');
+                    this.resetQuestionState();
+                }
+            }
         }
     },
     nextQuestion() {
         // ...existing code...
         if (this.questionMode === 'practice') {
+            // 使用 practiceContext（若存在）进行分组内/组间导航
+            const ctx = this.practiceContext || {};
+            if (ctx && Array.isArray(ctx.groups) && ctx.groups.length > 0) {
+                let g = ctx.currentGroupIndex || 0;
+                let i = ctx.indexInGroup || 0;
+                if (i < (ctx.groups[g].questions.length - 1)) {
+                    i++;
+                } else if (g < ctx.groups.length - 1) {
+                    // 移动到下一组的第一题
+                    g++;
+                    i = 0;
+                } else {
+                    this.showInfo('已经是本分类的最后一题了');
+                    return;
+                }
+                const q = ctx.groups[g].questions[i];
+                if (q) {
+                    this.practiceContext.currentGroupIndex = g;
+                    this.practiceContext.indexInGroup = i;
+                    this.loadQuestionForDisplay(q, 'practice');
+                    // 更新 global index
+                    this.currentQuestionIndex = this.rawQuestions.findIndex(r=>r.id===q.id);
+                    this.resetQuestionState();
+                }
+                return;
+            }
+            // 兜底：按全局ID顺序导航
             if (this.currentQuestionIndex < this.rawQuestions.length - 1) {
                 this.currentQuestionIndex++;
                 const question = this.rawQuestions[this.currentQuestionIndex];
@@ -41,21 +105,21 @@ window._appMethods4 = {
                 this.resetQuestionState();
             }
         } else if (this.questionMode === 'random') {
-            const doneQuestions = [...this.randomHistory];
-            const availableQuestions = this.rawQuestions.filter(
-                q => !doneQuestions.includes(q.id)
-            );
-            if (availableQuestions.length > 0) {
-                const randomIndex = Math.floor(Math.random() * availableQuestions.length);
-                const nextQuestion = availableQuestions[randomIndex];
-                this.randomHistory.push(nextQuestion.id);
-                this.randomCurrentIndex = this.randomHistory.length - 1;
-                this.loadQuestionForDisplay(nextQuestion, 'random');
-                this.resetQuestionState();
-            } else {
-                this.showInfo('所有题目都已练习过！');
-            }
-        } else if (this.questionMode === 'training') {
+             const doneQuestions = [...this.randomHistory];
+             const availableQuestions = this.rawQuestions.filter(
+                 q => !doneQuestions.includes(q.id)
+             );
+             if (availableQuestions.length > 0) {
+                 const randomIndex = Math.floor(Math.random() * availableQuestions.length);
+                 const nextQuestion = availableQuestions[randomIndex];
+                 this.randomHistory.push(nextQuestion.id);
+                 this.randomCurrentIndex = this.randomHistory.length - 1;
+                 this.loadQuestionForDisplay(nextQuestion, 'random');
+                 this.resetQuestionState();
+             } else {
+                 this.showInfo('所有题目都已练习过！');
+             }
+         } else if (this.questionMode === 'training') {
             const nextId = this.getNextTrainingQuestion();
             if (nextId !== null) {
                 this.goToTrainingQuestion(nextId);
@@ -68,6 +132,18 @@ window._appMethods4 = {
                 this.goToWrongQuestion(nextId);
             } else {
                 this.showInfo('已经是最后一题了！');
+            }
+        } else if (this.questionMode === 'search') {
+            // 搜索练习：移动到 searchResults 的下一题
+            if (Array.isArray(this.searchResults) && this.searchCurrentIndex < this.searchResults.length - 1) {
+                this.searchCurrentIndex++;
+                const q = this.searchResults[this.searchCurrentIndex];
+                if (q) {
+                    this.loadQuestionForDisplay(q, 'practice');
+                    this.resetQuestionState();
+                }
+            } else {
+                this.showInfo('已经是搜索结果中的最后一题了！');
             }
         }
     },
@@ -167,9 +243,30 @@ window._appMethods4 = {
             }
             return false;
         });
+        // 当搜索结果产生变化且当前处于 search 模式时，保持 searchCurrentIndex 在合理范围
+        if (this.questionMode === 'search') {
+            if (!Array.isArray(this.searchResults) || this.searchResults.length === 0) {
+                this.searchCurrentIndex = -1;
+            } else if (this.searchCurrentIndex >= this.searchResults.length) {
+                this.searchCurrentIndex = this.searchResults.length - 1;
+            }
+        }
     },
     goToSearchResult(questionId) {
-        this.goToQuestion(questionId, 'practice');
+        // 通过搜索结果进入：启用 special search 模式，该模式下 prev/next/返回行为不同
+        const idx = this.searchResults.findIndex(q => q.id === questionId);
+        if (idx === -1) {
+            // 兜底：如果未在当前 searchResults 中，尝试在 rawQuestions 中查找
+            this.goToQuestion(questionId, 'practice');
+            return;
+        }
+        this.questionMode = 'search';
+        this.searchCurrentIndex = idx;
+        const q = this.searchResults[idx];
+        this.loadQuestionForDisplay(q, 'practice');
+        this.currentPage = 'question';
+        this.selectedOption = null;
+        this.showAnswer = false;
     },
     truncateQuestion(question) {
         if (!question) return '';
@@ -242,6 +339,14 @@ window._appMethods4 = {
         window.location.href = 'exam.html';
     },
     goBackFromQuestion() {
+        // 如果当前是从搜索结果进入的练习（search 模式），返回搜索页面并保留搜索关键字与结果
+        if (this.questionMode === 'search') {
+            this.currentPage = 'search';
+            // 不重置 searchResults 或 searchKeyword；保留 searchCurrentIndex
+            // 清除 questionMode，防止返回后误以为仍在搜索答题模式
+            this.questionMode = '';
+            return;
+        }
         if (this.questionMode === 'practice') {
             this.currentPage = 'practice';
         } else if (this.questionMode === 'random' || this.questionMode === 'jump') {
@@ -414,4 +519,3 @@ window._appMethods4 = {
         this.showConfirmDialog = false;
     }
 };
-

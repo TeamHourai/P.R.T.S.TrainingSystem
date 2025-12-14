@@ -39,6 +39,15 @@ window._appData = {
     // 搜索相关
     searchKeyword: '',
     searchResults: [],
+    // 当前在搜索练习中的索引（-1 表示未在搜索练习中）
+    searchCurrentIndex: -1,
+    // 题库练习上下文（用于实现按分类/区跳题）
+    practiceContext: {
+        categoryKey: '', // 例如 'type_1' 或 'difficulty_2'
+        groups: [],      // [{ key: subgroupValue, questions: [q,...] }, ...]
+        currentGroupIndex: 0,
+        indexInGroup: 0
+    },
     // 系统公告
     showSystemNotice: false,
     systemNoticeTab: 'all',

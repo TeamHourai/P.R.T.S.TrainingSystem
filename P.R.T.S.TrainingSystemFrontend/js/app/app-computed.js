@@ -13,6 +13,8 @@ window._appComputed = {
         } else if (this.questionMode === 'wrong') {
             const prevId = this.getPrevWrongQuestion();
             return prevId !== null;
+        } else if (this.questionMode === 'search') {
+            return Array.isArray(this.searchResults) && this.searchCurrentIndex > 0;
         }
         return false;
     },
@@ -31,6 +33,8 @@ window._appComputed = {
         } else if (this.questionMode === 'wrong') {
             const nextId = this.getNextWrongQuestion();
             return nextId !== null;
+        } else if (this.questionMode === 'search') {
+            return Array.isArray(this.searchResults) && this.searchCurrentIndex < this.searchResults.length - 1;
         }
         return false;
     },

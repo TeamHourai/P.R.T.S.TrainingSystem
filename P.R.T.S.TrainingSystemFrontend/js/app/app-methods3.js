@@ -104,8 +104,9 @@ window._appMethods3 = {
         } else if (page === 'wrong') {
             this.updateWrongCategories();
         } else if (page === 'search') {
-            this.searchKeyword = '';
-            this.searchResults = [];
+            // 保持搜索关键字与结果，不在此处清空
+            // this.searchKeyword = '';
+            // this.searchResults = [];
         }
         if (window.innerWidth < 768) {
             this.sidebarOpen = false;
@@ -117,9 +118,77 @@ window._appMethods3 = {
         const question = this.rawQuestions.find(q => q.id === id);
         if (question) {
             this.loadQuestionForDisplay(question, mode);
+            // 如果是从题库练习进入，构建 practiceContext：按主分类（practiceMode）以及次级分组（另一维度）组织题目
             if (mode === 'practice') {
+                try {
+                    // 找到被点击题目所在的 category key
+                    let foundKey = null;
+                    Object.keys(this.categories || {}).forEach(k => {
+                        const cat = this.categories[k];
+                        if (cat && Array.isArray(cat.questions) && cat.questions.some(q => q.id === id)) {
+                            foundKey = k;
+                        }
+                    });
+                    // 如果未找到，则尝试根据 current practiceMode 推断
+                    if (!foundKey) {
+                        foundKey = this.practiceMode === 'type' ? `type_${question.type}` : `difficulty_${question.difficulty}`;
+                    }
+                    const groups = [];
+                    // 构建 groups：优先保留 category.questions 中子分组出现的顺序
+                    const cat = this.categories[foundKey] || { questions: [] };
+                    const seen = new Set();
+                    const subgroupKeys = [];
+                    if (this.practiceMode === 'type') {
+                        // 次级维度为 difficulty
+                        for (const q of cat.questions) {
+                          const k = q.difficulty;
+                          if (!seen.has(k)) { seen.add(k); subgroupKeys.push(k); }
+                        }
+                        // 按 subgroupKeys 顺序收集每组的题，保留 category.questions 的顺序
+                        for (const k of subgroupKeys) {
+                          const qs = cat.questions.filter(q => q.difficulty === k).slice();
+                          if (qs.length > 0) groups.push({ key: k, questions: qs });
+                        }
+                    } else {
+                        // practiceMode === 'difficulty' 次级为 type
+                        for (const q of cat.questions) {
+                          const k = q.type;
+                          if (!seen.has(k)) { seen.add(k); subgroupKeys.push(k); }
+                        }
+                        for (const k of subgroupKeys) {
+                          const qs = cat.questions.filter(q => q.type === k).slice();
+                          if (qs.length > 0) groups.push({ key: k, questions: qs });
+                        }
+                    }
+                    // 找到当前题在 groups 中的位置
+                    let gIndex = -1, idxInGrp = -1;
+                    for (let gi = 0; gi < groups.length; gi++) {
+                        const arr = groups[gi].questions;
+                        const pos = arr.findIndex(q=>q.id===id);
+                        if (pos !== -1) { gIndex = gi; idxInGrp = pos; break; }
+                    }
+                    if (gIndex === -1) {
+                        // 兜底：把题放到第一个分组
+                        if (groups.length===0) {
+                            groups.push({ key: this.practiceMode==='type'?question.type:question.difficulty, questions:[question] });
+                            gIndex = 0; idxInGrp = 0;
+                        } else {
+                            gIndex = 0; idxInGrp = 0;
+                        }
+                    }
+                    this.practiceContext = {
+                        categoryKey: foundKey,
+                        groups: groups,
+                        currentGroupIndex: gIndex,
+                        indexInGroup: idxInGrp
+                    };
+                } catch (e) {
+                    console.warn('构建 practiceContext 失败', e);
+                    this.practiceContext = { categoryKey: '', groups: [], currentGroupIndex: 0, indexInGroup: 0 };
+                }
                 this.currentQuestionIndex = this.rawQuestions.findIndex(q => q.id === id);
-            } else if (mode === 'random') {
+            }
+            if (mode === 'random') {
                 this.randomHistory.push(id);
                 this.randomCurrentIndex = this.randomHistory.length - 1;
             }

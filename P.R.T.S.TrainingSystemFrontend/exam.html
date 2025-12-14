@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>博士业务能力考核 - 随机试卷</title>
+    <link rel="stylesheet" href="css/exam.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-config.js"></script>
+    <script src="js/database.js"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+</head>
+
+<body>
+    <div id="app">
+        <!-- 顶部导航 -->
+        <div class="exam-header">
+            <div class="header-left">
+                <h1>博士业务能力考核</h1>
+                <p>随机试卷测试</p>
+            </div>
+            <div class="header-right">
+                <div class="timer">
+                    <i class="fas fa-clock"></i>
+                    <span>{{ formattedTime }}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="exam-container">
+            <!-- 答题区域 -->
+            <div class="question-area">
+                <div class="question-section" v-for="(section, sectionIndex) in examPaper" :key="sectionIndex">
+                    <div class="section-header">
+                        <h2>第{{ sectionIndex + 1 }}部分：{{ section.typeName }}</h2>
+                        <p>本部分共{{ section.questions.length }}题，每题难度递增</p>
+                    </div>
+
+                    <div class="question-card" v-for="(question, qIndex) in section.questions" :key="question.id"
+                        :data-question-number="getQuestionNumber(sectionIndex, qIndex)">
+                        <div class="question-meta">
+                            <span class="question-number">第{{ getQuestionNumber(sectionIndex, qIndex) }}题</span>
+                            <span class="question-difficulty">难度: {{ question.difficultyText }}</span>
+                        </div>
+
+                        <div class="question-text">
+                            <p v-html="question.question"></p>
+                            <img v-if="question.picture" :src="'./images/' + question.id + '.png'"
+                                :alt="'题目' + question.id + '图片'" class="question-image">
+                        </div>
+
+                        <div class="options-container">
+                            <div v-for="(option, index) in question.options" :key="index"
+                                :class="['option', { 'selected': question.userAnswer === index + 1 }]"
+                                @click="selectOption(question.id, index + 1)">
+                                <span class="option-label">{{ String.fromCharCode(65 + index) }}</span>
+                                <span class="option-text" v-html="option"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="submit-section">
+                    <button class="submit-btn" @click="submitExam">
+                        <i class="fas fa-paper-plane"></i> 提交试卷
+                    </button>
+                </div>
+            </div>
+
+            <!-- 答题卡区域 -->
+            <div class="answer-sheet">
+                <div class="sheet-header">
+                    <h3>答题卡</h3>
+                    <div class="time-info">
+                        <div class="time-elapsed">
+                            <i class="fas fa-hourglass-start"></i>
+                            <span>已用: {{ formatTime(elapsedTime) }}</span>
+                        </div>
+                        <div class="time-remaining">
+                            <i class="fas fa-hourglass-end"></i>
+                            <span>剩余: {{ formatTime(remainingTime) }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="sheet-content">
+                    <div class="question-grid">
+                        <div v-for="(section, sectionIndex) in examPaper" :key="sectionIndex" class="section-group">
+                            <div class="section-title">第{{ sectionIndex + 1 }}部分</div>
+                            <div class="question-numbers">
+                                <div v-for="(question, qIndex) in section.questions" :key="question.id"
+                                    :class="['question-number-item', 
+                                              { 'answered': question.userAnswer, 
+                                                'current': currentQuestionNumber === getQuestionNumber(sectionIndex, qIndex) }]" @click="scrollToQuestion(sectionIndex, qIndex)">
+                                    {{ getQuestionNumber(sectionIndex, qIndex) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 移动端答题卡按钮 -->
+            <div class="mobile-sheet-toggle" @click="toggleMobileSheet">
+                <i class="fas fa-clipboard-list"></i>
+                <span class="answered-count">{{ answeredCount }}</span>
+            </div>
+
+            <!-- 移动端答题卡面板 -->
+            <div class="mobile-sheet-panel" :class="{ 'active': mobileSheetOpen }">
+                <div class="panel-header">
+                    <h3>答题卡</h3>
+                    <button class="close-panel" @click="toggleMobileSheet">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="panel-content">
+                    <div class="time-info-mobile">
+                        <div class="time-elapsed">
+                            <i class="fas fa-hourglass-start"></i>
+                            <span>已用: {{ formatTime(elapsedTime) }}</span>
+                        </div>
+                        <div class="time-remaining">
+                            <i class="fas fa-hourglass-end"></i>
+                            <span>剩余: {{ formatTime(remainingTime) }}</span>
+                        </div>
+                    </div>
+                    <div class="question-grid-mobile">
+                        <div v-for="(section, sectionIndex) in examPaper" :key="sectionIndex" class="section-group">
+                            <div class="section-title">第{{ sectionIndex + 1 }}部分</div>
+                            <div class="question-numbers">
+                                <div v-for="(question, qIndex) in section.questions" :key="question.id"
+                                    :class="['question-number-item', 
+                                              { 'answered': question.userAnswer, 
+                                                'current': currentQuestionNumber === getQuestionNumber(sectionIndex, qIndex) }]"
+                                    @click="scrollToQuestion(sectionIndex, qIndex); toggleMobileSheet()">
+                                    {{ getQuestionNumber(sectionIndex, qIndex) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 成绩页面 -->
+        <div v-if="showResult" class="result-container">
+            <div class="result-card">
+                <div class="result-header">
+                    <h1>考核结果</h1>
+                    <p>博士，您已完成本次业务能力考核</p>
+                </div>
+
+                <div class="score-display">
+                    <div class="total-score">
+                        <span class="score-label">总分</span>
+                        <span class="score-value">{{ totalScore }} / {{ maxScore }}</span>
+                    </div>
+                    <div class="score-details">
+                        <div class="score-item" v-for="(section, sectionIndex) in examPaper" :key="sectionIndex">
+                            <span class="section-name">第{{ sectionIndex + 1 }}部分</span>
+                            <span class="section-score">{{ calculateSectionScore(section) }} / 20</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="question-review">
+                    <h3>题目回顾</h3>
+                    <div class="question-list">
+                        <div v-for="(section, sectionIndex) in examPaper" :key="sectionIndex" class="review-section">
+                            <h4>第{{ sectionIndex + 1 }}部分：{{ section.typeName }}</h4>
+                            <div class="question-review-items">
+                                <div v-for="(question, qIndex) in section.questions" :key="question.id" :class="['question-review-item', 
+                                              { 'correct': isQuestionCorrect(question), 
+                                                'incorrect': !isQuestionCorrect(question) }]"
+                                    @click="showQuestionDetail(question, sectionIndex, qIndex)">
+                                    <span class="review-number">{{ getQuestionNumber(sectionIndex, qIndex) }}</span>
+                                    <span class="review-status">
+                                        <i v-if="isQuestionCorrect(question)" class="fas fa-check"></i>
+                                        <i v-else class="fas fa-times"></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="result-actions">
+                    <button class="action-btn primary" @click="restartExam">
+                        <i class="fas fa-redo"></i> 重新测试
+                    </button>
+                    <button class="action-btn secondary" @click="goBack">
+                        <i class="fas fa-home"></i> 返回首页
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 题目详情弹窗 -->
+        <div v-if="showQuestionDetailModal" class="modal-overlay" @click="closeQuestionDetail">
+            <div class="modal-content" @click.stop>
+                <div class="modal-header">
+                    <h3>题目详情</h3>
+                    <button class="close-modal" @click="closeQuestionDetail">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="question-meta">
+                        <div class="meta-tag">
+                            <i class="fas fa-hashtag"></i> 题目ID: {{ currentDetailQuestion.id }}
+                        </div>
+                        <div class="meta-tag">
+                            <i class="fas fa-tag"></i> 类型: {{ currentDetailQuestion.typeText }}
+                        </div>
+                        <div class="meta-tag">
+                            <i class="fas fa-star"></i> 难度: {{ currentDetailQuestion.difficultyText }}
+                        </div>
+                    </div>
+
+                    <div class="question-text">
+                        <p v-html="currentDetailQuestion.question"></p>
+                        <img v-if="currentDetailQuestion.picture" :src="'./images/' + currentDetailQuestion.id + '.png'"
+                            :alt="'题目' + currentDetailQuestion.id + '图片'" class="question-image">
+                    </div>
+
+                    <div class="options-container">
+                        <div v-for="(option, index) in currentDetailQuestion.options" :key="index" :class="['option', {
+                                 'correct': index + 1 === currentDetailQuestion.answer,
+                                 'user-selected': currentDetailQuestion.userAnswer === index + 1,
+                                 'wrong': currentDetailQuestion.userAnswer === index + 1 && currentDetailQuestion.userAnswer !== currentDetailQuestion.answer
+                             }]">
+                            <span class="option-label">{{ String.fromCharCode(65 + index) }}</span>
+                            <span class="option-text" v-html="option"></span>
+                        </div>
+                    </div>
+
+                    <div class="answer-analysis">
+                        <h4>答案解析</h4>
+                        <p><strong>正确答案: {{ String.fromCharCode(64 + currentDetailQuestion.answer) }}</strong></p>
+                        <p v-if="currentDetailQuestion.userAnswer" class="user-answer">
+                            您的答案: {{ String.fromCharCode(64 + currentDetailQuestion.userAnswer) }}
+                        </p>
+                        <p style="margin-top: 15px;" v-html="currentDetailQuestion.analysis"></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 引入题目数据 -->
+    <script src="js/questions.js"></script>
+    <script src="js/exam.js"></script>
+</body>
+
+</html>

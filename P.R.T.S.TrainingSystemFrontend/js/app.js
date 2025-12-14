@@ -53,10 +53,22 @@ new Vue({
 
         // 系统公告
         showSystemNotice: false,
-        systemNoticeTab: 'tips',
+        systemNoticeTab: 'all', // 'all' | 'unread' | 'local'
         selectedVersion: {},
         updateVersions: [],
-        systemTips: ''
+        systemTips: '',
+
+        // ================== 系统公告/通知中心相关 ==================
+        // 公告数据
+        notifications: [], // 当前页通知
+        localNotifications: [], // 本地通知
+        unreadCount: 0,
+        noticePage: 1,
+        hasMoreNotifications: false,
+        loadingNotifications: false,
+        showConfirmDialog: false,
+        confirmMessage: '',
+        confirmAction: null,
     },
 
     computed: {
@@ -142,6 +154,17 @@ new Vue({
             if (newVal) {
                 this.loadUserData();
             }
+        },
+        // 监听系统公告显示状态
+        showSystemNotice(val) {
+            if (val) {
+                this.loadNotifications();
+            }
+        },
+        // 监听系统公告标签变化
+        systemNoticeTab() {
+            this.noticePage = 1;
+            this.loadNotifications();
         }
     },
 
@@ -1187,6 +1210,112 @@ new Vue({
             } else {
                 this.showError('暂无培训题目');
             }
-        }
+        },
+
+        // ================== 通知中心相关 ==================
+        async loadNotifications() {
+            if (this.systemNoticeTab === 'local') {
+                this.loadLocalNotifications();
+                return;
+            }
+            this.loadingNotifications = true;
+            try {
+                // 假设有 notificationApi.getNotifications({page, size, unread})
+                if (!window.notificationApi) {
+                    this.notifications = [];
+                    this.unreadCount = 0;
+                    this.hasMoreNotifications = false;
+                    this.loadingNotifications = false;
+                    return;
+                }
+                const params = {
+                    page: this.noticePage,
+                    size: 10,
+                    unread: this.systemNoticeTab === 'unread' ? true : undefined
+                };
+                const res = await notificationApi.getNotifications(params);
+                this.notifications = res.notifications || [];
+                this.unreadCount = res.unreadCount || 0;
+                this.hasMoreNotifications = res.hasMore || false;
+            } catch (e) {
+                this.notifications = [];
+                this.unreadCount = 0;
+                this.hasMoreNotifications = false;
+            } finally {
+                this.loadingNotifications = false;
+            }
+        },
+        loadLocalNotifications() {
+            // 本地通知可用localStorage等实现
+            this.localNotifications = JSON.parse(localStorage.getItem('localNotifications') || '[]');
+        },
+        switchNoticeTab(tab) {
+            this.systemNoticeTab = tab;
+        },
+        changeNoticePage(page) {
+            if (page < 1) return;
+            this.noticePage = page;
+            this.loadNotifications();
+        },
+        async markNotificationAsRead(notif) {
+            if (!notif || notif.isRead) return;
+            if (window.notificationApi) {
+                await notificationApi.markAsRead(notif.id);
+            }
+            notif.isRead = true;
+            this.unreadCount = Math.max(0, this.unreadCount - 1);
+        },
+        async markAllNotificationsAsRead() {
+            if (window.notificationApi) {
+                await notificationApi.markAllAsRead();
+            }
+            this.notifications.forEach(n => n.isRead = true);
+            this.unreadCount = 0;
+        },
+        async deleteNotification(notif) {
+            if (!notif) return;
+            if (window.notificationApi) {
+                await notificationApi.deleteNotification(notif.id);
+            }
+            this.notifications = this.notifications.filter(n => n.id !== notif.id);
+        },
+        async clearAllNotifications() {
+            if (window.notificationApi) {
+                await notificationApi.clearAll();
+            }
+            this.notifications = [];
+            this.unreadCount = 0;
+        },
+        // 本地通知相关
+        deleteLocalNotification(notif) {
+            this.localNotifications = this.localNotifications.filter(n => n.id !== notif.id);
+            localStorage.setItem('localNotifications', JSON.stringify(this.localNotifications));
+        },
+        clearAllLocalNotifications() {
+            this.localNotifications = [];
+            localStorage.removeItem('localNotifications');
+        },
+        // 二次确认弹窗
+        confirmMarkAllRead() {
+            this.confirmMessage = '确定要将全部通知标记为已读吗？';
+            this.confirmAction = this.markAllNotificationsAsRead;
+            this.showConfirmDialog = true;
+        },
+        confirmClearAllNotifications() {
+            this.confirmMessage = '确定要清空全部通知吗？';
+            this.confirmAction = this.clearAllNotifications;
+            this.showConfirmDialog = true;
+        },
+        confirmClearAllLocalNotifications() {
+            this.confirmMessage = '确定要清空本地通知吗？';
+            this.confirmAction = this.clearAllLocalNotifications;
+            this.showConfirmDialog = true;
+        },
+        handleConfirmAction() {
+            if (typeof this.confirmAction === 'function') {
+                this.confirmAction();
+            }
+            this.showConfirmDialog = false;
+        },
     }
 });

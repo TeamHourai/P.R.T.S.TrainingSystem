@@ -542,7 +542,7 @@
 
         <!-- 系统公告弹窗（优化为通知中心） -->
         <div class="modal-overlay" v-if="showSystemNotice" @click="showSystemNotice = false">
-            <div class="modal-content" @click.stop style="max-width: 520px;">
+            <div class="modal-content notification-modal" @click.stop style="max-width: 520px; width: 95vw;">
                 <div class="modal-header">
                     <h3>通知中心</h3>
                     <button class="modal-close" @click="showSystemNotice = false"><i class="fas fa-times"></i></button>
@@ -550,14 +550,11 @@
                 <div class="system-notice-tabs">
                     <div class="tab" :class="{ active: systemNoticeTab === 'all' }" @click="switchNoticeTab('all')">
                         全部通知
-                        <span v-if="unreadCount > 0" class="badge badge-danger" style="margin-left:6px;">{{ unreadCount
-                            }}</span>
+                        <span v-if="unreadCount > 0" class="badge badge-danger" style="margin-left:6px;">{{ unreadCount }}</span>
                     </div>
-                    <div class="tab" :class="{ active: systemNoticeTab === 'unread' }"
-                        @click="switchNoticeTab('unread')">
+                    <div class="tab" :class="{ active: systemNoticeTab === 'unread' }" @click="switchNoticeTab('unread')">
                         未读
-                        <span v-if="unreadCount > 0" class="badge badge-danger" style="margin-left:6px;">{{ unreadCount
-                            }}</span>
+                        <span v-if="unreadCount > 0" class="badge badge-danger" style="margin-left:6px;">{{ unreadCount }}</span>
                     </div>
                     <div class="tab" :class="{ active: systemNoticeTab === 'local' }" @click="switchNoticeTab('local')">
                         本地通知
@@ -576,8 +573,9 @@
                             <div v-else>
                                 <div class="notification-list">
                                     <div v-for="notif in notifications" :key="notif.id" class="notification-item"
-                                        :class="{ unread: !notif.isRead }"
-                                        style="display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid #eee;">
+                                        :class="{ unread: !notif.isRead, important: notif.isImportant }"
+                                        @mouseenter="notif._hover = true" @mouseleave="notif._hover = false"
+                                        :style="{background: notif._hover ? '#f5f7fa' : '', fontWeight: !notif.isRead ? 600 : 400, opacity: notif.isRead ? 0.7 : 1, borderLeft: notif.isImportant ? '4px solid #e53935' : ''}">
                                         <div class="notif-badge"
                                             :style="{background:notif.badgeColor||'#2196F3',borderRadius:'50%',width:'32px',height:'32px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',color:'#fff'}">
                                             {{ notif.badgeIcon || '🔔' }}
@@ -585,11 +583,10 @@
                                         <div style="flex:1;">
                                             <div style="font-weight:600;">
                                                 {{ notif.title || notif.typeInfo?.name || '通知' }}
-                                                <span v-if="!notif.isRead" class="badge badge-danger"
-                                                    style="margin-left:8px;">未读</span>
+                                                <span v-if="!notif.isRead" class="badge badge-danger" style="margin-left:8px;">未读</span>
+                                                <span v-if="notif.isImportant" class="badge badge-warning" style="margin-left:8px;">重要</span>
                                             </div>
-                                            <div class="notif-content" v-html="notif.formattedContent"
-                                                style="margin:4px 0 2px 0;"></div>
+                                            <div class="notif-content" v-html="notif.formattedContent" style="margin:4px 0 2px 0;"></div>
                                             <div style="font-size:12px;color:#888;">
                                                 {{ notif.formattedTime }}
                                             </div>
@@ -608,17 +605,13 @@
                                 </div>
                                 <!-- 分页 -->
                                 <div class="pagination" style="margin:12px 0;text-align:center;">
-                                    <button @click="changeNoticePage(noticePage-1)"
-                                        :disabled="noticePage<=1">上一页</button>
+                                    <button @click="changeNoticePage(noticePage-1)" :disabled="noticePage<=1" :class="{disabled: noticePage<=1}">上一页</button>
                                     <span style="margin:0 10px;">第 {{ noticePage }} 页</span>
-                                    <button @click="changeNoticePage(noticePage+1)"
-                                        :disabled="!hasMoreNotifications">下一页</button>
-                                    <button v-if="notifications.length>0" style="margin-left:16px;"
-                                        @click="markAllNotificationsAsRead">
+                                    <button @click="changeNoticePage(noticePage+1)" :disabled="!hasMoreNotifications" :class="{disabled: !hasMoreNotifications}">下一页</button>
+                                    <button v-if="notifications.length>0" style="margin-left:16px;" @click="confirmMarkAllRead" :disabled="unreadCount===0" :class="{disabled: unreadCount===0}">
                                         全部标记已读
                                     </button>
-                                    <button v-if="notifications.length>0" style="margin-left:8px;"
-                                        @click="clearAllNotifications">
+                                    <button v-if="notifications.length>0" style="margin-left:8px;" @click="confirmClearAllNotifications" :class="{disabled: notifications.length===0}">
                                         清空全部
                                     </button>
                                 </div>
@@ -627,14 +620,14 @@
                     </div>
                     <!-- 本地通知 -->
                     <div v-if="systemNoticeTab === 'local'">
-                        <div v-if="localNotifications.length === 0"
-                            style="text-align:center;padding:40px 0;color:#888;">
+                        <div v-if="localNotifications.length === 0" style="text-align:center;padding:40px 0;color:#888;">
                             <i class="fas fa-inbox" style="font-size:2rem;"></i><br>暂无本地通知
                         </div>
                         <div v-else>
                             <div class="notification-list">
                                 <div v-for="notif in localNotifications" :key="notif.id" class="notification-item"
-                                    style="display:flex;align-items:flex-start;gap:10px;padding:12px 0;border-bottom:1px solid #eee;">
+                                    @mouseenter="notif._hover = true" @mouseleave="notif._hover = false"
+                                    :style="{background: notif._hover ? '#f5f7fa' : ''}">
                                     <div class="notif-badge"
                                         :style="{background:notif.badgeColor||'#2196F3',borderRadius:'50%',width:'32px',height:'32px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',color:'#fff'}">
                                         {{ notif.badgeIcon || '🔔' }}
@@ -643,34 +636,46 @@
                                         <div style="font-weight:600;">
                                             {{ notif.title || notif.typeInfo?.name || '通知' }}
                                         </div>
-                                        <div class="notif-content" v-html="notif.formattedContent"
-                                            style="margin:4px 0 2px 0;"></div>
+                                        <div class="notif-content" v-html="notif.formattedContent" style="margin:4px 0 2px 0;"></div>
                                         <div style="font-size:12px;color:#888;">
                                             {{ notif.formattedTime }}
                                         </div>
                                     </div>
                                     <div>
-                                        <button class="notif-btn" title="删除"
-                                            @click.stop="deleteLocalNotification(notif)">
+                                        <button class="notif-btn" title="删除" @click.stop="deleteLocalNotification(notif)">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </div>
                                 </div>
                             </div>
                             <div style="margin:12px 0;text-align:center;">
-                                <button @click="clearAllLocalNotifications">清空本地通知</button>
+                                <button @click="confirmClearAllLocalNotifications">清空本地通知</button>
                             </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- 二次确认弹窗 -->
+                <div v-if="showConfirmDialog" class="modal-overlay confirm-modal" @click="showConfirmDialog=false">
+                    <div class="modal-content" @click.stop style="max-width:320px;">
+                        <div class="modal-header">
+                            <h4>操作确认</h4>
+                        </div>
+                        <div style="padding:20px 0; text-align:center;">{{ confirmMessage }}</div>
+                        <div style="text-align:center;">
+                            <button class="nav-btn primary" @click="handleConfirmAction">确定</button>
+                            <button class="nav-btn secondary" @click="showConfirmDialog=false" style="margin-left:16px;">取消</button>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
         <!-- 先加载基础API模块：Axios + 请求封装 + api 总入口 -->
         <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
         <script src="js/api/request.js"></script>
         <!-- 正确加载 api 总入口（避免占位路径导致 404） -->
-        <script src="js/api/apiapp.js"></script>
+        <script src="js/apiapp.js"></script>
 
         <!-- 再加载各个 api 模块（路径修正为 js/api/...） -->
         <script src="js/api/user.js"></script> <!-- 定义 userApi -->
@@ -689,3 +694,4 @@
 </body>
 
 </html>
+

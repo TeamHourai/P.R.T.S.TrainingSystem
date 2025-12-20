@@ -1,0 +1,288 @@
+/*
+ * question-editor.css - 题库/培训题目编辑器样式
+ * 复用 base/layout/components 的变量与按钮
+ */
+
+.qe-page {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 24px 20px 40px;
+}
+
+.qe-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.qe-title {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.qe-subtitle {
+    color: var(--text-secondary);
+}
+
+.qe-main {
+    display: grid;
+    grid-template-columns: 1.2fr 0.8fr;
+    gap: 18px;
+}
+
+.qe-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+
+.qe-left,
+.qe-right {
+    min-height: 560px;
+}
+
+.qe-toolbar {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.qe-filters {
+    display: grid;
+    grid-template-columns: 1fr 220px 220px 120px;
+    gap: 12px;
+}
+
+.qe-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.qe-field label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+}
+
+.qe-field input,
+.qe-field select,
+.qe-field textarea {
+    background: var(--bg-card-light);
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    color: var(--text-primary);
+    padding: 10px 12px;
+    outline: none;
+    transition: var(--transition);
+}
+
+.qe-field textarea {
+    resize: vertical;
+}
+
+.qe-field input:focus,
+.qe-field select:focus,
+.qe-field textarea:focus {
+    border-color: rgba(126, 87, 194, 0.8);
+    box-shadow: 0 0 0 3px rgba(126, 87, 194, 0.15);
+}
+
+.qe-field.qe-inline {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+}
+
+.qe-field.qe-inline input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: var(--primary-color);
+}
+
+.qe-toolbar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.qe-table-wrap {
+    padding: 0;
+    overflow: auto;
+    max-height: calc(100vh - 260px);
+}
+
+.qe-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.qe-table thead th {
+    position: sticky;
+    top: 0;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    text-align: left;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    padding: 12px 14px;
+    z-index: 1;
+}
+
+.qe-table tbody td {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    padding: 12px 14px;
+    vertical-align: top;
+}
+
+.qe-table tbody tr:hover {
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.qe-qtext {
+    color: var(--text-primary);
+}
+
+.qe-qmeta {
+    margin-top: 6px;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+
+.qe-row-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.qe-row-actions .qe-mini {
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card-light);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.qe-row-actions .qe-mini:hover {
+    background: var(--primary-color);
+    border-color: rgba(255, 255, 255, 0.15);
+}
+
+.qe-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+.qe-pageinfo {
+    color: var(--text-secondary);
+}
+
+.qe-form-header {
+    padding: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.qe-form-title {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin-bottom: 6px;
+}
+
+.qe-form-sub {
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.qe-form {
+    padding: 16px;
+}
+
+.qe-form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.qe-options {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 14px;
+    padding: 12px;
+}
+
+.qe-options-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+    color: var(--text-secondary);
+}
+
+.qe-answer {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.qe-answer label {
+    margin: 0;
+}
+
+.qe-options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.qe-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.qe-hint {
+    padding: 12px 16px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+.qe-hint.qe-error {
+    color: #ffd1d1;
+}
+
+.qe-hint.qe-success {
+    color: #d1ffe2;
+}
+
+/* 训练编辑器：隐藏未使用的筛选项时，自动适配 */
+.qe-field-sm {
+    max-width: 140px;
+}
+
+@media (max-width: 1100px) {
+    .qe-main {
+        grid-template-columns: 1fr;
+    }
+
+    .qe-table-wrap {
+        max-height: 420px;
+    }
+
+    .qe-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .qe-options-grid {
+        grid-template-columns: 1fr;
+    }
+}

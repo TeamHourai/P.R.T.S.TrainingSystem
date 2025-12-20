@@ -183,7 +183,7 @@
     color: white;
     box-shadow: var(--shadow-lg);
     cursor: pointer;
-    z-index: 1500;
+    z-index: 100; /* 调整：与老版保持一致，避免过高层级覆盖其他模态 */
     align-items: center;
     justify-content: center;
     font-size: 1.5rem;
@@ -241,7 +241,7 @@
     width: 100%;
     height: 100%;
     background: rgba(0, 0, 0, 0.7);
-    z-index: 4000;
+    z-index: 400; /* 调整：与老版统一 */
     display: flex;
     align-items: center;
     justify-content: center;

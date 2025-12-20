@@ -3,6 +3,41 @@
  * 包含：考试专用变量、全局重置、基础元素样式
  */
 
+/* 全局样式重置与老版变量（新增/替换） */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    /* 主色调 - 深蓝紫色系（与老版保持一致） */
+    --primary-color: #5E35B1;
+    --primary-dark: #4527A0;
+    --primary-light: #7E57C2;
+    --secondary-color: #26A69A;
+    --accent-color: #FF7043;
+    --success-color: #43A047;
+    --warning-color: #FFA726;
+    --error-color: #F44336;
+
+    /* 背景和文字色 */
+    --bg-dark: #121212;
+    --bg-card: #1E1E2E;
+    --bg-card-light: #2A2A3A;
+    --text-primary: #FFFFFF;
+    --text-secondary: #B0B0C0;
+    --text-muted: #888899;
+    --border-color: rgba(255, 255, 255, 0.1);
+
+    /* 效果变量 */
+    --border-radius: 12px;
+    --border-radius-lg: 20px;
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
 /* 考试专用CSS变量 - 扩展全局变量 */
 :root {
     /* 考试状态色 */
@@ -17,14 +52,112 @@
     --time-normal: #26A69A;
 }
 
-/* 考试全局重置 */
+/* 老版 body 背景，保证整体视觉一致 */
+body {
+    font-family: 'Segoe UI', 'Microsoft YaHei', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, rgba(30, 30, 60, 0.9) 0%, rgba(10, 10, 30, 0.95) 100%);
+    background-size: cover;
+    background-attachment: fixed;
+    color: var(--text-primary);
+    line-height: 1.6;
+    min-height: 100vh;
+}
+
+/* 如果你在页面中使用 .exam-wrapper 作为最外层容器，保持它不重复设置背景（避免叠加） */
 .exam-wrapper {
     min-height: 100vh;
-    background: linear-gradient(135deg, rgba(30, 30, 60, 0.9) 0%, rgba(10, 10, 30, 0.95) 100%);
+    background: none; /* 已由 body 提供背景 */
     background-attachment: fixed;
     background-size: cover;
     font-family: 'Segoe UI', 'Microsoft YaHei', Tahoma, Geneva, Verdana, sans-serif;
     line-height: 1.6;
+    z-index: 0;
+}
+
+.exam-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 30px;
+    background: var(--bg-card);
+    box-shadow: var(--shadow);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.exam-container {
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+    gap: 20px;
+    position: relative;
+    background: none;
+}
+
+.question-area {
+    flex: 1;
+    max-width: 900px;
+}
+
+.question-section {
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    padding: 30px;
+    margin-bottom: 30px;
+    box-shadow: var(--shadow);
+}
+
+.question-card {
+    background: var(--bg-card-light);
+    border-radius: var(--border-radius);
+    padding: 25px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+    position: relative;
+    z-index: 1;
+}
+
+.answer-sheet {
+    width: 300px;
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    box-shadow: var(--shadow);
+    height: fit-content;
+    position: fixed;
+    top: 100px;
+    right: 20px;
+    transition: var(--transition);
+}
+
+.sheet-content {
+    padding: 20px;
+    background: none;
+}
+
+.result-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-dark);
+    z-index: 300;
+    overflow-y: auto;
+    padding: 20px;
+}
+
+.result-card {
+    max-width: 800px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border-radius: var(--border-radius-lg);
+    padding: 40px;
+    box-shadow: var(--shadow-lg);
+}
+
+.panel-content,
+.modal-content {
+    background: var(--bg-card);
 }
 
 /* 滚动条样式 - 考试页面专用 */
@@ -103,4 +236,91 @@
 
 .exam-shake {
     animation: shake 0.5s ease-in-out;
+}
+
+/* 答题卡题号横向排列 */
+.question-numbers {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+.question-grid-mobile .question-numbers {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+}
+
+@media (max-width: 1024px) {
+    .exam-container {
+        flex-direction: column;
+    }
+    .question-area {
+        max-width: 100%;
+        margin-right: 0;
+    }
+    .answer-sheet {
+        position: static;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+}
+@media (max-width: 768px) {
+    .exam-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 15px;
+        padding: 15px 20px;
+    }
+    .exam-container {
+        padding: 15px;
+    }
+    .question-section {
+        padding: 20px;
+    }
+    .question-card {
+        padding: 20px;
+    }
+    .result-card {
+        padding: 25px;
+    }
+    .score-details {
+        grid-template-columns: 1fr;
+    }
+    .result-actions {
+        flex-direction: column;
+    }
+    .mobile-sheet-toggle {
+        display: flex;
+    }
+    .answer-sheet {
+        display: none;
+    }
+    .mobile-sheet-panel {
+        display: block;
+    }
+    .legend-items {
+        flex-direction: column;
+        gap: 10px;
+    }
+}
+@media (max-width: 480px) {
+    .question-meta {
+        flex-direction: column;
+        gap: 10px;
+    }
+    .question-text {
+        font-size: 1rem;
+    }
+    .option {
+        padding: 12px 15px;
+    }
+    .option-label {
+        width: 32px;
+        height: 32px;
+        margin-right: 12px;
+    }
+    .modal-body {
+        padding: 20px;
+    }
 }

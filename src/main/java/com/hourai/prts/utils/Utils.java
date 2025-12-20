@@ -199,4 +199,42 @@ public class Utils {
         sb.append("]");
         return sb.toString();
     }
+
+    /**
+     * 极简 JSON 对象解析（仅支持 {"k":"v", "k2":"v2"} 这种扁平结构，值按字符串处理）。
+     * 目的：兼容前端使用 application/json 提交的登录/注册请求。
+     */
+    public static Map<String, String> parseJsonObject(String json) {
+        Map<String, String> m = new HashMap<>();
+        if (json == null) return m;
+        String s = json.trim();
+        if (s.startsWith("{") && s.endsWith("}")) {
+            s = s.substring(1, s.length() - 1).trim();
+        }
+        if (s.isEmpty()) return m;
+
+        // 简单按逗号拆分（不支持嵌套/数组/带逗号的字符串）——对本项目用户名/密码足够
+        String[] parts = s.split(",");
+        for (String part : parts) {
+            String[] kv = part.split(":", 2);
+            if (kv.length != 2) continue;
+            String k = kv[0].trim();
+            String v = kv[1].trim();
+            k = stripJsonQuotes(k);
+            v = stripJsonQuotes(v);
+            if (!k.isEmpty()) m.put(k, v);
+        }
+        return m;
+    }
+
+    private static String stripJsonQuotes(String s) {
+        if (s == null) return "";
+        String t = s.trim();
+        if (t.startsWith("\"") && t.endsWith("\"") && t.length() >= 2) {
+            t = t.substring(1, t.length() - 1);
+        }
+        // 处理非常基础的转义
+        t = t.replace("\\\\", "\\").replace("\\\"", "\"");
+        return t;
+    }
 }

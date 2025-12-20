@@ -31,23 +31,30 @@ public class Main {
         server.createContext("/questions", HandlerRegistry.getWrapped("questions"));
         server.createContext("/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
         server.createContext("/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
+        server.createContext("/exam/history", HandlerRegistry.getWrapped("exam_history"));
         server.createContext("/user", HandlerRegistry.getWrapped("user")); // handles /user/{id}/wrong
         server.createContext("/ping", HandlerRegistry.getWrapped("ping"));
 
         // ===== 为兼容前端，增加带 /api 和 /api/v1 前缀的路由 =====
         server.createContext("/api/auth/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/api/auth/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/api/auth/profile", HandlerRegistry.getWrapped("auth_profile"));
         server.createContext("/api/questions", HandlerRegistry.getWrapped("questions"));
         server.createContext("/api/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
         server.createContext("/api/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
+        server.createContext("/api/exam/history", HandlerRegistry.getWrapped("exam_history"));
+        server.createContext("/api/answers/wrong", HandlerRegistry.getWrapped("answers_wrong"));
         server.createContext("/api/user", HandlerRegistry.getWrapped("user"));
         server.createContext("/api/ping", HandlerRegistry.getWrapped("ping"));
 
         server.createContext("/api/v1/auth/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/api/v1/auth/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/api/v1/auth/profile", HandlerRegistry.getWrapped("auth_profile"));
         server.createContext("/api/v1/questions", HandlerRegistry.getWrapped("questions"));
         server.createContext("/api/v1/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
         server.createContext("/api/v1/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
+        server.createContext("/api/v1/exam/history", HandlerRegistry.getWrapped("exam_history"));
+        server.createContext("/api/v1/answers/wrong", HandlerRegistry.getWrapped("answers_wrong"));
         server.createContext("/api/v1/user", HandlerRegistry.getWrapped("user"));
         server.createContext("/api/v1/ping", HandlerRegistry.getWrapped("ping"));
 

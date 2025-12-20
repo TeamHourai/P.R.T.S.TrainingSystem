@@ -23,9 +23,12 @@ public final class HandlerRegistry {
         // 初始化常用 handler 实例（与现有 Handler 类一一对应）
         HANDLERS.put("register", new RegisterHandler());
         HANDLERS.put("login", new LoginHandler());
+        HANDLERS.put("auth_profile", new AuthProfileHandler());
+        HANDLERS.put("answers_wrong", new WrongAnswersHandler());
         HANDLERS.put("questions", new QuestionsHandler());
         HANDLERS.put("exam_paper", new ExamPaperHandler());
         HANDLERS.put("exam_submit", new ExamSubmitHandler());
+        HANDLERS.put("exam_history", new ExamHistoryHandler());
         HANDLERS.put("user", new UserHandler());
         HANDLERS.put("ping", new PingHandler());
     }
@@ -57,4 +60,3 @@ public final class HandlerRegistry {
         HANDLERS.put(name, handler);
     }
 }
-

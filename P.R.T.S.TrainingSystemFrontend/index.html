@@ -79,7 +79,7 @@
                 <div class="nav-item" :class="{ active: currentPage === 'search' }" @click="goToPage('search')">
                     <i class="fas fa-search"></i><span>题目搜索</span>
                 </div>
-                <div class="nav-item admin-only" @click="goToPage('admin')" v-if="isAdmin" style="display: none;">
+                <div class="nav-item admin-only" @click="goToPage('admin')" v-if="isAdmin">
                     <i class="fas fa-cog"></i><span>管理员面板</span>
                 </div>
             </div>
@@ -113,28 +113,6 @@
                     <div>
                         <h1 class="page-title">博士业务能力考核</h1>
                         <p class="page-subtitle">欢迎回来，博士。请选择您要进行的考核类型。</p>
-                    </div>
-                    <!-- 登录弹窗 -->
-                    <div v-if="showAuthModal" class="modal-overlay" @click="showAuthModal = false">
-                        <div class="modal-content" @click.stop style="max-width: 400px;">
-                            <div class="modal-header">
-                                <h3>{{ authMode === 'login' ? '用户登录' : '用户注册' }}</h3>
-                                <button class="modal-close" @click="showAuthModal = false"><i
-                                        class="fas fa-times"></i></button>
-                            </div>
-                            <div style="padding: 30px;">
-                                <input type="text" v-model="authUsername" placeholder="请输入用户名" class="auth-input">
-                                <input type="password" v-model="authPassword" placeholder="请输入密码" class="auth-input">
-                                <button @click="authMode === 'login' ? handleLogin() : handleRegister()"
-                                    class="nav-btn primary auth-btn">
-                                    <i :class="authMode === 'login' ? 'fas fa-sign-in-alt' : 'fas fa-user-plus'"></i>
-                                    {{ authMode === 'login' ? '登录' : '注册' }}
-                                </button>
-                                <p class="auth-switch" @click="authMode = authMode === 'login' ? 'register' : 'login'">
-                                    {{ authMode === 'login' ? '没有账号？点击注册' : '已有账号？点击登录' }}
-                                </p>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
@@ -536,6 +514,27 @@
                     </div>
 
                     <p style="margin-top: 15px;" v-html="currentQuestion.analysis"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 全局登录弹窗：放在 main-content 之外，保证在任何页面都能显示 -->
+        <div v-if="showAuthModal" class="modal-overlay" @click="showAuthModal = false">
+            <div class="modal-content" @click.stop style="max-width: 400px;">
+                <div class="modal-header">
+                    <h3>{{ authMode === 'login' ? '用户登录' : '用户注册' }}</h3>
+                    <button class="modal-close" @click="showAuthModal = false"><i class="fas fa-times"></i></button>
+                </div>
+                <div style="padding: 30px;">
+                    <input type="text" v-model="authUsername" placeholder="请输入用户名" class="auth-input">
+                    <input type="password" v-model="authPassword" placeholder="请输入密码" class="auth-input">
+                    <button @click="authMode === 'login' ? handleLogin() : handleRegister()" class="nav-btn primary auth-btn">
+                        <i :class="authMode === 'login' ? 'fas fa-sign-in-alt' : 'fas fa-user-plus'"></i>
+                        {{ authMode === 'login' ? '登录' : '注册' }}
+                    </button>
+                    <p class="auth-switch" @click="authMode = authMode === 'login' ? 'register' : 'login'">
+                        {{ authMode === 'login' ? '没有账号？点击注册' : '已有账号？点击登录' }}
+                    </p>
                 </div>
             </div>
         </div>

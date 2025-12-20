@@ -48,14 +48,18 @@
         if (type === 'success') target.classList.add('qe-success');
     }
 
+    function getStored(keyA, keyB) {
+        return localStorage.getItem(keyA) || sessionStorage.getItem(keyA) || localStorage.getItem(keyB) || sessionStorage.getItem(keyB);
+    }
+
     function getUserInfo() {
-        const str = localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
+        const str = getStored('userInfo', 'user_info');
         if (!str) return null;
         try { return JSON.parse(str); } catch { return null; }
     }
 
     async function ensureAdmin() {
-        const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+        const token = getStored('token', 'auth_token');
         if (!token) {
             alert('请先登录管理员账号');
             window.location.href = 'index.html';

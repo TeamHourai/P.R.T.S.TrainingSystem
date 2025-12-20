@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.hourai.prts.utils.Utils;
 import com.hourai.prts.entity.*;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -17,19 +18,54 @@ public class LoginHandler implements HttpHandler {
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         if (!"POST".equalsIgnoreCase(exchange.getRequestMethod())) {
-            Utils.send(exchange,405,"{\"error\":\"POST required\"}");
+            Utils.send(exchange, 405, "{\"success\":false,\"message\":\"POST required\"}");
             return;
         }
-        Map<String,String> params = Utils.parseForm(exchange);
+
+        String contentType = exchange.getRequestHeaders().getFirst("Content-Type");
+        Map<String, String> params;
+        if (contentType != null && contentType.toLowerCase().contains("application/json")) {
+            // 兼容前端 JSON 提交（apiapp.js 的 postJson）
+            String body = new String(exchange.getRequestBody().readAllBytes(), java.nio.charset.StandardCharsets.UTF_8);
+            params = Utils.parseJsonObject(body);
+        } else {
+            // 原有：application/x-www-form-urlencoded
+            params = Utils.parseForm(exchange);
+        }
+
         String username = params.get("username");
         String password = params.get("password");
+        if (username == null || password == null) {
+            Utils.send(exchange, 400, "{\"success\":false,\"message\":\"username & password required\"}");
+            return;
+        }
+
         List<User> users = DataStore.loadUsers();
-        Optional<User> ou = users.stream().filter(u->u.getUsername().equals(username) && u.getPassword().equals(password)).findFirst();
+        Optional<User> ou = users.stream()
+                .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
+                .findFirst();
+
         if (ou.isPresent()) {
             User u = ou.get();
-            Utils.send(exchange,200,"{\"id\":"+u.getId()+",\"username\":\""+ Utils.escapeJson(u.getUsername())+"\"}");
+
+            // 兼容前端：返回 success/message/user/token（token 先用一个可用的轻量占位值）
+            // 前端的 userApi.login 会优先识别 token，其次可识别 id/username。
+            String token = "user-" + u.getId();
+
+            String body = "{"
+                    + "\"success\":true,"
+                    + "\"message\":\"登录成功\","
+                    + "\"token\":\"" + Utils.escapeJson(token) + "\","
+                    + "\"user\":{"
+                    + "\"id\":" + u.getId() + ","
+                    + "\"username\":\"" + Utils.escapeJson(u.getUsername()) + "\","
+                    + "\"isAdmin\":" + u.isAdmin()
+                    + "}"
+                    + "}";
+
+            Utils.send(exchange, 200, body);
         } else {
-            Utils.send(exchange,401,"{\"error\":\"invalid credentials\"}");
+            Utils.send(exchange, 401, "{\"success\":false,\"message\":\"invalid credentials\"}");
         }
     }
 }

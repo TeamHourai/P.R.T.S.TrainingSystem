@@ -4,11 +4,29 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="将app.js拆分为多个文件，全部放在app文件夹下了，实际内容并未变化">
+    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="优化“上一题”“下一题”“返回”按钮在不同页面的具体表现。">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AuthProfileHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/ExamHistoryHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/WrongAnswersHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/_2025_12_6_14_06____.xml" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/shelf/在进行更新之前于_2025_12_6_14_06_取消提交了更改_[更改]/shelved.patch" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-main.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-main.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/question-editor.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/question-editor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/training-editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/training-editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/CorsFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/CorsFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/QuestionsHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/QuestionsHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/utils/Utils.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/CorsFilter.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/CorsFilter.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/utils/Utils.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/utils/Utils.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,7 +40,7 @@
       </map>
     </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
-    <option name="RESET_MODE" value="HARD" />
+    <option name="RESET_MODE" value="KEEP" />
     <option name="SWAP_SIDES_IN_COMPARE_BRANCHES" value="true" />
     <option name="UPDATE_TYPE" value="REBASE" />
   </component>
@@ -34,8 +52,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings">{
   &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/TeamHourai/P.R.T.S.TrainingSystem.git&quot;,
-    &quot;accountId&quot;: &quot;208e8b87-5096-41da-8e94-eebabeab678d&quot;
+    &quot;url&quot;: &quot;git@github.com:/TeamHourai/P.R.T.S.TrainingSystem.git&quot;,
+    &quot;accountId&quot;: &quot;ba333ae1-8110-4cf7-aadc-b1075dbd68b5&quot;
   }
 }</component>
   <component name="ProblemsViewState">
@@ -65,7 +83,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "settings.sync",
+    "settings.editor.selected.configurable": "editor.preferences.fonts.default",
     "vue.rearranger.settings.migration": "true",
     "应用程序.Main.executor": "Run"
   },
@@ -88,6 +106,13 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+      </set>
+    </attachedChunks>
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="默认任务">
@@ -199,7 +224,15 @@
       <option name="project" value="LOCAL" />
       <updated>1765706363397</updated>
     </task>
-    <option name="localTasksCounter" value="13" />
+    <task id="LOCAL-00013" summary="优化“上一题”“下一题”“返回”按钮在不同页面的具体表现。">
+      <option name="closed" value="true" />
+      <created>1765720863356</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1765720863356</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -263,7 +296,12 @@
     <MESSAGE value="在未接入数据库分支中，把端口更改为8080，同时数据文件中前面的userid会随着注册用户而递增" />
     <MESSAGE value="完善了系统公告界面" />
     <MESSAGE value="将app.js拆分为多个文件，全部放在app文件夹下了，实际内容并未变化" />
-    <option name="LAST_COMMIT_MESSAGE" value="将app.js拆分为多个文件，全部放在app文件夹下了，实际内容并未变化" />
+    <MESSAGE value="优化“上一题”“下一题”“返回”按钮在不同页面的具体表现。" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化“上一题”“下一题”“返回”按钮在不同页面的具体表现。" />
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
   <component name="github-copilot-workspace">
     <instructionFileLocations>

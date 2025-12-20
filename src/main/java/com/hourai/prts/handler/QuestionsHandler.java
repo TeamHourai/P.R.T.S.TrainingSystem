@@ -27,6 +27,7 @@ import java.util.stream.Collectors;
 */
 public class QuestionsHandler implements HttpHandler {
     private static final Path QUESTIONS_FILE = Paths.get("data").resolve("questions.csv");
+    private static final Path ONBOARDING_FILE = Paths.get("data").resolve("questions_onboarding.csv");
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -78,16 +79,42 @@ public class QuestionsHandler implements HttpHandler {
         Integer difficulty = q.get("difficulty") == null || q.get("difficulty").isEmpty() ? null : parseIntOrNull(q.get("difficulty"));
         String keyword = q.getOrDefault("keyword", "").trim();
 
-        List<Question> all = DataStore.loadQuestions();
+        // 支持 ?mode=onboarding 来读取入职培训题库，或当请求路径中包含 /training/ 时也视为培训题库
+        String mode = q.getOrDefault("mode", "");
+        String fullPath = exchange.getRequestURI().getPath() == null ? "" : exchange.getRequestURI().getPath();
+        boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
+        List<Question> all = DataStore.loadQuestions(useOnboarding ? ONBOARDING_FILE : QUESTIONS_FILE);
+        // include keywords in search and collect results
+        String keywordLower = keyword == null ? "" : keyword.toLowerCase();
         List<Question> filtered = all.stream().filter(qq -> {
             if (type != null && qq.getType() != type) return false;
             if (difficulty != null && qq.getDifficulty() != difficulty) return false;
-            if (!keyword.isEmpty()) {
+
+            if (!keywordLower.isEmpty()) {
+                // check keywords first
+                String kws = qq.getKeywords() == null ? "" : qq.getKeywords();
+                if (kws.toLowerCase().contains(keywordLower)) return true;
+                // then check question and analysis
                 String hay = (qq.getQuestion() + " " + qq.getAnalysis()).toLowerCase();
-                return hay.contains(keyword.toLowerCase());
+                return hay.contains(keywordLower);
             }
             return true;
         }).collect(Collectors.toList());
+
+        // If keyword is present, prioritize items where the keyword matches the keywords field
+        if (!keywordLower.isEmpty() && filtered.size() > 1) {
+            List<Question> keywordMatches = new ArrayList<>();
+            List<Question> otherMatches = new ArrayList<>();
+            for (Question qq : filtered) {
+                String kws = qq.getKeywords() == null ? "" : qq.getKeywords();
+                if (kws.toLowerCase().contains(keywordLower)) keywordMatches.add(qq);
+                else otherMatches.add(qq);
+            }
+            // preserve relative order within groups
+            filtered = new ArrayList<>();
+            filtered.addAll(keywordMatches);
+            filtered.addAll(otherMatches);
+        }
 
         int from = Math.min((page - 1) * size, filtered.size());
         int to = Math.min(from + size, filtered.size());
@@ -97,10 +124,16 @@ public class QuestionsHandler implements HttpHandler {
     }
 
     private void handleGetOne(HttpExchange exchange, long id) throws IOException {
-        List<Question> all = DataStore.loadQuestions();
-        for (Question q : all) {
-            if (q.getId() != null && q.getId() == id) {
-                Utils.send(exchange, 200, oneQuestionToJson(q));
+        // 支持 ?mode=onboarding 或路径中包含 /training/
+        Map<String, String> q = Utils.parseQuery(exchange.getRequestURI().getQuery());
+        String mode = q.getOrDefault("mode", "");
+        String fullPath = exchange.getRequestURI().getPath() == null ? "" : exchange.getRequestURI().getPath();
+        boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
+
+        List<Question> all = DataStore.loadQuestions(useOnboarding ? ONBOARDING_FILE : QUESTIONS_FILE);
+        for (Question qz : all) {
+            if (qz.getId() != null && qz.getId() == id) {
+                Utils.send(exchange, 200, oneQuestionToJson(qz));
                 return;
             }
         }
@@ -111,11 +144,19 @@ public class QuestionsHandler implements HttpHandler {
         Map<String, Object> body = readJsonBody(exchange);
         if (body == null) { Utils.send(exchange, 400, "{\"error\":\"invalid json\"}"); return; }
 
-        List<Question> all = DataStore.loadQuestions();
+        // 根据请求判断是否写入入职培训题库
+        Map<String, String> qparams = Utils.parseQuery(exchange.getRequestURI().getQuery());
+        String mode = qparams.getOrDefault("mode", "");
+        String fullPath = exchange.getRequestURI().getPath() == null ? "" : exchange.getRequestURI().getPath();
+        boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
+        Path target = useOnboarding ? ONBOARDING_FILE : QUESTIONS_FILE;
+
+        // 新建写入目标题库
+        List<Question> all = DataStore.loadQuestions(target);
         long newId = DataStore.nextId(all);
         Question q = buildQuestionFromBody(newId, body);
 
-        appendQuestionCsv(q);
+        appendQuestionCsv(q, target);
         Utils.send(exchange, 200, "{\"id\":" + newId + "}");
     }
 
@@ -123,10 +164,16 @@ public class QuestionsHandler implements HttpHandler {
         Map<String, Object> body = readJsonBody(exchange);
         if (body == null) { Utils.send(exchange, 400, "{\"error\":\"invalid json\"}"); return; }
 
-        List<Question> all = DataStore.loadQuestions();
+        // Determine which file to update (support training path or mode=onboarding)
+        Map<String, String> qparams = Utils.parseQuery(exchange.getRequestURI().getQuery());
+        String mode = qparams.getOrDefault("mode", "");
+        String fullPath = exchange.getRequestURI().getPath() == null ? "" : exchange.getRequestURI().getPath();
+        boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
+        Path target = useOnboarding ? ONBOARDING_FILE : QUESTIONS_FILE;
+
         boolean found = false;
         List<String> newLines = new ArrayList<>();
-        List<String> lines = Files.readAllLines(QUESTIONS_FILE, StandardCharsets.UTF_8);
+        List<String> lines = Files.readAllLines(target, StandardCharsets.UTF_8);
         for (String ln : lines) {
             if (ln.trim().isEmpty()) continue;
             String[] p = ln.split(",", 9);
@@ -143,13 +190,20 @@ public class QuestionsHandler implements HttpHandler {
         }
 
         if (!found) { Utils.send(exchange, 404, "{\"error\":\"not found\"}"); return; }
-        Files.write(QUESTIONS_FILE, newLines, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        Files.write(target, newLines, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         Utils.send(exchange, 200, "{\"success\":true}");
     }
 
     private void handleDelete(HttpExchange exchange, long id) throws IOException {
-        if (!Files.exists(QUESTIONS_FILE)) { Utils.send(exchange, 404, "{\"error\":\"not found\"}"); return; }
-        List<String> lines = Files.readAllLines(QUESTIONS_FILE, StandardCharsets.UTF_8);
+        // Determine target file (training mode or default)
+        Map<String, String> qparams = Utils.parseQuery(exchange.getRequestURI().getQuery());
+        String mode = qparams.getOrDefault("mode", "");
+        String fullPath = exchange.getRequestURI().getPath() == null ? "" : exchange.getRequestURI().getPath();
+        boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
+        Path target = useOnboarding ? ONBOARDING_FILE : QUESTIONS_FILE;
+
+        if (!Files.exists(target)) { Utils.send(exchange, 404, "{\"error\":\"not found\"}"); return; }
+        List<String> lines = Files.readAllLines(target, StandardCharsets.UTF_8);
         List<String> newLines = new ArrayList<>();
         boolean found = false;
         for (String ln : lines) {
@@ -163,7 +217,7 @@ public class QuestionsHandler implements HttpHandler {
             newLines.add(ln);
         }
         if (!found) { Utils.send(exchange, 404, "{\"error\":\"not found\"}"); return; }
-        Files.write(QUESTIONS_FILE, newLines, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        Files.write(target, newLines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
         Utils.send(exchange, 200, "{\"success\":true}");
     }
 
@@ -195,7 +249,16 @@ public class QuestionsHandler implements HttpHandler {
         }
         sb.append("],");
         sb.append("\"answer\":").append(parseIntOrDefault(q.getAnswer(), 0)).append(",");
-        sb.append("\"analysis\":\"").append(Utils.escapeJson(q.getAnalysis())).append("\"");
+        sb.append("\"analysis\":\"").append(Utils.escapeJson(q.getAnalysis())).append("\",");
+        // keywords: stored in Question.keywords as pipe-separated string
+        String kwRaw = q.getKeywords() == null ? "" : q.getKeywords();
+        String[] kwArr = kwRaw.isEmpty() ? new String[0] : kwRaw.split("\\|");
+        sb.append("\"keywords\":[");
+        for (int i = 0; i < kwArr.length; i++) {
+            if (i > 0) sb.append(',');
+            sb.append("\"").append(Utils.escapeJson(kwArr[i])).append("\"");
+        }
+        sb.append("]");
         sb.append("}");
         return sb.toString();
     }
@@ -316,6 +379,32 @@ public class QuestionsHandler implements HttpHandler {
 
         int answer = parseIntOrDefault(toStr(body.get("answer")), 0);
         Question q = new Question(id, type, difficulty, resource, question, picture, options, answer, analysis);
+        // keywords: can be array or comma-separated string
+        Object kw = body.get("keywords");
+        String kwRaw = "";
+        if (kw instanceof List) {
+            //noinspection unchecked
+            List<Object> l = (List<Object>) kw;
+            List<String> ks = new ArrayList<>();
+            for (Object k : l) { if (k != null) ks.add(String.valueOf(k).trim()); }
+            kwRaw = String.join("|", ks);
+        } else if (kw instanceof String) {
+            String ks = ((String) kw).trim();
+            if (!ks.isEmpty()) {
+                // allow comma separated input
+                if (ks.contains(",") || ks.contains("，")) {
+                    String[] parts = ks.split("[,，]");
+                    List<String> arr = new ArrayList<>();
+                    for (String p : parts) { if (!p.trim().isEmpty()) arr.add(p.trim()); }
+                    kwRaw = String.join("|", arr);
+                } else if (ks.contains("|")) {
+                    kwRaw = ks; // already pipe separated
+                } else {
+                    kwRaw = ks;
+                }
+            }
+        }
+        q.setKeywords(kwRaw);
         return q;
     }
 
@@ -332,11 +421,16 @@ public class QuestionsHandler implements HttpHandler {
     }
 
     private static void appendQuestionCsv(Question q) throws IOException {
-        if (!Files.exists(QUESTIONS_FILE)) {
-            Files.createDirectories(QUESTIONS_FILE.getParent());
-            Files.createFile(QUESTIONS_FILE);
+        appendQuestionCsv(q, QUESTIONS_FILE);
+    }
+
+    // 新增：向指定文件追加题目行
+    private static void appendQuestionCsv(Question q, Path file) throws IOException {
+        if (!Files.exists(file)) {
+            Files.createDirectories(file.getParent());
+            Files.createFile(file);
         }
-        Files.write(QUESTIONS_FILE,
+        Files.write(file,
                 (toCsvLine(q) + System.lineSeparator()).getBytes(StandardCharsets.UTF_8),
                 StandardOpenOption.APPEND);
     }
@@ -347,7 +441,7 @@ public class QuestionsHandler implements HttpHandler {
         String analysis = q.getAnalysis() == null ? "" : q.getAnalysis();
         String resource = q.getResource() == null ? "" : q.getResource();
         String question = q.getQuestion() == null ? "" : q.getQuestion();
-        return q.getId() + "," + q.getType() + "," + q.getDifficulty() + "," + Utils.csvEscape(resource) + "," + Utils.csvEscape(question) + "," + (q.isHasPicture() ? 1 : 0) + "," + Utils.csvEscape(options) + "," + parseIntOrDefault(q.getAnswer(), 0) + "," + Utils.csvEscape(analysis);
+        String keywords = q.getKeywords() == null ? "" : q.getKeywords();
+        return q.getId() + "," + q.getType() + "," + q.getDifficulty() + "," + Utils.csvEscape(resource) + "," + Utils.csvEscape(question) + "," + (q.isHasPicture() ? 1 : 0) + "," + Utils.csvEscape(options) + "," + parseIntOrDefault(q.getAnswer(), 0) + "," + Utils.csvEscape(analysis) + "," + Utils.csvEscape(keywords);
     }
 }
-

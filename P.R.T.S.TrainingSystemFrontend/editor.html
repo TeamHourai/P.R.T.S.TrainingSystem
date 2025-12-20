@@ -194,7 +194,8 @@
                         </div>
                         <div class="qe-field">
                             <label>关键词（逗号分隔）</label>
-                            <input id="qe-form-keywords" type="text" placeholder="例如：职业,基础" />
+                            <input id="qe-form-keywords" type="text" placeholder="例如：职业,基础" list="qe-keywords-list" />
+                            <datalist id="qe-keywords-list"></datalist>
                         </div>
                     </div>
 
@@ -223,7 +224,7 @@
     <script src="js/api/user.js"></script>
     <script src="js/api/question.js"></script>
     <script src="js/api/admin.js"></script>
-
+    <script src="js/api/keyword.js"></script>
     <script>
         window.EDITOR_MODE = 'questions';
     </script>

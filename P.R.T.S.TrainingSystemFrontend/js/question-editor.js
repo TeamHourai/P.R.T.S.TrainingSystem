@@ -676,6 +676,23 @@
         }
     }
 
+    async function loadKeywords() {
+        try {
+            if (window.keywordApi && typeof keywordApi.getAll === 'function') {
+                const data = await keywordApi.getAll({ mode: isTraining ? 'onboarding' : undefined });
+                const list = Array.isArray(data) ? data : (data && Array.isArray(data.keywords) ? data.keywords : []);
+                const dedup = Array.from(new Set(list.map(k => String(k).trim()).filter(Boolean)));
+                // populate any datalist with id 'qe-keywords-list'
+                const dl = document.getElementById('qe-keywords-list');
+                if (dl) {
+                    dl.innerHTML = dedup.map(k => `<option value="${escapeHtml(k)}"></option>`).join('');
+                }
+            }
+        } catch (e) {
+            console.warn('加载关键词失败', e);
+        }
+    }
+
     async function init() {
         // training-editor.html 中不存在 type/difficulty 字段，隐藏无关校验
         if (isTraining) {
@@ -692,6 +709,9 @@
 
         const ok = await ensureAdmin();
         if (!ok) return;
+
+        // 加载关键词用于建议
+        await loadKeywords();
 
         bindEvents();
         clearForm();

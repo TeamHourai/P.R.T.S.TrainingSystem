@@ -16,7 +16,8 @@ import com.hourai.prts.entity.*;
 public class DataStore {
     static final Path DATA_DIR = Paths.get("data");
     static final Path USERS_FILE = DATA_DIR.resolve("users.csv");
-    static final Path QUESTIONS_FILE = DATA_DIR.resolve("questions.csv");
+    public static final Path QUESTIONS_FILE = DATA_DIR.resolve("questions.csv");
+    static final Path ONBOARDING_QUESTIONS_FILE = DATA_DIR.resolve("questions_onboarding.csv");
     static final Path USER_ANSWERS_FILE = DATA_DIR.resolve("user_answers.csv");
     static final Path EXAM_RECORDS_FILE = DATA_DIR.resolve("exam_records.csv");
 
@@ -39,6 +40,16 @@ public class DataStore {
                 qlines.add(Utils.csvQ(i, 1, 1, "", "示例题：" + (i - 2), false, "A|B|C|D", (i % 4 == 0 ? 4 : i % 4), "示例解析"));
             }
             Files.write(QUESTIONS_FILE, qlines, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
+        }
+        // ensure onboarding file exists (initial content can mirror QUESTIONS_FILE or be left empty)
+        if (!Files.exists(ONBOARDING_QUESTIONS_FILE)) {
+            List<String> qlines = new ArrayList<>();
+            qlines.add(Utils.csvQ(1, 1, 2, "", "以下哪个是 Java 的关键字？", false, "function|class|static|define", 3, "static 是关键字"));
+            qlines.add(Utils.csvQ(2, 2, 1, "", "2 + 2 = ?", false, "3|4|5|22", 2, "2+2=4"));
+            for (int i = 3; i <= 12; i++) {
+                qlines.add(Utils.csvQ(i, 1, 1, "", "示例题：" + (i - 2), false, "A|B|C|D", (i % 4 == 0 ? 4 : i % 4), "示例解析"));
+            }
+            Files.write(ONBOARDING_QUESTIONS_FILE, qlines, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
         }
         if (!Files.exists(USER_ANSWERS_FILE)) {
             Files.createFile(USER_ANSWERS_FILE);
@@ -83,13 +94,23 @@ public class DataStore {
      * 从题目数据文件中加载所有题目信息，返回题目列表
      */
     public static synchronized List<Question> loadQuestions() throws IOException {
-        if (!Files.exists(QUESTIONS_FILE)) return new ArrayList<>();
+        return loadQuestions(QUESTIONS_FILE);
+    }
+
+    // 新增：根据给定文件加载题目，若目标文件不存在则回退到默认 QUESTIONS_FILE
+    public static synchronized List<Question> loadQuestions(Path file) throws IOException {
+        Path target = file == null ? QUESTIONS_FILE : file;
+        if (!Files.exists(target)) {
+            // fallback to default questions file
+            if (!Files.exists(QUESTIONS_FILE)) return new ArrayList<>();
+            target = QUESTIONS_FILE;
+        }
         List<Question> out = new ArrayList<>();
-        List<String> lines = Files.readAllLines(QUESTIONS_FILE, StandardCharsets.UTF_8);
+        List<String> lines = Files.readAllLines(target, StandardCharsets.UTF_8);
         // 解析每一行题目数据
         for (String ln : lines) {
             if (ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 9);
+            String[] p = ln.split(",", 10); // allow an optional 10th column for keywords
             if (p.length < 9) continue;
 
             long id = Long.parseLong(p[0]);
@@ -102,7 +123,12 @@ public class DataStore {
             List<String> options = Arrays.stream(optionsRaw.split("\\|")).map(String::trim).collect(Collectors.toList());
             int answer = Integer.parseInt(p[7]);
             String analysis = Utils.unescapeCsv(p[8]);
-            out.add(new Question(id, type, difficulty, resource, question, hasPicture, options, answer, analysis));
+            String keywords = "";
+            if (p.length >= 10) keywords = Utils.unescapeCsv(p[9]);
+
+            Question q = new Question(id, type, difficulty, resource, question, hasPicture, options, answer, analysis);
+            q.setKeywords(keywords);
+            out.add(q);
         }
         return out;
     }
@@ -207,5 +233,9 @@ public class DataStore {
             }
         }
         return max + 1;
+    }
+
+    public static Path getQuestionsFile() {
+        return QUESTIONS_FILE;
     }
 }

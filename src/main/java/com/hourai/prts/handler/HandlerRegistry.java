@@ -31,6 +31,10 @@ public final class HandlerRegistry {
         HANDLERS.put("exam_history", new ExamHistoryHandler());
         HANDLERS.put("user", new UserHandler());
         HANDLERS.put("ping", new PingHandler());
+        // 新增：admin questions batch delete handler
+        HANDLERS.put("admin_questions", new AdminQuestionsHandler());
+        // 关键词列表
+        HANDLERS.put("keywords", new KeywordsHandler());
     }
 
     private HandlerRegistry() { /* no instantiation */ }

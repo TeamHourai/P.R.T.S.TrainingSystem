@@ -60,6 +60,12 @@ public class Main {
 
         server.createContext("/api/v1/training/questions", HandlerRegistry.getWrapped("questions"));
 
+        // 支持旧版管理接口的批量删除
+        server.createContext("/admin/questions/batch-delete", HandlerRegistry.getWrapped("admin_questions"));
+        // 关键词列表
+        server.createContext("/api/v1/keywords", HandlerRegistry.getWrapped("keywords"));
+        server.createContext("/keywords", HandlerRegistry.getWrapped("keywords"));
+
         // ======================================================
 
         server.setExecutor(null);

@@ -193,7 +193,19 @@ public class Utils {
                 sb.append("\"").append(escapeJson(opt)).append("\"");
             }
             sb.append("],");
-            sb.append("\"answer\":\"").append(q.getAnswer()).append("\"");
+            sb.append("\"answer\":\"").append(q.getAnswer()).append("\",");
+
+            // keywords: stored as pipe-separated string in Question.keywords -> output as JSON array
+            String kwRaw = q.getKeywords() == null ? "" : q.getKeywords();
+            String[] kwArr = kwRaw.isEmpty() ? new String[0] : kwRaw.split("\\|");
+            sb.append("\"keywords\":[");
+            boolean fk = true;
+            for (String kw : kwArr) {
+                if (!fk) sb.append(",");
+                fk = false;
+                sb.append("\"").append(escapeJson(kw)).append("\"");
+            }
+            sb.append("]");
             sb.append("}");
         }
         sb.append("]");

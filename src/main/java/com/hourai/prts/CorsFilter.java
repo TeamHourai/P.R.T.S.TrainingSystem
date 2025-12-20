@@ -18,7 +18,8 @@ public class CorsFilter implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
         // 1) 必须用 set（不是 add），避免多次包装/多次调用时产生重复 header，导致浏览器判定无效
         exchange.getResponseHeaders().set("Access-Control-Allow-Origin", "*");
-        exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET,POST,OPTIONS");
+        // include PUT/DELETE/PATCH to support editor operations
+        exchange.getResponseHeaders().set("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,PATCH,OPTIONS");
         exchange.getResponseHeaders().set("Access-Control-Allow-Headers", "Content-Type, Accept, Authorization, X-Requested-With, Origin");
         exchange.getResponseHeaders().set("Access-Control-Max-Age", "3600");
 

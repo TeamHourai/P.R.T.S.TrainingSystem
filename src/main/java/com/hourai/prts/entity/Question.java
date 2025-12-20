@@ -29,6 +29,7 @@ public class Question {
   private int errorCount;
   private Timestamp createdAt;
   private Timestamp updatedAt;
+  private String keywords; // stored as pipe-separated string (e.g., "kw1|kw2")
 
   public Question() {}
 
@@ -76,4 +77,7 @@ public class Question {
 
   public Timestamp getUpdatedAt() { return updatedAt; }
   public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
+
+  public String getKeywords() { return keywords; }
+  public void setKeywords(String keywords) { this.keywords = keywords; }
 }

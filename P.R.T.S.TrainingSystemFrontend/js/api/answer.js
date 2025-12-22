@@ -52,10 +52,7 @@
 
         // 【答题记录模块-16】获取错题本
         getWrongQuestions: function (params = {}) {
-            // 合并参数
-            const token = window.localStorage && window.localStorage.getItem('token');
-            if (!token) return Promise.reject(new Error('请先登录'));
-            const query = {
+            return http.get('/answers/wrong', {
                 page: params.page || 1,
                 size: params.size || 20,
                 questionType: params.questionType,

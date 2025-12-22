@@ -5,7 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>博士业务能力考核 - 随机试卷</title>
-    <link rel="stylesheet" href="css/exam.css">
+    <!-- 按依赖顺序引入考试模块各部分样式，替代单一不存在的 css/exam.css -->
+    <link rel="stylesheet" href="css/exam/base.css">
+    <link rel="stylesheet" href="css/exam/components.css">
+    <link rel="stylesheet" href="css/exam/layout.css">
+    <link rel="stylesheet" href="css/exam/question.css">
+    <link rel="stylesheet" href="css/exam/responsive.css">
+    <link rel="stylesheet" href="css/exam/result.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -16,7 +22,7 @@
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" class="exam-wrapper">
         <!-- 顶部导航 -->
         <div class="exam-header">
             <div class="header-left">
@@ -253,9 +259,15 @@
         </div>
     </div>
 
-    <!-- 引入题目数据 -->
+    <!-- 本地题库（回退用） -->
     <script src="js/questions.js"></script>
-    <script src="js/exam.js"></script>
+    <!-- 请求层/HTTP 封装（必须在 api 模块之前加载） -->
+    <script src="js/api/request.js"></script>
+    <!-- 考试相关 API（提供 window.examApi） -->
+    <script src="js/api/exam.js"></script>
+    <!-- 考试页面前端逻辑，依赖 window.examApi -->
+    <script src="js/exam-frontend.js"></script>
 </body>
 
 </html>
+

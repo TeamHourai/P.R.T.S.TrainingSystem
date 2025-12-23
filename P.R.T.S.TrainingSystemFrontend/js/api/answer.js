@@ -109,17 +109,15 @@
             const token = getToken();
             if (!token) return Promise.reject(new Error('请先登录'));
 
-            return fetch(`${API_PREFIX}/answers/wrong/${questionId}`, {
-                method: 'DELETE',
-                headers: { 'Authorization': 'Bearer ' + token }
-            }).then(async resp => {
-                const text = await resp.text();
-                if (!resp.ok) throw new Error(text || resp.statusText);
-                try { return JSON.parse(text); } catch (e) { return text; }
-            }).then(resp => {
-                if (resp && (resp.code === 200 || resp.success)) return { success: true };
-                return { success: false };
-            }).catch(() => ({ success: false }));
+            // Prefer shared http client so Authorization header interceptor always applies.
+            return http.delete(API_PREFIX + '/answers/wrong/' + questionId)
+                .then(resp => {
+                    if (resp && resp.success === true) return { success: true };
+                    // Some wrappers may return raw text/object
+                    if (resp && resp.code === 200) return { success: true };
+                    return { success: false, resp };
+                })
+                .catch(() => ({ success: false }));
         }
     };
 

@@ -28,10 +28,12 @@ public class Main {
     public static void main(String[] args) throws Exception {
         DataStore.ensureDataFiles();
 
-        // Bind explicitly to localhost and ALWAYS use port 8080.
-        // If 8080 is occupied, print the owning PID (best effort) and retry for a short period.
-        HttpServer server = null;
+        // ALWAYS use port 8080.
+        // To avoid BindException when re-running from IDE, try to free the port first.
         final int port = 8080;
+        forceKillLocalhostPortListener(port);
+
+        HttpServer server = null;
         final InetSocketAddress addr = new InetSocketAddress("127.0.0.1", port);
         int retries = 10;
         Exception last = null;
@@ -44,6 +46,8 @@ public class Main {
                 last = e;
                 System.err.println("[ERROR] Failed to bind http://127.0.0.1:" + port + " (" + e.getClass().getSimpleName() + ")");
                 printPortOwner(port);
+                // In case a previous instance is still around, try to free it again.
+                forceKillLocalhostPortListener(port);
                 Thread.sleep(500);
             }
         }
@@ -54,6 +58,7 @@ public class Main {
         // 用 HandlerRegistry.getWrapped(...) 统一获取已包裹 CORS 的 handler
         server.createContext("/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/logout", HandlerRegistry.getWrapped("logout"));
         server.createContext("/questions", HandlerRegistry.getWrapped("questions"));
         server.createContext("/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
         server.createContext("/exam/submit", HandlerRegistry.getWrapped("exam_submit"));
@@ -65,6 +70,7 @@ public class Main {
         // ===== 为兼容前端，增加带 /api 和 /api/v1 前缀的路由 =====
         server.createContext("/api/auth/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/api/auth/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/api/auth/logout", HandlerRegistry.getWrapped("logout"));
         server.createContext("/api/auth/profile", HandlerRegistry.getWrapped("auth_profile"));
         server.createContext("/api/questions", HandlerRegistry.getWrapped("questions"));
         server.createContext("/api/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
@@ -77,6 +83,7 @@ public class Main {
 
         server.createContext("/api/v1/auth/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/api/v1/auth/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/api/v1/auth/logout", HandlerRegistry.getWrapped("logout"));
         server.createContext("/api/v1/auth/profile", HandlerRegistry.getWrapped("auth_profile"));
         server.createContext("/api/v1/questions", HandlerRegistry.getWrapped("questions"));
         server.createContext("/api/v1/exam/paper", HandlerRegistry.getWrapped("exam_paper"));
@@ -100,6 +107,47 @@ public class Main {
         server.setExecutor(null);
         System.out.println("Server started at http://localhost:8080");
         server.start();
+    }
+
+    /**
+     * On Windows: best-effort attempt to kill the process that is LISTENING on 127.0.0.1:port.
+     * This makes repeated runs from IDE reliable.
+     */
+    private static void forceKillLocalhostPortListener(int port) {
+        try {
+            // Parse `netstat -ano` and only target LISTENING entries.
+            Process p = new ProcessBuilder("cmd", "/c", "netstat -ano | findstr :" + port + " | findstr LISTENING")
+                    .redirectErrorStream(true)
+                    .start();
+            List<String> lines = new ArrayList<>();
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(p.getInputStream(), StandardCharsets.UTF_8))) {
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (!line.trim().isEmpty()) lines.add(line.trim());
+                }
+            }
+            p.waitFor();
+
+            for (String line : lines) {
+                // netstat format: TCP 127.0.0.1:8080 0.0.0.0:0 LISTENING 30952
+                String[] parts = line.split("\\s+");
+                if (parts.length < 5) continue;
+                String pid = parts[parts.length - 1];
+                if (!pid.matches("\\d+")) continue;
+
+                // Avoid killing ourselves if it somehow matches.
+                String self = java.lang.management.ManagementFactory.getRuntimeMXBean().getName();
+                String selfPid = self != null && self.contains("@") ? self.substring(0, self.indexOf('@')) : "";
+                if (pid.equals(selfPid)) continue;
+
+                new ProcessBuilder("cmd", "/c", "taskkill /PID " + pid + " /F")
+                        .inheritIO()
+                        .start()
+                        .waitFor();
+            }
+        } catch (Exception ignored) {
+            // best-effort
+        }
     }
 
     /**

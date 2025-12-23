@@ -1,18 +1,13 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
 import com.hourai.prts.entity.Question;
+import com.hourai.prts.service.WrongQuestionService;
 import com.hourai.prts.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 /*
   GET /api/v1/answers/wrong?page=1&size=1000
@@ -25,13 +20,13 @@ import java.util.stream.Collectors;
   这里做容错读取，确保接口永远返回有效 JSON。
 */
 public class WrongAnswersHandler implements HttpHandler {
+    private final WrongQuestionService wrongQuestionService = new WrongQuestionService();
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
-        if (!"GET".equalsIgnoreCase(exchange.getRequestMethod())) {
-            Utils.send(exchange, 405, "{\"success\":false,\"message\":\"GET required\"}");
-            return;
-        }
+        String method = exchange.getRequestMethod();
 
+        // Allow GET/DELETE.
         String auth = exchange.getRequestHeaders().getFirst("Authorization");
         if (auth == null || !auth.toLowerCase().startsWith("bearer ")) {
             Utils.send(exchange, 401, "{\"success\":false,\"message\":\"missing token\"}");
@@ -44,35 +39,35 @@ public class WrongAnswersHandler implements HttpHandler {
             return;
         }
 
-        Set<Long> qids = loadWrongQuestionIds(userId);
-        List<Question> qs = DataStore.loadQuestions().stream().filter(q -> qids.contains(q.getId())).collect(Collectors.toList());
-        Utils.send(exchange, 200, Utils.questionsToJson(qs));
-    }
-
-    private static Set<Long> loadWrongQuestionIds(Long userId) throws IOException {
-        Set<Long> qids = new LinkedHashSet<>();
-        java.nio.file.Path file = java.nio.file.Paths.get("data").resolve("user_answers.csv");
-        if (!Files.exists(file)) return qids;
-        List<String> lines = Files.readAllLines(file, StandardCharsets.UTF_8);
-        for (String ln : lines) {
-            if (ln == null) continue;
-            String t = ln.trim();
-            if (t.isEmpty()) continue;
-            // 旧格式: id,userId,questionId,normal,true,2,2025-...
-            // 新/脏数据: id,userId,questionId,2,false,null,2025-...
-            String[] p = t.split(",", 7);
-            if (p.length < 5) continue;
-            try {
-                long uid = Long.parseLong(p[1].trim());
-                if (!userId.equals(uid)) continue;
-                long qid = Long.parseLong(p[2].trim());
-                boolean correct = Boolean.parseBoolean(p[4].trim());
-                if (!correct) qids.add(qid);
-            } catch (Exception ignored) {
-                // 忽略坏行
-            }
+        if ("GET".equalsIgnoreCase(method)) {
+            List<Question> qs = wrongQuestionService.getVisibleWrongQuestions(userId);
+            Utils.send(exchange, 200, Utils.questionsToJson(qs));
+            return;
         }
-        return qids;
+
+        if ("DELETE".equalsIgnoreCase(method)) {
+            // Expected path: /api/v1/answers/wrong/{questionId}
+            String path = exchange.getRequestURI().getPath();
+            String[] segs = path.split("/");
+            String last = segs.length > 0 ? segs[segs.length - 1] : "";
+            if (last == null || last.trim().isEmpty() || "wrong".equalsIgnoreCase(last.trim())) {
+                Utils.send(exchange, 400, "{\"success\":false,\"message\":\"questionId required\"}");
+                return;
+            }
+            long questionId;
+            try {
+                questionId = Long.parseLong(last.trim());
+            } catch (NumberFormatException nfe) {
+                Utils.send(exchange, 400, "{\"success\":false,\"message\":\"invalid questionId\"}");
+                return;
+            }
+
+            wrongQuestionService.hideWrongQuestion(userId, questionId);
+            Utils.send(exchange, 200, "{\"success\":true,\"message\":\"hidden\",\"userId\":" + userId + ",\"questionId\":" + questionId + "}");
+            return;
+        }
+
+        Utils.send(exchange, 405, "{\"success\":false,\"message\":\"GET or DELETE required\"}");
     }
 
     private static Long parseUserIdFromToken(String token) {

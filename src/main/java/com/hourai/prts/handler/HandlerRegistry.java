@@ -23,6 +23,7 @@ public final class HandlerRegistry {
         // 初始化常用 handler 实例（与现有 Handler 类一一对应）
         HANDLERS.put("register", new RegisterHandler());
         HANDLERS.put("login", new LoginHandler());
+        HANDLERS.put("logout", new LogoutHandler());
         HANDLERS.put("auth_profile", new AuthProfileHandler());
         HANDLERS.put("answers_wrong", new WrongAnswersHandler());
         HANDLERS.put("questions", new QuestionsHandler());

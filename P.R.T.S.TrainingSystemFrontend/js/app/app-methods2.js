@@ -33,17 +33,14 @@ window._appMethods2 = {
         }
         if (!window.answerApi) throw new Error('answerApi 未定义');
         const response = await answerApi.getWrongQuestions({ page: 1, size: 1000 });
-        if (response && response.history) {
-            this.wrongQuestions = response.history.filter(record => !record.isCorrect).map(record => record.questionId);
-            this.wrongQuestionsDetail = [];
-            for (const record of response.history) {
-                if (!record.isCorrect) {
-                    const question = this.rawQuestions.find(q => q.id === record.questionId);
-                    if (question) this.wrongQuestionsDetail.push(question);
-                }
-            }
-            this.updateWrongCategories();
-        }
+
+        // Backend currently returns an array of Question objects.
+        // Some older frontends expected { history: [...] }.
+        const list = Array.isArray(response) ? response : (response && response.history ? response.history : []);
+
+        this.wrongQuestionsDetail = Array.isArray(list) ? list.slice() : [];
+        this.wrongQuestions = this.wrongQuestionsDetail.map(q => q.id);
+        this.updateWrongCategories();
     },
     async loadQuestionStats(questionId, questionType) {
         // ...existing code...

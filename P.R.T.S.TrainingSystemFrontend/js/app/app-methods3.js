@@ -317,11 +317,30 @@ window._appMethods3 = {
     async removeFromWrongBook(questionId) {
         // ...existing code...
         if (!this.isLoggedIn) return;
+
+        let ok = true;
+        if (window.answerApi) {
+            try {
+                const resp = await answerApi.removeWrongQuestion(questionId);
+                ok = !!(resp && (resp.success === true));
+            } catch (e) {
+                ok = false;
+            }
+        }
+
+        if (!ok) {
+            this.showError('删除错题失败（后端未生效），请重试');
+            return;
+        }
+
+        // remove locally
         this.wrongQuestions = this.wrongQuestions.filter(id => id !== questionId);
         this.wrongQuestionsDetail = this.wrongQuestionsDetail.filter(q => q.id !== questionId);
         this.updateWrongCategories();
-        if (window.answerApi) {
-            await answerApi.removeWrongQuestion(questionId);
+
+        // refresh from backend to ensure persistence
+        if (typeof this.loadWrongQuestions === 'function') {
+            await this.loadWrongQuestions();
         }
     }
 };

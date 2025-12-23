@@ -5,6 +5,7 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.hourai.prts.utils.Utils;
 import com.hourai.prts.entity.*;
+import com.hourai.prts.service.WrongQuestionService;
 
 import java.io.IOException;
 import java.util.List;
@@ -15,6 +16,8 @@ import java.util.Map;
   body: userId=...&answers=1:2,3:1
 */
 public class ExamSubmitHandler implements HttpHandler {
+    private final WrongQuestionService wrongQuestionService = new WrongQuestionService();
+
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         try {
@@ -55,6 +58,16 @@ public class ExamSubmitHandler implements HttpHandler {
                 // Question.answer is stored as String of option index
                 boolean correct = qObj != null && qObj.getAnswer() != null && qObj.getAnswer().equals(String.valueOf(sel));
                 if (correct) score += 1;
+
+                // Rule: if user answers wrong again, unhide it so it can show in wrong list.
+                if (!correct) {
+                    try {
+                        wrongQuestionService.unhideIfHidden(userId, qid);
+                    } catch (Exception ignored) {
+                        // never break exam submit for visibility bookkeeping
+                    }
+                }
+
                 UserAnswer ua = new UserAnswer(uaNext++, userId, qid, "normal", correct, sel, Utils.now());
                 DataStore.appendUserAnswer(ua);
             }

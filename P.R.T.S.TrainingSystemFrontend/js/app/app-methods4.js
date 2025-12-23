@@ -393,9 +393,16 @@ window._appMethods4 = {
     deleteWrongCategory(key) {
         if (confirm('确定要删除这个分类的所有错题吗？')) {
             const type = parseInt(key.split('_')[1]);
-            this.wrongQuestionsDetail = this.wrongQuestionsDetail.filter(q => q.type !== type);
-            this.wrongQuestions = this.wrongQuestionsDetail.map(q => q.id);
-            this.updateWrongCategories();
+            const idsToDelete = this.wrongQuestionsDetail.filter(q => q.type === type).map(q => q.id);
+
+            // hide on backend (one by one)
+            Promise.all(idsToDelete.map(id => this.removeFromWrongBook(id)))
+                .then(() => {
+                    // then update UI
+                    this.wrongQuestionsDetail = this.wrongQuestionsDetail.filter(q => q.type !== type);
+                    this.wrongQuestions = this.wrongQuestionsDetail.map(q => q.id);
+                    this.updateWrongCategories();
+                });
         }
     },
     deleteWrongQuestion(id) {
@@ -405,10 +412,14 @@ window._appMethods4 = {
     },
     clearWrongRecords() {
         if (confirm('确定要清除所有错题记录吗？')) {
-            this.wrongQuestions = [];
-            this.wrongQuestionsDetail = [];
-            this.updateWrongCategories();
-            this.showSuccess('已清除所有错题记录');
+            const idsToDelete = (this.wrongQuestionsDetail || []).map(q => q.id);
+            Promise.all(idsToDelete.map(id => this.removeFromWrongBook(id)))
+                .then(() => {
+                    this.wrongQuestions = [];
+                    this.wrongQuestionsDetail = [];
+                    this.updateWrongCategories();
+                    this.showSuccess('已清除所有错题记录');
+                });
         }
     },
     goToFirstUnansweredTraining() {

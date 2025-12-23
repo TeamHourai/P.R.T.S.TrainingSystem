@@ -91,22 +91,110 @@ document.addEventListener('DOMContentLoaded', function () {
                 return correct * 4; // 假设每题4分
             },
             // 提交试卷
-            submitExam() {
+            async submitExam() {
+                // 先计算分数 & 展示结果
                 this.showResult = true;
                 let total = 0;
                 for (const section of this.examPaper) {
                     total += this.calculateSectionScore(section);
                 }
                 this.totalScore = total;
+
+                // 如果后端支持提交（用于回填正确答案/解析/记录），则提交一次。
+                // 不阻塞 UI：失败也不影响本地展示。
+                try {
+                    if (window.examApi && typeof examApi.submitExamAnswers === 'function') {
+                        // collect answers: {questionId: userAnswer}
+                        const answers = {};
+                        for (const sec of this.examPaper) {
+                            for (const q of sec.questions) {
+                                if (q && q.id != null && q.userAnswer != null) {
+                                    answers[q.id] = q.userAnswer;
+                                }
+                            }
+                        }
+                        // userId 可选：若你有登录体系，可从 localStorage/sessionStorage 取
+                        let userId = null;
+                        try {
+                            const ui = JSON.parse(localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo') || 'null');
+                            if (ui && ui.id) userId = ui.id;
+                        } catch (e) { /* ignore */ }
+
+                        const res = await examApi.submitExamAnswers(userId, answers);
+                        // 若后端返回了纠正后的题目数据（例如 correctAnswer/analysis），可在这里合并回 examPaper
+                        // 保持兼容：仅在字段存在时覆盖
+                        if (res && Array.isArray(res.questions)) {
+                            const byId = new Map(res.questions.map(x => [x.id, x]));
+                            for (const sec of this.examPaper) {
+                                for (const q of sec.questions) {
+                                    const serverQ = byId.get(q.id);
+                                    if (!serverQ) continue;
+                                    // merge common fields
+                                    if (serverQ.answer !== undefined) q.answer = serverQ.answer;
+                                    if (serverQ.analysis !== undefined) q.analysis = serverQ.analysis;
+                                    if (serverQ.options !== undefined) q.options = serverQ.options;
+                                    if (serverQ.question !== undefined) q.question = serverQ.question;
+                                    if (serverQ.picture !== undefined) q.picture = serverQ.picture;
+                                    if (serverQ.difficulty !== undefined) q.difficulty = serverQ.difficulty;
+                                    if (serverQ.type !== undefined) q.type = serverQ.type;
+                                }
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.warn('提交考试到后端失败（已忽略，不影响前端结果显示）', e);
+                }
             },
-            // 重新测试
-            restartExam() {
-                window.location.reload();
+
+            // 查看题目详情：如果当前题缺少详情（尤其 analysis/options/question），则从后端按 id 拉取再展示
+            async showQuestionDetail(q, sectionIndex, qIndex) {
+                const section = this.examPaper[sectionIndex] || {};
+
+                // 若本地没有解析/选项/题干，尝试从后端 /api/v1/questions/{id} 拉取完整详情
+                try {
+                    const needsFetch = !q || !q.id || !q.question || !q.options || (Array.isArray(q.options) && q.options.length === 0) || (q.analysis == null || q.analysis === '');
+                    if (needsFetch && window.questionApi && typeof questionApi.getQuestionById === 'function') {
+                        const full = await questionApi.getQuestionById(q.id);
+                        if (full) {
+                            // 合并回原对象，保证后续再次点不用再请求
+                            Object.assign(q, full);
+                        }
+                    } else if (needsFetch) {
+                        // fallback：直接 fetch
+                        const base = (window.API_BASE_URL || 'http://localhost:8080').replace(/\/+$/, '');
+                        const resp = await fetch(base + '/api/v1/questions/' + encodeURIComponent(q.id));
+                        if (resp.ok) {
+                            const full = await resp.json();
+                            if (full) Object.assign(q, full);
+                        }
+                    }
+                } catch (e) {
+                    console.warn('拉取题目详情失败（将用本地数据展示）', e);
+                }
+
+                const rawAnswer = (q.answer !== undefined && q.answer !== null) ? q.answer : (q.correct !== undefined ? q.correct : null);
+                const rawUser = (q.userAnswer !== undefined && q.userAnswer !== null) ? q.userAnswer : null;
+                const answerNorm = this.normalizeToNumber(rawAnswer);
+                const userNorm = this.normalizeToNumber(rawUser);
+
+                this.currentDetailQuestion = {
+                    id: q.id,
+                    question: q.question || '',
+                    options: Array.isArray(q.options) ? q.options : (q.options ? String(q.options).split('|') : []),
+                    answer: answerNorm || this.normalizeToNumber(q.answer) || 0,
+                    userAnswer: userNorm || this.normalizeToNumber(rawUser) || null,
+                    analysis: q.analysis || q.explain || '暂无解析',
+                    picture: q.picture || q.image || false,
+                    typeText: section.typeName || q.typeName || q.type || '未知类型',
+                    difficultyText: q.difficultyText || (typeof q.difficulty === 'number' ? ['常识','基操','娴熟','明智','深邃'][q.difficulty - 1] : q.difficulty) || '未知'
+                };
+
+                this.$nextTick(() => {
+                    this.showQuestionDetailModal = true;
+                    document.body.style.overflow = 'hidden';
+                });
             },
-            // 返回首页
-            goBack() {
-                window.location.href = 'index.html';
-            },
+
             // 辅助：把可能为字母或数字的答案归一化为数字（1 -> A, 2 -> B）
             normalizeToNumber(ans) {
                 if (ans === null || ans === undefined) return null;
@@ -130,38 +218,18 @@ document.addEventListener('DOMContentLoaded', function () {
                 return '-';
             },
 
-            // 查看题目详情（改为在 nextTick 后显示，避免渲染/事件时序问题）
-            showQuestionDetail(q, sectionIndex, qIndex) {
-                const section = this.examPaper[sectionIndex] || {};
-                const rawAnswer = (q.answer !== undefined && q.answer !== null) ? q.answer : (q.correct !== undefined ? q.correct : null);
-                const rawUser = (q.userAnswer !== undefined && q.userAnswer !== null) ? q.userAnswer : null;
-                const answerNorm = this.normalizeToNumber(rawAnswer);
-                const userNorm = this.normalizeToNumber(rawUser);
 
-                this.currentDetailQuestion = {
-                    id: q.id,
-                    question: q.question || '',
-                    options: Array.isArray(q.options) ? q.options : (q.options ? q.options.split('|') : []),
-                    // 归一化后的数值（1表示A，2表示B...），以及保留原始值
-                    answerNormalized: answerNorm,
-                    rawAnswer: rawAnswer,
-                    userAnswerNormalized: userNorm,
-                    rawUserAnswer: rawUser,
-                    analysis: q.analysis || q.explain || '',
-                    picture: q.picture || q.image || null,
-                    typeText: section.typeName || q.typeName || q.type || '未知类型',
-                    difficultyText: q.difficultyText || (typeof q.difficulty === 'number' ? ['常识','基操','娴熟','明智','深邃'][q.difficulty - 1] : q.difficulty) || '未知'
-                };
-                // 在 DOM 更新后再打开 modal，防止点击事件与插入时序冲突
-                this.$nextTick(() => {
-                    setTimeout(() => {
-                        this.showQuestionDetailModal = true;
-                        document.body.style.overflow = 'hidden';
-                        if (this.$refs && this.$refs.modalOverlay) {
-                            this.$refs.modalOverlay.style.zIndex = '9999';
-                        }
-                    }, 30);
-                });
+            // 图片加载失败时隐藏图片，避免控制台大量 404 + Vue 报错
+            onQuestionImageError(question) {
+                try {
+                    if (question) question.picture = false;
+                } catch (e) { /* ignore */ }
+            },
+
+            onDetailImageError() {
+                try {
+                    if (this.currentDetailQuestion) this.currentDetailQuestion.picture = false;
+                } catch (e) { /* ignore */ }
             },
 
             closeQuestionDetail() {
@@ -253,6 +321,33 @@ document.addEventListener('DOMContentLoaded', function () {
                     this.bindScrollListener();
                     this.scheduleUpdateCurrentQuestion();
                 });
+            },
+
+            restartExam() {
+                // reset state without full page reload (more stable under dev servers)
+                try {
+                    this.showResult = false;
+                    this.showQuestionDetailModal = false;
+                    this.currentDetailQuestion = {};
+                    this.totalScore = 0;
+                    this.answeredCount = 0;
+                    this.currentQuestionNumber = 1;
+                    for (const sec of this.examPaper) {
+                        for (const q of sec.questions) {
+                            q.userAnswer = null;
+                        }
+                    }
+                    // reset timer
+                    this.elapsedTime = 0;
+                    this.remainingTime = 900;
+                } catch (e) {
+                    // fallback
+                    window.location.reload();
+                }
+            },
+
+            goBack() {
+                window.location.href = 'index.html';
             },
         },
         mounted() {

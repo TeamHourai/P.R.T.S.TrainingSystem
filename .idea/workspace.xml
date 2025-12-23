@@ -4,21 +4,14 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="修复bug：错题记录会随重新登录而消失">
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/ui/modal.js" afterDir="false" />
+    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="修复bug：题库的题目没有解析">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/question-editor.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/question-editor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/components.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/components.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/study-pages.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/study-pages.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/exam.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/exam.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/exam-frontend.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/exam-frontend.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/exam_records.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/exam_records.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/data/user_answers.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/user_answers.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/users.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/users.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/RegisterHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/RegisterHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/utils/Utils.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/utils/Utils.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/RegisterHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/RegisterHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/utils/Utils.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/utils/Utils.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -264,7 +257,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766489667893</updated>
     </task>
-    <option name="localTasksCounter" value="19" />
+    <task id="LOCAL-00019" summary="修复bug：题库的题目没有解析">
+      <option name="closed" value="true" />
+      <created>1766492065500</created>
+      <option name="number" value="00019" />
+      <option name="presentableId" value="LOCAL-00019" />
+      <option name="project" value="LOCAL" />
+      <updated>1766492065500</updated>
+    </task>
+    <option name="localTasksCounter" value="20" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -333,7 +334,8 @@
     <MESSAGE value="修复了无法登录的问题，修复了错题记录无法使用的问题。现有问题还有无法查看解析，无法正确渲染考试页面" />
     <MESSAGE value="修复了登录状态也无法提交答题记录、未能显示解析和答题统计的bug" />
     <MESSAGE value="修复bug：错题记录会随重新登录而消失" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复bug：错题记录会随重新登录而消失" />
+    <MESSAGE value="修复bug：题库的题目没有解析" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复bug：题库的题目没有解析" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

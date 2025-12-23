@@ -14,9 +14,10 @@
     <link rel="stylesheet" href="css/exam/result.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase-config.js"></script>
-    <script src="js/database.js"></script>
+    <!-- 移除 Supabase 相关脚本：项目当前未提供 js/supabase-config.js 与 js/database.js，导致 404/ MIME 报错 -->
+
+    <!-- 全局API配置（用于设置 window.API_BASE_URL） -->
+    <script src="js/config.js"></script>
 
     <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
 </head>
@@ -57,7 +58,7 @@
                         <div class="question-text">
                             <p v-html="question.question"></p>
                             <img v-if="question.picture" :src="'./images/' + question.id + '.png'"
-                                :alt="'题目' + question.id + '图片'" class="question-image">
+                                :alt="'题目' + question.id + '图片'" class="question-image" @error="onQuestionImageError(question)">
                         </div>
 
                         <div class="options-container">
@@ -232,7 +233,7 @@
                     <div class="question-text">
                         <p v-html="currentDetailQuestion.question"></p>
                         <img v-if="currentDetailQuestion.picture" :src="'./images/' + currentDetailQuestion.id + '.png'"
-                            :alt="'题目' + currentDetailQuestion.id + '图片'" class="question-image">
+                            :alt="'题目' + currentDetailQuestion.id + '图片'" class="question-image" @error="onDetailImageError">
                     </div>
 
                     <div class="options-container">
@@ -259,15 +260,16 @@
         </div>
     </div>
 
-    <!-- 本地题库（回退用） -->
-    <script src="js/questions.js"></script>
+    <!-- 依赖顺序：axios -> request -> api -> page logic -->
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <!-- 请求层/HTTP 封装（必须在 api 模块之前加载） -->
     <script src="js/api/request.js"></script>
+    <!-- 题目 API（提供 window.questionApi，用于点击题号拉取详情） -->
+    <script src="js/api/question.js"></script>
     <!-- 考试相关 API（提供 window.examApi） -->
     <script src="js/api/exam.js"></script>
-    <!-- 考试页面前端逻辑，依赖 window.examApi -->
+    <!-- 考试页面前端逻辑，依赖 window.examApi / window.questionApi -->
     <script src="js/exam-frontend.js"></script>
 </body>
 
 </html>
-

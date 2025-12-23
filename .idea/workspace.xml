@@ -5,13 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="修复bug：题库的题目没有解析">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/components.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/components.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/study-pages.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/study-pages.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/exam.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/exam.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/exam-frontend.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/exam-frontend.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/exam_records.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/exam_records.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/user_answers.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/user_answers.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/questions.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/questions.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/questions_onboarding.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/questions_onboarding.csv" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -60,7 +55,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "SHARE_PROJECT_CONFIGURATION_FILES": "true",
-    "git-widget-placeholder": "无数据库",
+    "git-widget-placeholder": "main",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "D:/新建文件夹/cc/P.R.T.S.TrainingSystem",
     "node.js.detected.package.eslint": "true",

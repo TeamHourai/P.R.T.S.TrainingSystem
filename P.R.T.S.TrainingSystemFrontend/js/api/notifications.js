@@ -21,7 +21,8 @@
         // 【通知模块-31】获取通知
         getNotifications: function (params = {}) {
             return http.get('/notifications', {
-                unreadOnly: params.unreadOnly || false,
+                // 新参数名：unread=true 表示仅未读
+                unread: !!params.unread,
                 page: params.page || 1,
                 size: params.size || 20,
                 type: params.type
@@ -44,7 +45,7 @@
         },
 
         // 【UPD1.1-3】清空所有通知
-        clearAllNotifications: function () {
+        clearAll: function () {
             return http.delete('/notifications');
         },
 

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>发布系统公告</title>
+
+  <link rel="stylesheet" href="css/index/base.css" />
+  <link rel="stylesheet" href="css/index/layout.css" />
+  <link rel="stylesheet" href="css/index/components.css" />
+  <link rel="stylesheet" href="css/index/admin.css" />
+  <link rel="stylesheet" href="css/index/question-editor.css" />
+  <link rel="stylesheet" href="css/index/responsive.css" />
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <script src="js/config.js"></script>
+</head>
+<body>
+<div class="qe-page">
+  <header class="qe-header">
+    <div>
+      <h1 class="qe-title">发布系统公告</h1>
+      <p class="qe-subtitle">管理员发布全体用户可见的系统公告</p>
+    </div>
+    <div class="qe-header-actions">
+      <a class="back-btn" href="index.html" style="text-decoration:none;"><i class="fas fa-arrow-left"></i> 返回首页</a>
+    </div>
+  </header>
+
+  <main class="qe-main">
+    <section class="qe-card qe-right" style="max-width: 860px; margin: 0 auto;">
+      <div class="qe-form-header">
+        <h2 class="qe-form-title">新公告</h2>
+        <div class="qe-form-sub">填写标题与内容后点击发布</div>
+      </div>
+
+      <form id="ann-form" class="qe-form">
+        <div class="qe-field">
+          <label>公告类型 *</label>
+          <select id="ann-type" required>
+            <option value="system" selected>系统通知</option>
+            <option value="exam">考试通知</option>
+            <option value="answer">答题反馈</option>
+            <option value="warning">系统提醒</option>
+            <option value="update">更新通知</option>
+            <option value="reward">奖励通知</option>
+          </select>
+          <div class="qe-hint" style="margin-top:6px;">不同类型会在通知中心以不同图标/颜色展示。</div>
+        </div>
+
+        <div class="qe-field">
+          <label>标题 *</label>
+          <input id="ann-title" type="text" placeholder="请输入公告标题" required />
+        </div>
+
+        <div class="qe-field">
+          <label>内容 *</label>
+          <textarea id="ann-content" rows="8" placeholder="请输入公告内容（支持换行）" required></textarea>
+        </div>
+
+        <div class="qe-form-grid">
+          <div class="qe-field qe-inline">
+            <input id="ann-important" type="checkbox" />
+            <label for="ann-important" style="margin:0;">重要公告</label>
+          </div>
+          <div class="qe-field">
+            <label>过期时间（可选）</label>
+            <input id="ann-expires" type="datetime-local" />
+          </div>
+        </div>
+
+        <div class="qe-actions">
+          <button class="nav-btn primary" type="submit"><i class="fas fa-bullhorn"></i> 发布</button>
+          <button class="nav-btn secondary" type="button" id="ann-clear"><i class="fas fa-broom"></i> 清空</button>
+        </div>
+
+        <div class="qe-hint" id="ann-hint"></div>
+      </form>
+    </section>
+  </main>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+<script src="js/api/request.js"></script>
+<script src="js/apiapp.js"></script>
+<script src="js/api/user.js"></script>
+<script src="js/api/announcements.js"></script>
+<script src="js/ui/modal.js"></script>
+
+<script>
+(function () {
+  const hint = document.getElementById('ann-hint');
+  const titleEl = document.getElementById('ann-title');
+  const contentEl = document.getElementById('ann-content');
+  const importantEl = document.getElementById('ann-important');
+  const expiresEl = document.getElementById('ann-expires');
+  const typeEl = document.getElementById('ann-type');
+  const clearBtn = document.getElementById('ann-clear');
+  const form = document.getElementById('ann-form');
+
+  function setHint(msg, type) {
+    if (!hint) return;
+    hint.textContent = msg || '';
+    hint.classList.remove('qe-error', 'qe-success');
+    if (type === 'error') hint.classList.add('qe-error');
+    if (type === 'success') hint.classList.add('qe-success');
+  }
+
+  function toastError(msg) {
+    if (window.uiModal && window.uiModal.error) window.uiModal.error(msg);
+    else alert(msg);
+  }
+  function toastSuccess(msg) {
+    if (window.uiModal && window.uiModal.success) window.uiModal.success(msg);
+    else alert(msg);
+  }
+
+  function getStored(keyA, keyB) {
+    return localStorage.getItem(keyA) || sessionStorage.getItem(keyA) || localStorage.getItem(keyB) || sessionStorage.getItem(keyB);
+  }
+
+  function getUserInfo() {
+    const str = getStored('userInfo', 'user_info');
+    if (!str) return null;
+    try { return JSON.parse(str); } catch { return null; }
+  }
+
+  async function ensureAdmin() {
+    const token = getStored('token', 'auth_token');
+    if (!token) {
+      toastError('请先登录管理员账号');
+      return false;
+    }
+    let user = getUserInfo();
+    if (!user && window.userApi && typeof userApi.getCurrentUser === 'function') {
+      try { user = await userApi.getCurrentUser(); } catch { /* ignore */ }
+    }
+    const isAdmin = user && (user.isAdmin === true || user.role === 'admin');
+    if (!isAdmin) {
+      toastError('需要管理员权限');
+      return false;
+    }
+    return true;
+  }
+
+  clearBtn.addEventListener('click', () => {
+    typeEl.value = 'system';
+    titleEl.value = '';
+    contentEl.value = '';
+    importantEl.checked = false;
+    expiresEl.value = '';
+    setHint('', null);
+  });
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    setHint('', null);
+
+    const ok = await ensureAdmin();
+    if (!ok) return;
+
+    const payload = {
+      type: (typeEl && typeEl.value) ? typeEl.value : 'system',
+      title: (titleEl.value || '').trim(),
+      content: (contentEl.value || '').trim(),
+      important: !!importantEl.checked,
+      expiresAt: expiresEl.value ? new Date(expiresEl.value).toISOString() : ''
+    };
+
+    if (!payload.title) {
+      setHint('标题不能为空', 'error');
+      return;
+    }
+    if (!payload.content) {
+      setHint('内容不能为空', 'error');
+      return;
+    }
+
+    try {
+      setHint('发布中...', null);
+      const res = await announcementApi.createAnnouncement(payload);
+      toastSuccess('公告已发布');
+      setHint('发布成功', 'success');
+      // clear after success
+      typeEl.value = 'system';
+      titleEl.value = '';
+      contentEl.value = '';
+      importantEl.checked = false;
+      expiresEl.value = '';
+
+      // 可选：跳回首页通知中心
+      // window.location.href = 'index.html';
+    } catch (err) {
+      console.error(err);
+      setHint('发布失败', 'error');
+      toastError((err && err.message) ? err.message : '发布失败');
+    }
+  });
+})();
+</script>
+</body>
+</html>

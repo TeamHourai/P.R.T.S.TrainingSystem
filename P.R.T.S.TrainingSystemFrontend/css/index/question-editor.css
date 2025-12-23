@@ -264,6 +264,24 @@
     color: #d1ffe2;
 }
 
+/* 公告编辑：类型选择下拉 */
+#ann-type {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--bg-card-light);
+    color: var(--text-primary);
+    font-size: 1rem;
+    transition: var(--transition);
+}
+
+#ann-type:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px rgba(94, 53, 177, 0.2);
+}
+
 /* 训练编辑器：隐藏未使用的筛选项时，自动适配 */
 .qe-field-sm {
     max-width: 140px;

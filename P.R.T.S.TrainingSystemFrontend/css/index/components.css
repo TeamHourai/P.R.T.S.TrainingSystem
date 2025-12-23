@@ -203,6 +203,8 @@
     display: flex;
     background: var(--bg-card-light);
     border-bottom: 1px solid var(--border-color);
+    gap: 8px;
+    padding: 10px;
 }
 
 .tab {
@@ -213,12 +215,182 @@
     transition: var(--transition);
     font-weight: 500;
     color: var(--text-secondary);
+    border-radius: 12px;
+    padding: 12px 10px;
+    border: 1px solid transparent;
+}
+
+.tab:hover {
+    background: rgba(94, 53, 177, 0.08);
+    color: var(--text-primary);
 }
 
 .tab.active {
     color: var(--text-primary);
     border-bottom: 3px solid var(--accent-color);
     background: var(--bg-card);
+    border: 1px solid rgba(94, 53, 177, 0.25);
+    box-shadow: 0 8px 18px rgba(94, 53, 177, 0.14);
+}
+
+/* ================== 通知中心（公告）样式 ================== */
+.notification-modal {
+    overflow: hidden;
+}
+
+.notification-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 14px;
+}
+
+.notification-item {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 14px 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.notification-item:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow);
+}
+
+.notification-item.unread {
+    border-color: rgba(33, 150, 243, 0.35);
+    background: linear-gradient(180deg, rgba(33, 150, 243, 0.06), rgba(255, 255, 255, 0));
+}
+
+.notification-item .notif-badge {
+    flex: 0 0 auto;
+}
+
+.notification-item .badge {
+    vertical-align: middle;
+}
+
+.notif-content {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    color: var(--text-secondary);
+    line-height: 1.55;
+}
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2px 8px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.6;
+    border: 1px solid transparent;
+}
+
+.badge-danger {
+    background: rgba(244, 67, 54, 0.12);
+    color: #d32f2f;
+    border-color: rgba(244, 67, 54, 0.22);
+}
+
+.badge-warning {
+    background: rgba(255, 152, 0, 0.14);
+    color: #ef6c00;
+    border-color: rgba(255, 152, 0, 0.25);
+}
+
+.notif-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card-light);
+    cursor: pointer;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-secondary);
+}
+
+.notif-btn:hover {
+    background: var(--bg-card);
+    color: var(--text-primary);
+}
+
+.pagination button {
+    border: 1px solid var(--border-color);
+    background: var(--bg-card-light);
+    color: var(--text-primary);
+    padding: 10px 14px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.pagination button:hover:not(.disabled):not(:disabled) {
+    background: var(--primary-color);
+    color: #fff;
+    transform: translateY(-1px);
+}
+
+.pagination button.disabled,
+.pagination button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* 详情弹窗 */
+.notice-detail-modal {
+    overflow: hidden;
+}
+
+.notice-detail-body {
+    padding: 18px 22px 6px 22px;
+}
+
+.notice-detail-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.notice-detail-meta {
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 14px;
+}
+
+.notice-detail-content {
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    background: var(--bg-card-light);
+    color: var(--text-primary);
+    line-height: 1.8;
+    max-height: 50vh;
+    overflow: auto;
+}
+
+.notice-detail-actions {
+    padding: 0 22px 18px 22px;
+    display: flex;
+    justify-content: flex-end;
 }
 
 /* 表单元素 */

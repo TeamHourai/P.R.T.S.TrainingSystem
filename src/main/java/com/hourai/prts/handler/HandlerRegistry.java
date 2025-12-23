@@ -38,6 +38,11 @@ public final class HandlerRegistry {
         HANDLERS.put("keywords", new KeywordsHandler());
         // 统计接口
         HANDLERS.put("stats", new StatsHandler());
+        // 系统公告（管理员发布/用户查看）
+        HANDLERS.put("announcements", new AnnouncementsHandler());
+
+        // 通知中心（由公告映射而来，支持已读/隐藏状态）
+        HANDLERS.put("notifications", new NotificationsHandler());
     }
 
     private HandlerRegistry() { /* no instantiation */ }

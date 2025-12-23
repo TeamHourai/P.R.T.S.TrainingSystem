@@ -66,6 +66,9 @@ public class Main {
         server.createContext("/user", HandlerRegistry.getWrapped("user")); // handles /user/{id}/wrong
         server.createContext("/ping", HandlerRegistry.getWrapped("ping"));
         server.createContext("/stats", HandlerRegistry.getWrapped("stats"));
+        server.createContext("/announcements", HandlerRegistry.getWrapped("announcements"));
+        server.createContext("/admin/announcements", HandlerRegistry.getWrapped("announcements"));
+        server.createContext("/notifications", HandlerRegistry.getWrapped("notifications"));
 
         // ===== 为兼容前端，增加带 /api 和 /api/v1 前缀的路由 =====
         server.createContext("/api/auth/register", HandlerRegistry.getWrapped("register"));
@@ -80,6 +83,9 @@ public class Main {
         server.createContext("/api/user", HandlerRegistry.getWrapped("user"));
         server.createContext("/api/ping", HandlerRegistry.getWrapped("ping"));
         server.createContext("/api/stats", HandlerRegistry.getWrapped("stats"));
+        server.createContext("/api/announcements", HandlerRegistry.getWrapped("announcements"));
+        server.createContext("/api/admin/announcements", HandlerRegistry.getWrapped("announcements"));
+        server.createContext("/api/notifications", HandlerRegistry.getWrapped("notifications"));
 
         server.createContext("/api/v1/auth/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/api/v1/auth/login", HandlerRegistry.getWrapped("login"));
@@ -93,6 +99,9 @@ public class Main {
         server.createContext("/api/v1/user", HandlerRegistry.getWrapped("user"));
         server.createContext("/api/v1/ping", HandlerRegistry.getWrapped("ping"));
         server.createContext("/api/v1/stats", HandlerRegistry.getWrapped("stats"));
+        server.createContext("/api/v1/announcements", HandlerRegistry.getWrapped("announcements"));
+        server.createContext("/api/v1/admin/announcements", HandlerRegistry.getWrapped("announcements"));
+        server.createContext("/api/v1/notifications", HandlerRegistry.getWrapped("notifications"));
 
         server.createContext("/api/v1/training/questions", HandlerRegistry.getWrapped("questions"));
 

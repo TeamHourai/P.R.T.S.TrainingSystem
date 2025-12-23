@@ -56,7 +56,6 @@ window._appData = {
     systemTips: '',
     // ================== 系统公告/通知中心相关 ==================
     notifications: [],
-    localNotifications: [],
     unreadCount: 0,
     noticePage: 1,
     hasMoreNotifications: false,
@@ -64,4 +63,8 @@ window._appData = {
     showConfirmDialog: false,
     confirmMessage: '',
     confirmAction: null,
+
+    // 公告详情弹窗
+    showNoticeDetail: false,
+    currentNoticeDetail: null,
 };

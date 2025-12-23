@@ -342,6 +342,19 @@ window._appMethods4 = {
         }
         console.log(String(message));
     },
+    openSystemNotice() {
+        if (!this.isLoggedIn) {
+            this.showError('请先登录后查看系统公告');
+            this.showAuthModal = true;
+            this.authMode = 'login';
+            return;
+        }
+        this.showSystemNotice = true;
+        // 默认切到未读页
+        if (!this.systemNoticeTab) this.systemNoticeTab = 'unread';
+        this.noticePage = 1;
+        this.loadNotifications();
+    },
     startExam() {
         if (!this.isLoggedIn) {
             this.showError('请先登录以参加考试');
@@ -382,6 +395,10 @@ window._appMethods4 = {
             training: 'training-editor.html'
         };
         window.open(map[type], '_blank');
+    },
+    goToAnnouncementEditor() {
+        // 独立页面，避免把公告编辑逻辑塞进首页 Vue
+        window.location.href = 'announcement-editor.html';
     },
     toggleCategory(key) {
         const updatedCategories = { ...this.categories };
@@ -443,10 +460,18 @@ window._appMethods4 = {
         }
     },
     async loadNotifications() {
-        if (this.systemNoticeTab === 'local') {
-            this.loadLocalNotifications();
+        // 必须登录才能查看公告
+        if (!this.isLoggedIn) {
+            this.notifications = [];
+            this.unreadCount = 0;
+            this.hasMoreNotifications = false;
+            this.loadingNotifications = false;
+            this.showError('请先登录后查看系统公告');
+            this.showAuthModal = true;
+            this.authMode = 'login';
             return;
         }
+
         this.loadingNotifications = true;
         try {
             if (!window.notificationApi) {
@@ -462,7 +487,12 @@ window._appMethods4 = {
                 unread: this.systemNoticeTab === 'unread' ? true : undefined
             };
             const res = await notificationApi.getNotifications(params);
-            this.notifications = res.notifications || [];
+            const raw = res.notifications || [];
+            if (window.notificationHelper && typeof window.notificationHelper.formatNotification === 'function') {
+                this.notifications = raw.map(n => window.notificationHelper.formatNotification(n)).filter(Boolean);
+            } else {
+                this.notifications = raw;
+            }
             this.unreadCount = res.unreadCount || 0;
             this.hasMoreNotifications = res.hasMore || false;
         } catch (e) {
@@ -473,12 +503,31 @@ window._appMethods4 = {
             this.loadingNotifications = false;
         }
     },
-    loadLocalNotifications() {
-        this.localNotifications = JSON.parse(localStorage.getItem('localNotifications') || '[]');
-    },
     switchNoticeTab(tab) {
         this.systemNoticeTab = tab;
+        // 切换 tab 立即刷新
+        this.noticePage = 1;
+        this.loadNotifications();
     },
+
+    // 点击公告查看详情
+    openNoticeDetail(notif) {
+        if (!notif) return;
+        this.currentNoticeDetail = {
+            ...notif,
+            // 保留 helper 生成的 formattedContent（含换行 <br>）
+        };
+        this.showNoticeDetail = true;
+        // 点击查看时自动标记已读（可选）
+        if (!notif.isRead) {
+            this.markNotificationAsRead(notif);
+        }
+    },
+    closeNoticeDetail() {
+        this.showNoticeDetail = false;
+        this.currentNoticeDetail = null;
+    },
+
     changeNoticePage(page) {
         if (page < 1) return;
         this.noticePage = page;
@@ -513,14 +562,6 @@ window._appMethods4 = {
         this.notifications = [];
         this.unreadCount = 0;
     },
-    deleteLocalNotification(notif) {
-        this.localNotifications = this.localNotifications.filter(n => n.id !== notif.id);
-        localStorage.setItem('localNotifications', JSON.stringify(this.localNotifications));
-    },
-    clearAllLocalNotifications() {
-        this.localNotifications = [];
-        localStorage.removeItem('localNotifications');
-    },
     confirmMarkAllRead() {
         this.confirmMessage = '确定要将全部通知标记为已读吗？';
         this.confirmAction = this.markAllNotificationsAsRead;
@@ -529,11 +570,6 @@ window._appMethods4 = {
     confirmClearAllNotifications() {
         this.confirmMessage = '确定要清空全部通知吗？';
         this.confirmAction = this.clearAllNotifications;
-        this.showConfirmDialog = true;
-    },
-    confirmClearAllLocalNotifications() {
-        this.confirmMessage = '确定要清空本地通知吗？';
-        this.confirmAction = this.clearAllLocalNotifications;
         this.showConfirmDialog = true;
     },
     handleConfirmAction() {

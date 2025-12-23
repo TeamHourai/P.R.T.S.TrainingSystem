@@ -21,6 +21,7 @@ public class DataStore {
     static final Path USER_ANSWERS_FILE = DATA_DIR.resolve("user_answers.csv");
     static final Path EXAM_RECORDS_FILE = DATA_DIR.resolve("exam_records.csv");
     static final Path WRONG_VISIBILITY_FILE = DATA_DIR.resolve("wrong_visibility.csv");
+    static final Path ANNOUNCEMENTS_FILE = DATA_DIR.resolve("announcements.csv");
 
     /**
      * Expose the default questions CSV path for handlers that need direct file access.
@@ -31,6 +32,10 @@ public class DataStore {
 
     public static Path getWrongVisibilityFile() {
         return WRONG_VISIBILITY_FILE;
+    }
+
+    public static Path getAnnouncementsFile() {
+        return ANNOUNCEMENTS_FILE;
     }
 
     /* 方法ensureDataFiles：
@@ -71,6 +76,9 @@ public class DataStore {
         }
         if (!Files.exists(WRONG_VISIBILITY_FILE)) {
             Files.createFile(WRONG_VISIBILITY_FILE);
+        }
+        if (!Files.exists(ANNOUNCEMENTS_FILE)) {
+            Files.createFile(ANNOUNCEMENTS_FILE);
         }
     }
 

@@ -6,21 +6,25 @@
         console.error('请先加载 request.js');
         return;
     }
+
+    const BASE = ((window.API_BASE_URL && String(window.API_BASE_URL)) || 'http://localhost:8080').replace(/\/+$/, '');
+    const API_PREFIX = BASE + '/api/v1';
+
     // 统计 API
     window.statsApi = {
         // 【统计模块-23】获取用户答题统计
         getUserStats: function () {
-            return http.get('/stats/user');
+            return http.get(`${API_PREFIX}/stats/user`);
         },
 
         // 【统计模块-24】获取题目统计
         getQuestionStats: function (questionId) {
-            return http.get(`/stats/question/${questionId}`);
+            return http.get(`${API_PREFIX}/stats/question/${questionId}`);
         },
 
         // 【统计模块-25】获取系统统计（管理员操作）
         getSystemStats: function () {
-            return http.get('/stats/system');
+            return http.get(`${API_PREFIX}/stats/system`);
         }
     };
 

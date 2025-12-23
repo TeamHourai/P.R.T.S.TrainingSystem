@@ -35,6 +35,8 @@ public final class HandlerRegistry {
         HANDLERS.put("admin_questions", new AdminQuestionsHandler());
         // 关键词列表
         HANDLERS.put("keywords", new KeywordsHandler());
+        // 统计接口
+        HANDLERS.put("stats", new StatsHandler());
     }
 
     private HandlerRegistry() { /* no instantiation */ }

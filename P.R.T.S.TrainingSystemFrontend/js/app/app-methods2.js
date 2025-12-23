@@ -49,14 +49,18 @@ window._appMethods2 = {
         // ...existing code...
         if (!questionId) return;
         if (window.statsApi) {
-            this.questionStats = await statsApi.getQuestionStats(questionId);
-        } else {
-            this.questionStats = {
-                totalAttempts: Math.floor(Math.random() * 500) + 100,
-                correctRate: Math.random() * 0.3 + 0.6,
-                mostCommonWrongOption: Math.floor(Math.random() * 4) + 1
-            };
+            try {
+                this.questionStats = await statsApi.getQuestionStats(questionId);
+                return;
+            } catch (e) {
+                console.warn('获取题目统计失败，使用本地统计兜底', e);
+            }
         }
+        this.questionStats = {
+            totalAttempts: Math.floor(Math.random() * 500) + 100,
+            correctRate: Math.random() * 0.3 + 0.6,
+            mostCommonWrongOption: Math.floor(Math.random() * 4) + 1
+        };
     },
     async loadExamStats() {
         // ...existing code...
@@ -87,4 +91,3 @@ window._appMethods2 = {
         `;
     }
 };
-

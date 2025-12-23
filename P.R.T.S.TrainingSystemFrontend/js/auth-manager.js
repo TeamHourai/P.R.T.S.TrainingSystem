@@ -13,10 +13,12 @@
         window.authManager = window.authManager || {};
     }
 
-    // 本地存储键名
+    // 本地存储键名 - use common 'token' and 'userInfo' to match other modules; keep legacy keys for compatibility
     const STORAGE_KEYS = {
-        TOKEN: 'auth_token',
-        USER_INFO: 'user_info',
+        TOKEN: 'token',         // primary key used by other modules
+        LEGACY_TOKEN: 'auth_token',
+        USER_INFO: 'userInfo',  // primary key used by other modules
+        LEGACY_USER_INFO: 'user_info',
         REMEMBER_ME: 'remember_me',
         LAST_LOGIN: 'last_login_time',
         SESSION_EXPIRE: 'session_expire_time'
@@ -96,7 +98,11 @@
         getToken() {
             // 先检查localStorage（记住我），再检查sessionStorage
             return localStorage.getItem(STORAGE_KEYS.TOKEN) ||
-                sessionStorage.getItem(STORAGE_KEYS.TOKEN);
+                sessionStorage.getItem(STORAGE_KEYS.TOKEN) ||
+                // 兼容旧 key
+                localStorage.getItem(STORAGE_KEYS.LEGACY_TOKEN) ||
+                sessionStorage.getItem(STORAGE_KEYS.LEGACY_TOKEN) ||
+                null;
         },
 
         /**
@@ -106,7 +112,10 @@
         getUserInfo() {
             try {
                 const userData = localStorage.getItem(STORAGE_KEYS.USER_INFO) ||
-                    sessionStorage.getItem(STORAGE_KEYS.USER_INFO);
+                    sessionStorage.getItem(STORAGE_KEYS.USER_INFO) ||
+                    // 兼容旧 key
+                    localStorage.getItem(STORAGE_KEYS.LEGACY_USER_INFO) ||
+                    sessionStorage.getItem(STORAGE_KEYS.LEGACY_USER_INFO);
 
                 if (!userData) {
                     return null;
@@ -150,11 +159,17 @@
                 // 保存令牌
                 if (authData.token) {
                     storage.setItem(STORAGE_KEYS.TOKEN, authData.token);
+                    // 兼容旧 key
+                    localStorage.removeItem(STORAGE_KEYS.LEGACY_TOKEN);
+                    sessionStorage.removeItem(STORAGE_KEYS.LEGACY_TOKEN);
                 }
 
                 // 保存用户信息
                 if (authData.user) {
                     storage.setItem(STORAGE_KEYS.USER_INFO, JSON.stringify(authData.user));
+                    // 兼容旧 key
+                    localStorage.removeItem(STORAGE_KEYS.LEGACY_USER_INFO);
+                    sessionStorage.removeItem(STORAGE_KEYS.LEGACY_USER_INFO);
                 }
 
                 // 保存过期时间
@@ -182,13 +197,9 @@
          */
         clearAuthData() {
             try {
-                // 清除localStorage
-                Object.values(STORAGE_KEYS).forEach(key => {
+                // 清除主 key 与 legacy key
+                [STORAGE_KEYS.TOKEN, STORAGE_KEYS.LEGACY_TOKEN, STORAGE_KEYS.USER_INFO, STORAGE_KEYS.LEGACY_USER_INFO, STORAGE_KEYS.REMEMBER_ME, STORAGE_KEYS.LAST_LOGIN, STORAGE_KEYS.SESSION_EXPIRE].forEach(key => {
                     localStorage.removeItem(key);
-                });
-
-                // 清除sessionStorage
-                Object.values(STORAGE_KEYS).forEach(key => {
                     sessionStorage.removeItem(key);
                 });
 
@@ -244,7 +255,7 @@
                 // 调用登录API
                 const response = await userApi.login(username, password, rememberMe);
 
-                if (response.success) {
+                if (response && response.success) {
                     // 保存认证数据
                     this.saveAuthData(response, rememberMe);
 
@@ -260,7 +271,7 @@
                 } else {
                     return {
                         success: false,
-                        message: response.message || '登录失败'
+                        message: (response && response.message) || '登录失败'
                     };
                 }
             } catch (error) {

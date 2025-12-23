@@ -21,6 +21,13 @@ public class DataStore {
     static final Path USER_ANSWERS_FILE = DATA_DIR.resolve("user_answers.csv");
     static final Path EXAM_RECORDS_FILE = DATA_DIR.resolve("exam_records.csv");
 
+    /**
+     * Expose the default questions CSV path for handlers that need direct file access.
+     */
+    public static Path getQuestionsFile() {
+        return QUESTIONS_FILE;
+    }
+
     /* 方法ensureDataFiles：
      * 确保数据目录和文件存在，如不存在则创建并写入初始数据
      */
@@ -143,17 +150,21 @@ public class DataStore {
         // 解析每一行用户答案数据
         for (String ln : lines) {
             if (ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 7);
-            if (p.length < 7) continue;
+            try {
+                String[] p = ln.split(",", 7);
+                if (p.length < 7) continue;
 
-            long id = Long.parseLong(p[0]);
-            long userId = Long.parseLong(p[1]);
-            long questionId = Long.parseLong(p[2]);
-            String qt = p[3];
-            boolean isCorrect = Boolean.parseBoolean(p[4]);
-            int selected = Integer.parseInt(p[5]);
-            String at = p[6];
-            out.add(new UserAnswer(id, userId, questionId, qt, isCorrect, selected, at));
+                long id = Long.parseLong(p[0]);
+                long userId = Long.parseLong(p[1]);
+                long questionId = Long.parseLong(p[2]);
+                String qt = p[3];
+                boolean isCorrect = Boolean.parseBoolean(p[4]);
+                int selected = Integer.parseInt(p[5]);
+                String at = p[6];
+                out.add(new UserAnswer(id, userId, questionId, qt, isCorrect, selected, at));
+            } catch (Exception ignoreBadRow) {
+                // Skip legacy/corrupted rows silently
+            }
         }
         return out;
     }
@@ -162,8 +173,16 @@ public class DataStore {
      * 将新用户答案信息追加写入用户答案数据文件
      */
     public static synchronized void appendUserAnswer(UserAnswer ua) throws IOException {
-        String line = ua.getId() + "," + ua.getUserId() + "," + ua.getQuestionId() + "," + ua.getSelectedAnswer() + "," + ua.isCorrect() + "," + ua.getAnswerTime() + "," + ua.getCreatedAt() + System.lineSeparator();
-        Files.write(USER_ANSWERS_FILE, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+        // Keep CSV format consistent with loadUserAnswers():
+        // id,userId,questionId,questionType,isCorrect,selected,answeredAt
+        String questionType = "normal";
+        String selectedStr = ua.getSelectedAnswer() == null ? "0" : ua.getSelectedAnswer();
+        int selected;
+        try { selected = Integer.parseInt(selectedStr.trim()); } catch (Exception e) { selected = 0; }
+        String answeredAt = (ua.getCreatedAt() == null) ? Utils.now() : ua.getCreatedAt().toString().replace('T', ' ');
+
+        String line = ua.getId() + "," + ua.getUserId() + "," + ua.getQuestionId() + "," + questionType + "," + ua.isCorrect() + "," + selected + "," + answeredAt + System.lineSeparator();
+        Files.write(USER_ANSWERS_FILE, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
 
     /* 方法loadExamRecords:
@@ -192,7 +211,7 @@ public class DataStore {
      */
     public static synchronized void appendExamRecord(ExamRecord er) throws IOException {
         String line = er.getId() + "," + er.getUserId() + "," + er.getScore() + "," + er.getCreatedAt() + System.lineSeparator();
-        Files.write(EXAM_RECORDS_FILE, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+        Files.write(EXAM_RECORDS_FILE, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
 
     /* 方法nextId:
@@ -203,39 +222,37 @@ public class DataStore {
     public static synchronized long nextId(List<?> list) {
         long max = 0;
         if (list == null || list.isEmpty()) return 1;
+
         for (Object o : list) {
             if (o == null) continue;
             try {
-                // 优先尝试 public getId() 方法
+                // Prefer getId() if present
                 try {
                     java.lang.reflect.Method m = o.getClass().getMethod("getId");
                     Object v = m.invoke(o);
                     if (v instanceof Number) {
-                        long id = ((Number) v).longValue();
-                        if (id > max) max = id;
+                        max = Math.max(max, ((Number) v).longValue());
                         continue;
                     }
-                } catch (NoSuchMethodException ignored) { }
+                } catch (NoSuchMethodException ignored) {
+                    // fall through
+                }
 
-                // 其次尝试访问声明字段 "id"（可访问 private）
+                // Fallback to field "id"
                 try {
                     java.lang.reflect.Field f = o.getClass().getDeclaredField("id");
                     f.setAccessible(true);
                     Object v = f.get(o);
                     if (v instanceof Number) {
-                        long id = ((Number) v).longValue();
-                        if (id > max) max = id;
-                        continue;
+                        max = Math.max(max, ((Number) v).longValue());
                     }
-                } catch (NoSuchFieldException ignored) { }
+                } catch (NoSuchFieldException ignored) {
+                    // ignore
+                }
             } catch (Exception ignored) {
-                // 单个读取错误忽略，继续下一个对象
             }
         }
         return max + 1;
     }
-
-    public static Path getQuestionsFile() {
-        return QUESTIONS_FILE;
-    }
 }
+

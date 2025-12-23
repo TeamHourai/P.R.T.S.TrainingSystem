@@ -235,7 +235,7 @@ window._appMethods3 = {
             resource: question.resource || '',
             question: fmtText(question.question),
             options: question.options ? question.options.map(opt => fmtText(opt || '')) : ['', '', '', ''],
-            analysis: fmtText(question.analysis),
+            analysis: fmtText(question.analysis) || '暂无解析',
             picture: question.picture || false
         };
     },
@@ -250,12 +250,10 @@ window._appMethods3 = {
             this.showError('请先选择一个答案');
             return;
         }
-        if (!this.isLoggedIn && this.questionMode !== 'training') {
-            this.showError('请先登录以保存答题记录');
-            this.showAnswer = true;
-            return;
-        }
+
+        // 先显示答案/解析（无论是否登录都能看）
         this.showAnswer = true;
+
         // 如果是培训题目，把结果保存到本地 trainingRecords
         const isCorrect = this.currentQuestion && this.selectedOption === this.currentQuestion.answer;
         if (this.questionMode === 'training') {
@@ -265,24 +263,42 @@ window._appMethods3 = {
                 console.warn('保存培训记录失败', e);
             }
         }
-        if (window.answerApi && this.isLoggedIn) {
-            await answerApi.submitAnswer(
-                this.currentQuestion.id,
-                this.questionMode === 'training' ? 'training' : 'normal',
-                this.selectedOption
-            );
+
+        // 非培训模式：已登录才提交做题记录
+        if (this.questionMode !== 'training') {
+            if (!this.isLoggedIn) {
+                this.showError('请先登录以保存答题记录');
+            } else if (window.answerApi) {
+                try {
+                    await answerApi.submitAnswer(
+                        this.currentQuestion.id,
+                        'normal',
+                        this.selectedOption
+                    );
+                } catch (e) {
+                    console.warn('提交答题记录失败', e);
+                }
+            }
+
+            // 错题本（前端本地维护 + 尝试后端删除/同步）
+            if (!this.isAnswerCorrect) {
+                await this.addToWrongBook(this.currentQuestion.id);
+            }
         }
-        if (!this.isAnswerCorrect && this.questionMode !== 'training') {
-            await this.addToWrongBook(this.currentQuestion.id);
-        }
+
         await this.loadQuestionStats(
             this.currentQuestion.id,
             this.questionMode === 'training' ? 'training' : 'normal'
         );
+
+        // 提交后自动滑到解析区
         this.$nextTick(() => {
             const analysisElement = this.$refs.answerAnalysis;
-            if (analysisElement) {
+            if (analysisElement && typeof analysisElement.scrollIntoView === 'function') {
                 analysisElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                // fallback: scroll to bottom
+                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
             }
         });
     },

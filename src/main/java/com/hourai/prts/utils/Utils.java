@@ -183,7 +183,9 @@ public class Utils {
             sb.append("\"id\":").append(q.getId()).append(",");
             sb.append("\"type\":").append(q.getType()).append(",");
             sb.append("\"difficulty\":").append(q.getDifficulty()).append(",");
+            sb.append("\"resource\":\"").append(escapeJson(q.getResource())).append("\",");
             sb.append("\"question\":\"").append(escapeJson(q.getQuestion())).append("\",");
+            sb.append("\"picture\":").append(q.isHasPicture()).append(",");
             sb.append("\"options\":[");
             boolean f2 = true;
             String[] optionsArr = q.getOptions() != null ? q.getOptions().split("\\|") : new String[0];
@@ -194,6 +196,7 @@ public class Utils {
             }
             sb.append("],");
             sb.append("\"answer\":\"").append(q.getAnswer()).append("\",");
+            sb.append("\"analysis\":\"").append(escapeJson(q.getAnalysis())).append("\",");
 
             // keywords: stored as pipe-separated string in Question.keywords -> output as JSON array
             String kwRaw = q.getKeywords() == null ? "" : q.getKeywords();

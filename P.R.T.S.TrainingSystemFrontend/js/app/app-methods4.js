@@ -321,13 +321,26 @@ window._appMethods4 = {
         }
     },
     showError(message) {
-        alert(`错误：${message}`);
+        if (window.uiModal && typeof window.uiModal.error === 'function') {
+            window.uiModal.error(message);
+            return;
+        }
+        // fallback
+        console.error('错误：' + message);
     },
     showSuccess(message) {
-        alert(`成功：${message}`);
+        if (window.uiModal && typeof window.uiModal.success === 'function') {
+            window.uiModal.success(message);
+            return;
+        }
+        console.log('成功：' + message);
     },
     showInfo(message) {
-        alert(message);
+        if (window.uiModal && typeof window.uiModal.info === 'function') {
+            window.uiModal.info(message);
+            return;
+        }
+        console.log(String(message));
     },
     startExam() {
         if (!this.isLoggedIn) {

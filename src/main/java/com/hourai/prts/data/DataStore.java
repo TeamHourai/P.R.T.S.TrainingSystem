@@ -125,7 +125,11 @@ public class DataStore {
         // 解析每一行题目数据
         for (String ln : lines) {
             if (ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 10); // allow an optional 10th column for keywords
+
+            // Core format is 9 columns:
+            // id,type,difficulty,resource,question,hasPicture,options,answer,analysis
+            // Some newer rows may have a 10th column: keywords
+            String[] p = ln.split(",", 10);
             if (p.length < 9) continue;
 
             long id = Long.parseLong(p[0]);
@@ -135,11 +139,18 @@ public class DataStore {
             String question = Utils.unescapeCsv(p[4]);
             boolean hasPicture = !"0".equals(p[5]);
             String optionsRaw = Utils.unescapeCsv(p[6]);
-            List<String> options = Arrays.stream(optionsRaw.split("\\|")).map(String::trim).collect(Collectors.toList());
+            List<String> options = Arrays.stream(optionsRaw.split("\\|"))
+                    .map(String::trim)
+                    .collect(Collectors.toList());
             int answer = Integer.parseInt(p[7]);
+
+            // analysis is always the 9th core column (index 8)
             String analysis = Utils.unescapeCsv(p[8]);
+
             String keywords = "";
-            if (p.length >= 10) keywords = Utils.unescapeCsv(p[9]);
+            if (p.length >= 10) {
+                keywords = Utils.unescapeCsv(p[9]);
+            }
 
             Question q = new Question(id, type, difficulty, resource, question, hasPicture, options, answer, analysis);
             q.setKeywords(keywords);

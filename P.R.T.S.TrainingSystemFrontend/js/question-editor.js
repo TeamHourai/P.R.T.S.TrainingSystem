@@ -61,8 +61,8 @@
     async function ensureAdmin() {
         const token = getStored('token', 'auth_token');
         if (!token) {
-            alert('请先登录管理员账号');
-            window.location.href = 'index.html';
+            if (window.uiModal && window.uiModal.error) window.uiModal.error('请先登录管理员账号');
+            else alert('请先登录管理员账号');
             return false;
         }
 
@@ -71,9 +71,10 @@
             try { user = await userApi.getCurrentUser(); } catch { /* ignore */ }
         }
 
-        if (!user || !(user.isAdmin === true || user.role === 'admin')) {
-            alert('需要管理员权限');
-            window.location.href = 'index.html';
+        const isAdmin = user && (user.isAdmin === true || user.role === 'admin');
+        if (!isAdmin) {
+            if (window.uiModal && window.uiModal.error) window.uiModal.error('需要管理员权限');
+            else alert('需要管理员权限');
             return false;
         }
 

@@ -154,6 +154,12 @@
     background: rgba(255, 112, 67, 0.2);
 }
 
+/* 细化优先级：正确答案永远为绿色（即使同时是 user-selected） */
+.option.correct.user-selected {
+    border-color: var(--success-color);
+    background: rgba(67, 160, 71, 0.2);
+}
+
 /* 选项标签 */
 .option-label {
     width: 36px;
@@ -170,9 +176,13 @@
     transition: var(--transition);
 }
 
-.option.selected .option-label,
-.option.correct .option-label {
+.option.selected .option-label {
     background: var(--primary-color);
+    color: white;
+}
+
+.option.correct .option-label {
+    background: var(--success-color);
     color: white;
 }
 
@@ -183,6 +193,12 @@
 
 .option.user-selected .option-label {
     background: var(--accent-color);
+    color: white;
+}
+
+/* 正确答案优先：覆盖 user-selected 的 label */
+.option.correct.user-selected .option-label {
+    background: var(--success-color);
     color: white;
 }
 

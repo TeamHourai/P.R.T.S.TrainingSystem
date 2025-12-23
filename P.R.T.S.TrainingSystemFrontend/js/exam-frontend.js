@@ -179,11 +179,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 this.currentDetailQuestion = {
                     id: q.id,
-                    question: q.question || '',
-                    options: Array.isArray(q.options) ? q.options : (q.options ? String(q.options).split('|') : []),
+                    question: this.fmtHtmlText(q.question || ''),
+                    options: Array.isArray(q.options)
+                        ? q.options.map(opt => this.fmtHtmlText(opt))
+                        : (q.options ? String(q.options).split('|').map(s => this.fmtHtmlText(s)) : []),
                     answer: answerNorm || this.normalizeToNumber(q.answer) || 0,
                     userAnswer: userNorm || this.normalizeToNumber(rawUser) || null,
-                    analysis: q.analysis || q.explain || '暂无解析',
+                    analysis: this.fmtHtmlText(q.analysis || q.explain || '暂无解析'),
                     picture: q.picture || q.image || false,
                     typeText: section.typeName || q.typeName || q.type || '未知类型',
                     difficultyText: q.difficultyText || (typeof q.difficulty === 'number' ? ['常识','基操','娴熟','明智','深邃'][q.difficulty - 1] : q.difficulty) || '未知'
@@ -349,6 +351,14 @@ document.addEventListener('DOMContentLoaded', function () {
             goBack() {
                 window.location.href = 'index.html';
             },
+            // 文本格式化：支持真实换行与转义换行(\\n / \\r\\n)，并用于 v-html 渲染
+            fmtHtmlText(str) {
+                return (str || '')
+                    .replace(/\\r\\n/g, '\n')
+                    .replace(/\\n/g, '\n')
+                    .replace(/\r\n/g, '\n')
+                    .replace(/\n/g, '<br>');
+            },
         },
         mounted() {
             // 获取试卷数据
@@ -369,6 +379,10 @@ document.addEventListener('DOMContentLoaded', function () {
                             if (!group[q.type]) group[q.type] = [];
                             group[q.type].push({
                                 ...q,
+                                // 题干/选项/解析在页面上用 v-html 显示，因此这里提前把换行统一成 <br>
+                                question: this.fmtHtmlText(q.question),
+                                options: Array.isArray(q.options) ? q.options.map(opt => this.fmtHtmlText(opt)) : q.options,
+                                analysis: this.fmtHtmlText(q.analysis),
                                 typeName: typeMap[q.type] || '未知类型',
                                 difficultyText: ['常识','基操','娴熟','明智','深邃'][q.difficulty-1] || '未知',
                                 userAnswer: null

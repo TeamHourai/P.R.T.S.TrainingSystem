@@ -227,7 +227,12 @@ window._appMethods3 = {
     },
     loadQuestionForDisplay(question, mode) {
         // ...existing code...
-        const fmtText = (str) => (str || '').replace(/\n/g, '<br>').replace(/\r\n/g, '<br>');
+        const fmtText = (str) => (str || '')
+            // 支持真实换行与转义换行(\n / \r\n)
+            .replace(/\\r\\n/g, '\n')
+            .replace(/\\n/g, '\n')
+            .replace(/\r\n/g, '\n')
+            .replace(/\n/g, '<br>');
         this.currentQuestion = {
             ...question,
             typeText: mode === 'training' ? '入职培训' : this.getTypeText(question.type),

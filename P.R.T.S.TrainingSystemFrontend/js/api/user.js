@@ -31,26 +31,34 @@
     window.userApi = {
         // 【认证模块-1】用户注册
         register: function (username, password, email) {
-            if (!username || username.length < 3) {
-                return Promise.resolve({ success: false, message: '用户名至少需要3个字符' });
-            }
-            if (!password || password.length < 6) {
-                return Promise.resolve({ success: false, message: '密码至少需要6个字符' });
-            }
-
             // 优先使用 window.api.auth.register（该方法使用 application/x-www-form-urlencoded 提交）
             if (window.api && api.auth && typeof api.auth.register === 'function') {
                 return api.auth.register(username, password, email)
-                    .then(res => ({
-                        success: true,
-                        message: '注册成功',
-                        userId: res.userId || res.id,
-                        user: res
-                    }))
-                    .catch(error => ({
-                        success: false,
-                        message: (error && error.message) || '注册失败，用户名可能已存在'
-                    }));
+                    .then(res => {
+                        // 后端可能返回 {success:false,message:"username exists"} 但仍是 200（或已被 request.js 解包）
+                        if (res && res.success === false) {
+                            const msg = String(res.message || '注册失败');
+                            if (msg.includes('username exists')) {
+                                return { success: false, message: '该用户名已被使用' };
+                            }
+                            return { success: false, message: msg };
+                        }
+                        return {
+                            success: true,
+                            message: '注册成功',
+                            userId: res.userId || res.id,
+                            user: res
+                        };
+                    })
+                    .catch(error => {
+                        const raw = (error && error.message) ? String(error.message) : '';
+                        const msg = raw || '注册失败，用户名可能已存在';
+                        // 识别后端 RegisterHandler 的错误
+                        if (msg.includes('username exists')) {
+                            return { success: false, message: '该用户名已被使用' };
+                        }
+                        return { success: false, message: msg };
+                    });
             }
 
             // 降级：直接以 form 表单格式 POST 到 /register（避免 /auth 前缀）
@@ -66,9 +74,26 @@
                 body: body.toString()
             }).then(async resp => {
                 const text = await resp.text();
-                if (!resp.ok) throw new Error(text || resp.statusText);
-                try { const json = JSON.parse(text); return { success: true, message: '注册成功', user: json, userId: json.userId || json.id }; }
-                catch (e) { return { success: true, message: '注册成功', user: text }; }
+                if (!resp.ok) {
+                    // 解析后端错误信息
+                    const low = String(text || '').toLowerCase();
+                    if (low.includes('username exists')) {
+                        return { success: false, message: '该用户名已被使用' };
+                    }
+                    return { success: false, message: text || resp.statusText || '注册失败' };
+                }
+                try {
+                    const json = JSON.parse(text);
+                    if (json && json.success === false) {
+                        const msg = String(json.message || '注册失败');
+                        if (msg.includes('username exists')) return { success: false, message: '该用户名已被使用' };
+                        return { success: false, message: msg };
+                    }
+                    return { success: true, message: '注册成功', user: json, userId: json.userId || json.id };
+                }
+                catch (e) {
+                    return { success: true, message: '注册成功', user: text };
+                }
             }).catch(error => ({ success: false, message: error.message || '注册失败' }));
         },
 
@@ -78,6 +103,13 @@
             if (window.api && api.auth && typeof api.auth.login === 'function') {
                 return api.auth.login(username, password)
                     .then(res => {
+                        if (res && res.success === false) {
+                            const msg = String(res.message || '登录失败');
+                            if (msg.includes('invalid credentials')) {
+                                return { success: false, message: '密码错误' };
+                            }
+                            return { success: false, message: msg };
+                        }
                         if (res.token) {
                             setToken(res.token, rememberMe);
                             if (res.user) setUserInfo(res.user, rememberMe);
@@ -97,7 +129,14 @@
                         }
                         throw new Error('登录失败：服务器返回格式异常');
                     })
-                    .catch(error => ({ success: false, message: error.message || '登录失败，请检查用户名和密码' }));
+                    .catch(error => {
+                        const raw = (error && error.message) ? String(error.message) : '';
+                        // request.js 把 401 统一成“登录已过期”，这里改为更贴合登录失败语义
+                        if (raw.includes('401') || raw.includes('invalid credentials')) {
+                            return { success: false, message: '密码错误' };
+                        }
+                        return { success: false, message: raw || '登录失败，请检查用户名和密码' };
+                    });
             }
 
             // 降级：以 form 表单格式 POST 到 /login（避免 /auth 前缀）
@@ -112,9 +151,19 @@
                 body: body.toString()
             }).then(async resp => {
                 const text = await resp.text();
-                if (!resp.ok) throw new Error(text || resp.statusText);
+                if (!resp.ok) {
+                    if (resp.status === 401) {
+                        return { success: false, message: '密码错误' };
+                    }
+                    return { success: false, message: text || resp.statusText || '登录失败' };
+                }
                 try {
                     const json = JSON.parse(text);
+                    if (json && json.success === false) {
+                        const msg = String(json.message || '登录失败');
+                        if (msg.includes('invalid credentials')) return { success: false, message: '密码错误' };
+                        return { success: false, message: msg };
+                    }
                     if (json.token) {
                         setToken(json.token, rememberMe);
                         if (json.user) setUserInfo(json.user, rememberMe);
@@ -129,7 +178,7 @@
                     throw new Error('登录失败：服务器返回格式异常');
                 } catch (e) {
                     // 若非 JSON 返回，视为失败
-                    throw new Error(text || '登录失败');
+                    return { success: false, message: text || '登录失败' };
                 }
             }).catch(error => ({ success: false, message: error.message || '登录失败，请检查用户名和密码' }));
         },

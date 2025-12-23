@@ -213,7 +213,12 @@
             if (question && (question.options === undefined || typeof question.answer === 'string')) {
                 question = normalizeQuestion(question);
             }
-            const fmtText = (str) => (str || '').replace(/\n/g, '<br>').replace(/\r\n/g, '<br>');
+            const fmtText = (str) => (str || '')
+                // 支持真实换行与转义换行(\\n / \\r\\n)
+                .replace(/\\r\\n/g, '\n')
+                .replace(/\\n/g, '\n')
+                .replace(/\r\n/g, '\n')
+                .replace(/\n/g, '<br>');
             return {
                 ...question,
                 typeText: typeNames[question.type] || '未知类型',
@@ -230,7 +235,10 @@
 
         // 格式化题目提交：HTML转义和字段处理
         formatQuestionForSubmit: function (question) {
-            const fmtText = (str) => (str || '').replace(/<br>/g, '\n').replace(/<br\s*\/?>/g, '\n');
+            const fmtText = (str) => (str || '')
+                .replace(/<br\s*\/?>/gi, '\n')
+                .replace(/\\r\\n/g, '\n')
+                .replace(/\\n/g, '\n');
 
             const result = {
                 ...question,

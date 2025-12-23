@@ -290,21 +290,28 @@
 
     function fillForm(q) {
         if (!q) return;
+
+        // 将文本中的转义换行(\n / \r\n)转换为真实换行，便于 textarea 显示
+        const toTextareaText = (str) => (str || '')
+            .replace(/\\r\\n/g, '\n')
+            .replace(/\\n/g, '\n')
+            .replace(/\r\n/g, '\n');
+
         if (el.id) el.id.value = q.id != null ? String(q.id) : '';
 
         if (el.formType) el.formType.value = q.type != null ? String(q.type) : '';
         if (el.formDifficulty) el.formDifficulty.value = q.difficulty != null ? String(q.difficulty) : '';
 
-        if (el.formQuestion) el.formQuestion.value = q.question || '';
+        if (el.formQuestion) el.formQuestion.value = toTextareaText(q.question);
 
         const opts = Array.isArray(q.options) ? q.options : ['', '', '', ''];
-        if (el.optA) el.optA.value = opts[0] || '';
-        if (el.optB) el.optB.value = opts[1] || '';
-        if (el.optC) el.optC.value = opts[2] || '';
-        if (el.optD) el.optD.value = opts[3] || '';
+        if (el.optA) el.optA.value = toTextareaText(opts[0] || '');
+        if (el.optB) el.optB.value = toTextareaText(opts[1] || '');
+        if (el.optC) el.optC.value = toTextareaText(opts[2] || '');
+        if (el.optD) el.optD.value = toTextareaText(opts[3] || '');
 
         if (el.formAnswer) el.formAnswer.value = q.answer != null ? String(q.answer) : '';
-        if (el.formAnalysis) el.formAnalysis.value = q.analysis || '';
+        if (el.formAnalysis) el.formAnalysis.value = toTextareaText(q.analysis);
         if (el.formResource) el.formResource.value = q.resource || '';
 
         const keywords = Array.isArray(q.keywords) ? q.keywords : parseKeywords(q.keywords);
@@ -318,16 +325,21 @@
     }
 
     function buildPayload() {
+        // 将 textarea 中的转义换行(\n / \r\n)统一成真实换行再提交
+        const normalizeSubmitText = (str) => (str || '')
+            .replace(/\\r\\n/g, '\n')
+            .replace(/\\n/g, '\n')
+            .replace(/\r\n/g, '\n');
         const payload = {
-            question: (el.formQuestion ? el.formQuestion.value : '').trim(),
+            question: normalizeSubmitText((el.formQuestion ? el.formQuestion.value : '')).trim(),
             options: [
-                el.optA ? el.optA.value : '',
-                el.optB ? el.optB.value : '',
-                el.optC ? el.optC.value : '',
-                el.optD ? el.optD.value : ''
+                normalizeSubmitText(el.optA ? el.optA.value : ''),
+                normalizeSubmitText(el.optB ? el.optB.value : ''),
+                normalizeSubmitText(el.optC ? el.optC.value : ''),
+                normalizeSubmitText(el.optD ? el.optD.value : '')
             ],
             answer: el.formAnswer ? Number(el.formAnswer.value) : 0,
-            analysis: el.formAnalysis ? el.formAnalysis.value : '',
+            analysis: normalizeSubmitText(el.formAnalysis ? el.formAnalysis.value : ''),
             resource: el.formResource ? el.formResource.value : '',
             keywords: parseKeywords(el.formKeywords ? el.formKeywords.value : ''),
             picture: !!(el.formPicture && el.formPicture.checked)

@@ -553,5 +553,80 @@ window._appMethods4 = {
             this.confirmAction();
         }
         this.showConfirmDialog = false;
-    }
+    },
+
+    // ============ 错题辑录操作 ============
+    async clearWrongRecords() {
+        if (!this.isLoggedIn) {
+            this.showError('请先登录');
+            return;
+        }
+        if (!confirm('确定要清除所有错题吗？')) return;
+
+        // 尝试逐个同步到后端删除（如果后端支持）
+        const ids = Array.isArray(this.wrongQuestions) ? this.wrongQuestions.slice() : [];
+        for (const id of ids) {
+            try {
+                if (typeof this.removeFromWrongBook === 'function') {
+                    await this.removeFromWrongBook(id);
+                }
+            } catch (e) {
+                // ignore single failure; continue
+            }
+        }
+
+        // 本地兜底清空
+        this.wrongQuestions = [];
+        this.wrongQuestionsDetail = [];
+        this.updateWrongCategories();
+        this.showSuccess('已清除所有错题');
+    },
+
+    async deleteWrongQuestion(questionId) {
+        if (!this.isLoggedIn) {
+            this.showError('请先登录');
+            return;
+        }
+        if (!confirm('确定要删除该错题吗？')) return;
+        try {
+            if (typeof this.removeFromWrongBook === 'function') {
+                await this.removeFromWrongBook(questionId);
+                return;
+            }
+        } catch (e) {
+            // ignore
+        }
+
+        // 本地兜底
+        this.wrongQuestions = (this.wrongQuestions || []).filter(id => id !== questionId);
+        this.wrongQuestionsDetail = (this.wrongQuestionsDetail || []).filter(q => q.id !== questionId);
+        this.updateWrongCategories();
+    },
+
+    async deleteWrongCategory(key) {
+        if (!this.isLoggedIn) {
+            this.showError('请先登录');
+            return;
+        }
+        const cat = (this.wrongCategories || {})[key];
+        if (!cat || !Array.isArray(cat.questions) || cat.questions.length === 0) return;
+        if (!confirm('确定要删除该分类下的所有错题吗？')) return;
+
+        const ids = cat.questions.map(q => q.id);
+        for (const id of ids) {
+            try {
+                if (typeof this.removeFromWrongBook === 'function') {
+                    await this.removeFromWrongBook(id);
+                }
+            } catch (e) {
+                // ignore
+            }
+        }
+
+        // 本地兜底：再清一次，避免后端失败导致残留
+        const toRemove = new Set(ids);
+        this.wrongQuestions = (this.wrongQuestions || []).filter(id => !toRemove.has(id));
+        this.wrongQuestionsDetail = (this.wrongQuestionsDetail || []).filter(q => !toRemove.has(q.id));
+        this.updateWrongCategories();
+    },
 };

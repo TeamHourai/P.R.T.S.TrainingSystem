@@ -13,6 +13,18 @@ new Vue({
     async mounted() {
         // ...existing code from mounted...
         try {
+            // 防止登录/退出后 reload 标记导致循环：启动后立即清理
+            try {
+                const k1 = sessionStorage.getItem('__refresh_after_login__');
+                const k2 = sessionStorage.getItem('__refresh_after_logout__');
+                if (k1 || k2) {
+                    sessionStorage.removeItem('__refresh_after_login__');
+                    sessionStorage.removeItem('__refresh_after_logout__');
+                }
+            } catch (e) {
+                // ignore
+            }
+
             console.log('博士考核系统初始化...');
             await this.checkLoginStatus();
             // 登录后拉取用户答题设置
@@ -21,15 +33,29 @@ new Vue({
             }
             await this.loadQuestions();
             await this.loadTrainingQuestions();
-            // 从 localStorage 恢复入职培训记录（如果有）
-            try {
-                const raw = localStorage.getItem('trainingRecords');
-                if (raw) {
-                    this.trainingRecords = JSON.parse(raw);
+
+            // 从后端加载入职培训记录（替代 localStorage）
+            if (this.isLoggedIn && window.trainingRecordsApi && typeof window.trainingRecordsApi.get === 'function') {
+                try {
+                    const res = await window.trainingRecordsApi.get();
+                    if (res && res.success && res.records) {
+                        // 前端内部结构为 { [id]: { attempts, correct, lastAt } }
+                        const mapped = {};
+                        Object.keys(res.records).forEach(k => {
+                            const r = res.records[k];
+                            mapped[k] = {
+                                attempts: r.attempts || 0,
+                                correct: !!r.correct,
+                                lastAt: r.lastAt || 0
+                            };
+                        });
+                        this.trainingRecords = mapped;
+                    }
+                } catch (e) {
+                    console.warn('加载 trainingRecords 失败', e);
                 }
-            } catch (e) {
-                console.warn('恢复 trainingRecords 失败', e);
             }
+
             this.updateCategories();
             await this.loadExamStats();
             this.loadSystemData();

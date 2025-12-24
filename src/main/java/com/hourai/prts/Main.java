@@ -90,6 +90,8 @@ public class Main {
 
         // 用户答题设置
         server.createContext("/api/user/answer-settings", HandlerRegistry.getWrapped("answer_settings"));
+        // 入职培训答题记录
+        server.createContext("/api/user/training-records", HandlerRegistry.getWrapped("training_records"));
 
         server.createContext("/api/v1/auth/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/api/v1/auth/login", HandlerRegistry.getWrapped("login"));
@@ -109,6 +111,8 @@ public class Main {
 
         // 用户答题设置
         server.createContext("/api/v1/user/answer-settings", HandlerRegistry.getWrapped("answer_settings"));
+        // 入职培训答题记录
+        server.createContext("/api/v1/user/training-records", HandlerRegistry.getWrapped("training_records"));
 
         // 新增：管理员设置用户权限
         server.createContext("/api/v1/admin/user/permission", HandlerRegistry.getWrapped("admin_set_permissions"));

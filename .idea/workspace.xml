@@ -4,41 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="修复小bug">
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/12.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/15.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/17.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/20.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/22.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/28.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/30.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/32.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/35.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/40.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/41.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/42.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/43.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/47.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/50.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/52.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/53.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/54.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/55.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/56.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/6.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/8.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/bg-3.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/answerSettings.js" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AnswerSettingsHandler.java" afterDir="false" />
+    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="给若干重要文件添加git管理">
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/trainingRecords.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/data/training_records.csv" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/TrainingRecordsHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-main.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods1.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods1.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/exam_records.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/exam_records.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/user_answers.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/user_answers.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/wrong_visibility.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/wrong_visibility.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" afterDir="false" />
@@ -345,7 +319,23 @@
       <option name="project" value="LOCAL" />
       <updated>1766564627081</updated>
     </task>
-    <option name="localTasksCounter" value="25" />
+    <task id="LOCAL-00025" summary="修复小bug；添加答题设置功能">
+      <option name="closed" value="true" />
+      <created>1766566235922</created>
+      <option name="number" value="00025" />
+      <option name="presentableId" value="LOCAL-00025" />
+      <option name="project" value="LOCAL" />
+      <updated>1766566235922</updated>
+    </task>
+    <task id="LOCAL-00026" summary="给若干重要文件添加git管理">
+      <option name="closed" value="true" />
+      <created>1766566399105</created>
+      <option name="number" value="00026" />
+      <option name="presentableId" value="LOCAL-00026" />
+      <option name="project" value="LOCAL" />
+      <updated>1766566399105</updated>
+    </task>
+    <option name="localTasksCounter" value="27" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -421,7 +411,9 @@
     <MESSAGE value="已完成数据同步数据库" />
     <MESSAGE value="优化UI，添加题目图片" />
     <MESSAGE value="修复小bug" />
-    <option name="LAST_COMMIT_MESSAGE" value="修复小bug" />
+    <MESSAGE value="修复小bug；添加答题设置功能" />
+    <MESSAGE value="给若干重要文件添加git管理" />
+    <option name="LAST_COMMIT_MESSAGE" value="给若干重要文件添加git管理" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

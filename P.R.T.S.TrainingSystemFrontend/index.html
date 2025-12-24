@@ -577,8 +577,8 @@
                     <button class="modal-close" @click="showAuthModal = false"><i class="fas fa-times"></i></button>
                 </div>
                 <div style="padding: 30px;">
-                    <input type="text" v-model="authUsername" placeholder="请输入用户名" class="auth-input">
-                    <input type="password" v-model="authPassword" placeholder="请输入密码" class="auth-input">
+                    <input type="text" v-model="authUsername" placeholder="请输入用户名" class="auth-input" ref="authUsernameInput" @keydown.enter.prevent="focusAuthPassword">
+                    <input type="password" v-model="authPassword" placeholder="请输入密码" class="auth-input" ref="authPasswordInput" @keydown.enter.prevent="handleLogin">
                     <button @click="authMode === 'login' ? handleLogin() : handleRegister()" class="nav-btn primary auth-btn">
                         <i :class="authMode === 'login' ? 'fas fa-sign-in-alt' : 'fas fa-user-plus'"></i>
                         {{ authMode === 'login' ? '登录' : '注册' }}
@@ -720,6 +720,7 @@
     <script src="js/api/question.js"></script> <!-- 定义 questionApi -->
     <script src="js/api/answer.js"></script> <!-- 如果存在，请放到 js/api/answer.js -->
     <script src="js/api/answerSettings.js"></script> <!-- 用户答题设置 -->
+    <script src="js/api/trainingRecords.js"></script> <!-- 入职培训答题记录 -->
     <script src="js/api/exam.js"></script> <!-- 如果存在，请放到 js/api/exam.js -->
     <script src="js/api/stats.js"></script> <!-- 定义 statsApi -->
     <script src="js/api/notifications.js"></script> <!-- 定义 notificationApi -->

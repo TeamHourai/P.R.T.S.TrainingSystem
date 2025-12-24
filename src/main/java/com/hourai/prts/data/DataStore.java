@@ -24,6 +24,8 @@ public class DataStore {
     static final Path ANNOUNCEMENTS_FILE = DATA_DIR.resolve("announcements.csv");
     // 新增：用户答题设置
     static final Path ANSWER_SETTINGS_FILE = DATA_DIR.resolve("answer_settings.csv");
+    // 新增：入职培训答题记录（按用户维度持久化）
+    static final Path TRAINING_RECORDS_FILE = DATA_DIR.resolve("training_records.csv");
 
     /**
      * Expose the default questions CSV path for handlers that need direct file access.
@@ -85,6 +87,10 @@ public class DataStore {
         // 用户答题设置（按用户维度持久化）
         if (!Files.exists(ANSWER_SETTINGS_FILE)) {
             Files.createFile(ANSWER_SETTINGS_FILE);
+        }
+        // 入职培训答题记录
+        if (!Files.exists(TRAINING_RECORDS_FILE)) {
+            Files.createFile(TRAINING_RECORDS_FILE);
         }
     }
 
@@ -173,6 +179,128 @@ public class DataStore {
         Files.write(ANSWER_SETTINGS_FILE, out, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         return new AnswerSettings(autoSubmit, autoNextCorrect);
     }
+
+    // ===================== 入职培训答题记录（CSV: user_id,question_id,attempts,correct,last_at） =====================
+
+    public static class TrainingRecord {
+        public long questionId;
+        public int attempts;
+        public boolean correct;
+        public long lastAt; // epoch millis
+
+        public TrainingRecord() {}
+
+        public TrainingRecord(long questionId, int attempts, boolean correct, long lastAt) {
+            this.questionId = questionId;
+            this.attempts = attempts;
+            this.correct = correct;
+            this.lastAt = lastAt;
+        }
+    }
+
+    /** Load all training records for a given user as map keyed by questionId. */
+    public static synchronized Map<Long, TrainingRecord> loadTrainingRecords(long userId) throws IOException {
+        Map<Long, TrainingRecord> out = new HashMap<>();
+        if (!Files.exists(TRAINING_RECORDS_FILE)) return out;
+        List<String> lines = Files.readAllLines(TRAINING_RECORDS_FILE, StandardCharsets.UTF_8);
+        for (String ln : lines) {
+            if (ln == null) continue;
+            String t = ln.trim();
+            if (t.isEmpty()) continue;
+            if (t.startsWith("#")) continue;
+            String[] p = t.split(",", -1);
+            if (p.length < 5) continue;
+            if (!p[0].trim().matches("\\d+")) continue;
+            long uid;
+            try { uid = Long.parseLong(p[0].trim()); } catch (Exception e) { continue; }
+            if (uid != userId) continue;
+
+            long qid;
+            int attempts;
+            boolean correct;
+            long lastAt;
+            try {
+                qid = Long.parseLong(p[1].trim());
+                attempts = Integer.parseInt(p[2].trim());
+                correct = "true".equalsIgnoreCase(p[3].trim()) || "1".equals(p[3].trim());
+                lastAt = Long.parseLong(p[4].trim());
+            } catch (Exception e) {
+                continue;
+            }
+            out.put(qid, new TrainingRecord(qid, attempts, correct, lastAt));
+        }
+        return out;
+    }
+
+    /** Upsert a single training record line for (userId, questionId). */
+    public static synchronized TrainingRecord upsertTrainingRecord(long userId, long questionId, int attempts, boolean correct, long lastAt) throws IOException {
+        if (!Files.exists(TRAINING_RECORDS_FILE)) {
+            Files.createFile(TRAINING_RECORDS_FILE);
+        }
+
+        List<String> lines = Files.readAllLines(TRAINING_RECORDS_FILE, StandardCharsets.UTF_8);
+        List<String> out = new ArrayList<>();
+        boolean updated = false;
+
+        for (String ln : lines) {
+            if (ln == null) continue;
+            String t = ln.trim();
+            if (t.isEmpty()) continue;
+            if (t.startsWith("#")) {
+                out.add(ln);
+                continue;
+            }
+            String[] p = t.split(",", -1);
+            if (p.length < 2 || !p[0].trim().matches("\\d+")) {
+                out.add(ln);
+                continue;
+            }
+            long uid;
+            long qid;
+            try {
+                uid = Long.parseLong(p[0].trim());
+                qid = Long.parseLong(p[1].trim());
+            } catch (Exception e) {
+                out.add(ln);
+                continue;
+            }
+
+            if (uid == userId && qid == questionId) {
+                out.add(userId + "," + questionId + "," + attempts + "," + correct + "," + lastAt);
+                updated = true;
+            } else {
+                out.add(ln);
+            }
+        }
+
+        if (!updated) {
+            out.add(userId + "," + questionId + "," + attempts + "," + correct + "," + lastAt);
+        }
+
+        Files.write(TRAINING_RECORDS_FILE, out, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        return new TrainingRecord(questionId, attempts, correct, lastAt);
+    }
+
+    /** Clear all training records for a user. */
+    public static synchronized void clearTrainingRecords(long userId) throws IOException {
+        if (!Files.exists(TRAINING_RECORDS_FILE)) return;
+        List<String> lines = Files.readAllLines(TRAINING_RECORDS_FILE, StandardCharsets.UTF_8);
+        List<String> out = new ArrayList<>();
+        for (String ln : lines) {
+            if (ln == null) continue;
+            String t = ln.trim();
+            if (t.isEmpty()) continue;
+            if (t.startsWith("#")) { out.add(ln); continue; }
+            String[] p = t.split(",", -1);
+            if (p.length < 1 || !p[0].trim().matches("\\d+")) { out.add(ln); continue; }
+            long uid;
+            try { uid = Long.parseLong(p[0].trim()); } catch (Exception e) { out.add(ln); continue; }
+            if (uid != userId) out.add(ln);
+        }
+        Files.write(TRAINING_RECORDS_FILE, out, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+    }
+
+    // ===================== 用户管理相关 =====================
 
     /* 方法loadUsers:
      * 从用户数据文件中加载所有用户信息，返回用户列表

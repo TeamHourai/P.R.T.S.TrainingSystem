@@ -55,6 +55,8 @@ public final class HandlerRegistry {
 
         // 新增：用户答题设置（自动提交/答对自动下一题）
         HANDLERS.put("answer_settings", new AnswerSettingsHandler());
+        // 新增：入职培训答题记录（替代 localStorage）
+        HANDLERS.put("training_records", new TrainingRecordsHandler());
     }
 
     private HandlerRegistry() { /* no instantiation */ }

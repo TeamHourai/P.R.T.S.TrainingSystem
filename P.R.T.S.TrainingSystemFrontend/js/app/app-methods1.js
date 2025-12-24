@@ -41,6 +41,37 @@ window._appMethods1 = {
             this.authUsername = '';
             this.authPassword = '';
             await this.loadUserData();
+
+            // 登录后拉取入职培训记录
+            if (window.trainingRecordsApi && typeof window.trainingRecordsApi.get === 'function') {
+                try {
+                    const res = await window.trainingRecordsApi.get();
+                    if (res && res.success && res.records) {
+                        const mapped = {};
+                        Object.keys(res.records).forEach(k => {
+                            const r = res.records[k];
+                            mapped[k] = {
+                                attempts: r.attempts || 0,
+                                correct: !!r.correct,
+                                lastAt: r.lastAt || 0
+                            };
+                        });
+                        this.trainingRecords = mapped;
+                    }
+                } catch (e) {
+                    console.warn('登录后加载 trainingRecords 失败', e);
+                }
+            }
+
+            // 登录后自动刷新页面（防止状态不同步）
+            try {
+                sessionStorage.setItem('__refresh_after_login__', String(Date.now()));
+                window.location.reload();
+                return;
+            } catch (e) {
+                // ignore
+            }
+
             this.showSuccess('登录成功！');
         } else {
             this.showError(result.message || '登录失败');
@@ -76,12 +107,49 @@ window._appMethods1 = {
         this.isAdmin = false;
         this.wrongQuestions = [];
         this.wrongQuestionsDetail = [];
+        // 退出登录后清空本地培训记录（登录后会从后端重新拉取）
+        this.trainingRecords = {};
         this.showSuccess('已退出登录');
+
+        // 退出登录后自动刷新页面
+        try {
+            sessionStorage.setItem('__refresh_after_logout__', String(Date.now()));
+            window.location.reload();
+        } catch (e) {
+            // ignore
+        }
     },
     async loadUserData() {
         // ...existing code...
         await this.loadWrongQuestions();
         await this.loadExamStats();
-    }
-};
 
+        // 登录后也刷新一次培训记录（防止外部调用 loadUserData 时遗漏）
+        if (window.trainingRecordsApi && typeof window.trainingRecordsApi.get === 'function') {
+            try {
+                const res = await window.trainingRecordsApi.get();
+                if (res && res.success && res.records) {
+                    const mapped = {};
+                    Object.keys(res.records).forEach(k => {
+                        const r = res.records[k];
+                        mapped[k] = {
+                            attempts: r.attempts || 0,
+                            correct: !!r.correct,
+                            lastAt: r.lastAt || 0
+                        };
+                    });
+                    this.trainingRecords = mapped;
+                }
+            } catch (e) {
+                console.warn('loadUserData: load trainingRecords failed', e);
+            }
+        }
+    },
+    // 新增：登录弹窗输入体验
+    focusAuthPassword() {
+        this.$nextTick(() => {
+            const el = this.$refs && this.$refs.authPasswordInput;
+            if (el && typeof el.focus === 'function') el.focus();
+        });
+    },
+};

@@ -68,26 +68,47 @@ window._appMethods3 = {
         if (rec.correct) return '#43A047';
         return '#F44336';
     },
-    // 清除培训本地记录
-    clearTrainingRecords() {
-        if (confirm('确定要清除所有入职培训练习记录吗？')) {
-            this.trainingRecords = {};
-            localStorage.removeItem('trainingRecords');
-            this.showSuccess('已清除入职培训记录');
+    // 清除培训记录（后端持久化，替代 localStorage）
+    async clearTrainingRecords() {
+        if (!confirm('确定要清除所有入职培训练习记录吗？')) return;
+
+        // 登录态：同步后端
+        if (this.isLoggedIn && window.trainingRecordsApi && typeof window.trainingRecordsApi.clear === 'function') {
+            try {
+                await window.trainingRecordsApi.clear();
+            } catch (e) {
+                console.warn('清除 trainingRecords 失败', e);
+            }
         }
+
+        // 本地状态清空
+        this.trainingRecords = {};
+        this.showSuccess('已清除入职培训记录');
     },
-    // 保存单题培训记录到本地
-    saveTrainingRecord(questionId, correct) {
+
+    // 保存单题培训记录（后端持久化，替代 localStorage）
+    async saveTrainingRecord(questionId, correct) {
         const now = Date.now();
         const prev = this.trainingRecords[questionId] || { attempts: 0, correct: false, lastAt: 0 };
-        prev.attempts = (prev.attempts || 0) + 1;
-        prev.correct = correct || prev.correct;
-        prev.lastAt = now;
-        this.$set(this.trainingRecords, questionId, prev);
-        try {
-            localStorage.setItem('trainingRecords', JSON.stringify(this.trainingRecords));
-        } catch (e) {
-            console.warn('无法写入 trainingRecords 到 localStorage', e);
+        const next = {
+            attempts: (prev.attempts || 0) + 1,
+            correct: !!correct || !!prev.correct,
+            lastAt: now
+        };
+        this.$set(this.trainingRecords, questionId, next);
+
+        // 登录态：写入后端
+        if (this.isLoggedIn && window.trainingRecordsApi && typeof window.trainingRecordsApi.upsert === 'function') {
+            try {
+                await window.trainingRecordsApi.upsert({
+                    questionId: Number(questionId),
+                    attempts: next.attempts,
+                    correct: next.correct,
+                    lastAt: next.lastAt
+                });
+            } catch (e) {
+                console.warn('写入 trainingRecords 失败', e);
+            }
         }
     },
 
@@ -275,11 +296,11 @@ window._appMethods3 = {
         // - 开启“答对自动下一题”且答对：也让 showAnswer=true 以便选项变绿，但解析面板在模板里被隐藏（见 index.html 改动）
         this.showAnswer = true;
 
-        // 如果是培训题目，把结果保存到本地 trainingRecords
+        // 如果是培训题目，把结果保存到 trainingRecords
         const isCorrect = isCorrectNow;
         if (this.questionMode === 'training') {
             try {
-                this.saveTrainingRecord(this.currentQuestion.id, !!isCorrect);
+                await this.saveTrainingRecord(this.currentQuestion.id, !!isCorrect);
             } catch (e) {
                 console.warn('保存培训记录失败', e);
             }

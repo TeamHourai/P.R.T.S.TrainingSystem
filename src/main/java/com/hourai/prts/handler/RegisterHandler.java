@@ -49,7 +49,6 @@ public class RegisterHandler implements HttpHandler {
         }
 
         boolean exists = false;
-        boolean dbOk = true;
         long id = -1;
         User u = null;
         try {
@@ -64,25 +63,9 @@ public class RegisterHandler implements HttpHandler {
             u = new User(id, uname, password, false, Utils.now());
             userService.register(u);
         } catch (Exception e) {
-            dbOk = false;
-        }
-
-        if (!dbOk) {
-            // 数据库不可用时，回退到CSV查重和写入
-            try {
-                List<User> users = DataStore.loadUsers();
-                exists = users.stream().anyMatch(user -> user.getUsername() != null && user.getUsername().equals(uname));
-                if (exists) {
-                    Utils.send(exchange, 400, "{\"success\":false,\"message\":\"username exists\"}");
-                    return;
-                }
-                id = DataStore.nextId(users);
-                u = new User(id, uname, password, false, Utils.now());
-                DataStore.appendUser(u);
-            } catch (Exception ex) {
-                Utils.send(exchange, 500, "{\"success\":false,\"message\":\"internal error\"}");
-                return;
-            }
+            e.printStackTrace();
+            Utils.send(exchange, 500, "{\"success\":false,\"message\":\"database error\"}");
+            return;
         }
 
         Utils.send(exchange, 200,

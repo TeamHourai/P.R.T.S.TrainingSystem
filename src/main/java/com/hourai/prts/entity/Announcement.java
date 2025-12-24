@@ -6,7 +6,7 @@ package com.hourai.prts.entity;
  * Stored in CSV for now (future DB migration friendly).
  */
 public class Announcement {
-    private long id;
+    private Long id;
     // Notification type: system/exam/answer/warning/update/reward
     private String type = "system";
     private String title;
@@ -18,7 +18,7 @@ public class Announcement {
 
     public Announcement() {}
 
-    public Announcement(long id, String title, String content, boolean important, String createdAt, String createdBy, String expiresAt) {
+    public Announcement(Long id, String title, String content, boolean important, String createdAt, String createdBy, String expiresAt) {
         this.id = id;
         this.type = "system";
         this.title = title;
@@ -29,7 +29,7 @@ public class Announcement {
         this.expiresAt = expiresAt;
     }
 
-    public Announcement(long id, String type, String title, String content, boolean important, String createdAt, String createdBy, String expiresAt) {
+    public Announcement(Long id, String type, String title, String content, boolean important, String createdAt, String createdBy, String expiresAt) {
         this.id = id;
         this.type = (type == null || type.trim().isEmpty()) ? "system" : type.trim();
         this.title = title;
@@ -40,11 +40,11 @@ public class Announcement {
         this.expiresAt = expiresAt;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

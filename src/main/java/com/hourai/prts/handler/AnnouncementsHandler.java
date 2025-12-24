@@ -101,19 +101,12 @@ public class AnnouncementsHandler implements HttpHandler {
             return;
         }
 
-        List<Announcement> all = loadAll();
-        long id = DataStore.nextId(all);
-
-        Announcement a = new Announcement(id, type, title, content, important, Utils.now(), u.getUsername(), expiresAt);
+        // Create announcement without assigning a local id; let DB generate id when possible
+        Announcement a = new Announcement(null, type, title, content, important, Utils.now(), u.getUsername(), expiresAt);
+        // try append to file for backwards compatibility (will call DB inside append)
         append(a);
-        // 同步写入MySQL
-        try {
-            com.hourai.prts.service.AnnouncementService announcementService = new com.hourai.prts.service.AnnouncementService();
-            announcementService.addAnnouncement(a);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        Utils.send(exchange, 200, "{\"success\":true,\"id\":" + id + "}");
+        long generatedId = a.getId() == null ? -1L : a.getId();
+        Utils.send(exchange, 200, "{\"success\":true,\"id\":" + generatedId + "}");
     }
 
     private static String safe(String s) {
@@ -129,9 +122,12 @@ public class AnnouncementsHandler implements HttpHandler {
         if (!auth.startsWith("user-")) return null;
         try {
             long uid = Long.parseLong(auth.substring("user-".length()));
-            List<User> users = DataStore.loadUsers();
-            for (User u : users) {
-                if (u.getId() == uid) return u;
+            com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
+            try {
+                return userService.getUserById(uid);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
             }
         } catch (Exception ignored) {
         }
@@ -139,54 +135,24 @@ public class AnnouncementsHandler implements HttpHandler {
     }
 
     private static synchronized List<Announcement> loadAll() throws IOException {
-        Path f = DataStore.getAnnouncementsFile();
-        if (!Files.exists(f)) return new ArrayList<>();
-        List<String> lines = Files.readAllLines(f, StandardCharsets.UTF_8);
-        List<Announcement> out = new ArrayList<>();
-        for (String ln : lines) {
-            if (ln == null || ln.trim().isEmpty()) continue;
-            // new: id,type,title,content,important,createdAt,createdBy,expiresAt
-            // old: id,title,content,important,createdAt,createdBy,expiresAt
-            String[] p = ln.split(",", 8);
-            if (p.length < 6) continue;
-            try {
-                long id = Long.parseLong(p[0]);
-                if (p.length >= 8) {
-                    String type = Utils.unescapeCsv(p[1]);
-                    String title = Utils.unescapeCsv(p[2]);
-                    String content = Utils.unescapeCsv(p[3]);
-                    boolean important = Boolean.parseBoolean(p[4]);
-                    String createdAt = Utils.unescapeCsv(p[5]);
-                    String createdBy = Utils.unescapeCsv(p[6]);
-                    String expiresAt = Utils.unescapeCsv(p[7]);
-                    out.add(new Announcement(id, type, title, content, important, createdAt, createdBy, expiresAt));
-                } else {
-                    String title = Utils.unescapeCsv(p[1]);
-                    String content = Utils.unescapeCsv(p[2]);
-                    boolean important = Boolean.parseBoolean(p[3]);
-                    String createdAt = Utils.unescapeCsv(p[4]);
-                    String createdBy = Utils.unescapeCsv(p[5]);
-                    String expiresAt = p.length >= 7 ? Utils.unescapeCsv(p[6]) : "";
-                    out.add(new Announcement(id, "system", title, content, important, createdAt, createdBy, expiresAt));
-                }
-            } catch (Exception ignoreBadRow) {
-            }
+        try {
+            com.hourai.prts.service.AnnouncementService announcementService = new com.hourai.prts.service.AnnouncementService();
+            return announcementService.getAllAnnouncements();
+        } catch (Exception e) {
+            e.printStackTrace();
+            // On DB error, return empty list (handlers may handle empty results)
+            return new ArrayList<>();
         }
-        return out;
     }
 
     private static synchronized void append(Announcement a) throws IOException {
-        Path f = DataStore.getAnnouncementsFile();
-        String line = a.getId() + ","
-                + Utils.csvEscape(a.getType()) + ","
-                + Utils.csvEscape(a.getTitle()) + ","
-                + Utils.csvEscape(a.getContent()) + ","
-                + a.isImportant() + ","
-                + Utils.csvEscape(a.getCreatedAt()) + ","
-                + Utils.csvEscape(a.getCreatedBy()) + ","
-                + Utils.csvEscape(a.getExpiresAt())
-                + System.lineSeparator();
-        Files.write(f, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+        try {
+            com.hourai.prts.service.AnnouncementService announcementService = new com.hourai.prts.service.AnnouncementService();
+            announcementService.addAnnouncement(a);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("failed to insert announcement into database", e);
+        }
     }
 
     private static String toJson(Announcement a) {

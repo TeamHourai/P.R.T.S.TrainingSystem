@@ -5,18 +5,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="优化UX；使入职培训不再使用本地存储，而是使用后端">
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-10.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-11.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-9.png" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/study-pages.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/study-pages.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-computed.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-computed.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods1.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods1.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/exam_records.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/exam_records.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/user_answers.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/user_answers.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/notifications_state.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/notifications_state.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/training_records.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/training_records.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/AnnouncementDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/AnnouncementDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/Announcement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/Announcement.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminUserListHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminUserListHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AnnouncementsHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AnnouncementsHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AuthProfileHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AuthProfileHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/NotificationsHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/NotificationsHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/RegisterHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/RegisterHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/TrainingRecordsHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/TrainingRecordsHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/AnnouncementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/AnnouncementService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -41,8 +48,8 @@
 }</component>
   <component name="GithubPullRequestsUISettings"><![CDATA[{
   "selectedUrlAndAccountId": {
-    "url": "git@github.com:/TeamHourai/P.R.T.S.TrainingSystem.git",
-    "accountId": "ba333ae1-8110-4cf7-aadc-b1075dbd68b5"
+    "url": "https://github.com/TeamHourai/P.R.T.S.TrainingSystem.git",
+    "accountId": "0055ab69-a480-44d8-80aa-a9abd370a267"
   }
 }]]></component>
   <component name="ProblemsViewState">
@@ -104,7 +111,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.138" />
+        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.138" />
       </set>
     </attachedChunks>
   </component>
@@ -123,6 +131,7 @@
       <workItem from="1765001151557" duration="3593000" />
       <workItem from="1766541868395" duration="420000" />
       <workItem from="1766542306256" duration="2274000" />
+      <workItem from="1766581634857" duration="6999000" />
     </task>
     <task id="LOCAL-00001" summary="更新">
       <option name="closed" value="true" />

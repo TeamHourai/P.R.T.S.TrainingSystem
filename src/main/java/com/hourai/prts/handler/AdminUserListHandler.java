@@ -35,7 +35,8 @@ public class AdminUserListHandler implements HttpHandler {
         }
 
         try {
-            List<User> allUsers = DataStore.loadUsers();
+            com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
+            List<User> allUsers = userService.getAllUsers();
             List<User> filteredUsers;
 
             if (keyword.isEmpty()) {

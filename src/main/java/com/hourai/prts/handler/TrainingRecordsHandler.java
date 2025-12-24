@@ -1,6 +1,7 @@
 package com.hourai.prts.handler;
 
 import com.hourai.prts.data.DataStore;
+import com.hourai.prts.service.TrainingRecordService;
 import com.hourai.prts.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -38,7 +39,14 @@ public class TrainingRecordsHandler implements HttpHandler {
 
         String method = exchange.getRequestMethod();
         if ("GET".equalsIgnoreCase(method)) {
-            Map<Long, DataStore.TrainingRecord> recs = DataStore.loadTrainingRecords(userId);
+            Map<Long, DataStore.TrainingRecord> recs;
+            try {
+                recs = new TrainingRecordService().getRecordsForUser(userId);
+            } catch (Exception e) {
+                e.printStackTrace();
+                Utils.send(exchange, 500, "{\"success\":false,\"message\":\"db error\"}");
+                return;
+            }
             StringBuilder sb = new StringBuilder();
             sb.append("{\"success\":true,\"records\":{");
             boolean first = true;
@@ -56,8 +64,13 @@ public class TrainingRecordsHandler implements HttpHandler {
         }
 
         if ("DELETE".equalsIgnoreCase(method)) {
-            DataStore.clearTrainingRecords(userId);
-            Utils.send(exchange, 200, "{\"success\":true}");
+            try {
+                new TrainingRecordService().clearForUser(userId);
+                Utils.send(exchange, 200, "{\"success\":true}");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Utils.send(exchange, 500, "{\"success\":false,\"message\":\"db error\"}");
+            }
             return;
         }
 
@@ -81,9 +94,14 @@ public class TrainingRecordsHandler implements HttpHandler {
             if (attempts < 0) attempts = 0;
             if (lastAt <= 0) lastAt = System.currentTimeMillis();
 
-            DataStore.TrainingRecord saved = DataStore.upsertTrainingRecord(userId, qid, attempts, correct, lastAt);
-            Utils.send(exchange, 200,
+            try {
+                DataStore.TrainingRecord saved = new TrainingRecordService().upsert(userId, qid, attempts, correct, lastAt);
+                Utils.send(exchange, 200,
                     "{\"success\":true,\"questionId\":" + qid + ",\"attempts\":" + saved.attempts + ",\"correct\":" + saved.correct + ",\"lastAt\":" + saved.lastAt + "}");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Utils.send(exchange, 500, "{\"success\":false,\"message\":\"db error\"}");
+            }
             return;
         }
 

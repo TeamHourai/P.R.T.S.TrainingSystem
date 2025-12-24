@@ -36,13 +36,14 @@ public class AuthProfileHandler implements HttpHandler {
             return;
         }
 
-        List<User> users = DataStore.loadUsers();
         User found = null;
-        for (User u : users) {
-            if (u.getId() != null && u.getId().equals(userId)) {
-                found = u;
-                break;
-            }
+        try {
+            com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
+            found = userService.getUserById(userId);
+        } catch (Exception e) {
+            e.printStackTrace();
+            Utils.send(exchange, 500, "{\"success\":false,\"message\":\"database error\"}");
+            return;
         }
         if (found == null) {
             Utils.send(exchange, 401, "{\"success\":false,\"message\":\"user not found\"}");

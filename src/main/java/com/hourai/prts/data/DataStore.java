@@ -47,12 +47,8 @@ public class DataStore {
      */
     public static void ensureDataFiles() throws IOException {
         if (!Files.exists(DATA_DIR)) Files.createDirectories(DATA_DIR);
-        if (!Files.exists(USERS_FILE)) {
-            List<String> lines = new ArrayList<>();
-            lines.add("1,admin,admin,true," + Utils.now());
-            lines.add("2,student1,password,false," + Utils.now());
-            Files.write(USERS_FILE, lines, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
-        }
+        // NOTE: users.csv is no longer auto-created. User data is expected to be stored in the database.
+        // If you need to seed users for a fallback or local testing, create the file manually.
         if (!Files.exists(QUESTIONS_FILE)) {
             List<String> qlines = new ArrayList<>();
             qlines.add(Utils.csvQ(1, 1, 2, "", "以下哪个是 Java 的关键字？", false, "function|class|static|define", 3, "static 是关键字"));

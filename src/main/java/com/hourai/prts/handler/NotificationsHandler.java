@@ -266,9 +266,12 @@ public class NotificationsHandler implements HttpHandler {
         if (!auth.startsWith("user-")) return null;
         try {
             long uid = Long.parseLong(auth.substring("user-".length()));
-            List<User> users = DataStore.loadUsers();
-            for (User u : users) {
-                if (u.getId() == uid) return u;
+            com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
+            try {
+                return userService.getUserById(uid);
+            } catch (Exception e) {
+                e.printStackTrace();
+                return null;
             }
         } catch (Exception ignored) {
         }
@@ -276,116 +279,42 @@ public class NotificationsHandler implements HttpHandler {
     }
 
     private static synchronized List<Announcement> loadAnnouncements() throws IOException {
-        Path f = DataStore.getAnnouncementsFile();
-        if (!Files.exists(f)) return new ArrayList<>();
-        List<String> lines = Files.readAllLines(f, StandardCharsets.UTF_8);
-        List<Announcement> out = new ArrayList<>();
-        for (String ln : lines) {
-            if (ln == null || ln.trim().isEmpty()) continue;
-            // Split by comma, but we need to handle the case where content might contain commas if not properly escaped.
-            // However, Utils.unescapeCsv assumes simple splitting.
-            // The issue is that p.split(",", 7) limits the split to 7 parts, which merges the last parts if there are more commas.
-            // But if we have 8 columns (new format), split(",", 7) will merge the last two columns into one string.
-            // We should split by -1 to get all parts, or at least 8.
-            String[] p = ln.split(",", -1);
-            if (p.length < 6) continue;
-            try {
-                long id = Long.parseLong(p[0]);
-                // CSV format: id,type,title,content,important,createdAt,createdBy,expiresAt
-
-                String type = "system";
-                String title;
-                String content;
-                boolean important;
-                String createdAt;
-                String createdBy;
-                String expiresAt = "";
-
-                // Check if the second column looks like a type (short, lowercase letters)
-                // or if we have enough columns for the new format.
-                // The example CSV row is: 1,reward,阿米娅生日和Adonis生日,记得上线明日方舟领取200合成玉补偿,true,2025-12-23 22:44:31,二狗子,2025-12-23T16:00:00.000Z
-                // This has 8 parts.
-
-                if (p.length >= 8) {
-                    // New format with type
-                    type = Utils.unescapeCsv(p[1]);
-                    title = Utils.unescapeCsv(p[2]);
-                    content = Utils.unescapeCsv(p[3]);
-                    important = Boolean.parseBoolean(p[4]);
-                    createdAt = Utils.unescapeCsv(p[5]);
-                    createdBy = Utils.unescapeCsv(p[6]);
-                    expiresAt = Utils.unescapeCsv(p[7]);
-                } else {
-                    // Legacy format (no type column)
-                    // id,title,content,important,createdAt,createdBy,expiresAt
-                    title = Utils.unescapeCsv(p[1]);
-                    content = Utils.unescapeCsv(p[2]);
-                    important = Boolean.parseBoolean(p[3]);
-                    createdAt = Utils.unescapeCsv(p[4]);
-                    createdBy = Utils.unescapeCsv(p[5]);
-                    if (p.length >= 7) {
-                        expiresAt = Utils.unescapeCsv(p[6]);
-                    }
-                }
-
-                out.add(new Announcement(id, type, title, content, important, createdAt, createdBy, expiresAt));
-            } catch (Exception ignoreBadRow) {
-            }
+        try {
+            com.hourai.prts.service.AnnouncementService announcementService = new com.hourai.prts.service.AnnouncementService();
+            return announcementService.getAllAnnouncements();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ArrayList<>();
         }
-        return out;
     }
 
     // state row: userId,notificationId,isRead,isHidden
     private static synchronized Map<Long, State> loadStateForUser(long userId) throws IOException {
         Map<Long, State> out = new HashMap<>();
-        if (!Files.exists(STATE_FILE)) return out;
-        List<String> lines = Files.readAllLines(STATE_FILE, StandardCharsets.UTF_8);
-        for (String ln : lines) {
-            if (ln == null || ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 4);
-            if (p.length < 4) continue;
-            try {
-                long uid = Long.parseLong(p[0]);
-                if (uid != userId) continue;
-                long nid = Long.parseLong(p[1]);
-                boolean read = Boolean.parseBoolean(p[2]);
-                boolean hidden = Boolean.parseBoolean(p[3]);
-                out.put(nid, new State(read, hidden));
-            } catch (Exception ignored) {
+        try {
+            com.hourai.prts.service.NotificationStateService nsService = new com.hourai.prts.service.NotificationStateService();
+            java.util.List<com.hourai.prts.entity.NotificationState> states = nsService.getStatesForUser(userId);
+            for (com.hourai.prts.entity.NotificationState ns : states) {
+                out.put(ns.getNotificationId(), new State(ns.isRead(), ns.isHidden()));
             }
+        } catch (Exception e) {
+            e.printStackTrace();
+            // on DB error return empty map
         }
         return out;
     }
 
     private static synchronized void upsertState(long userId, long notifId, Boolean read, Boolean hidden) throws IOException {
-        List<String> lines = Files.exists(STATE_FILE) ? Files.readAllLines(STATE_FILE, StandardCharsets.UTF_8) : new ArrayList<>();
-        boolean found = false;
-        for (int i = 0; i < lines.size(); i++) {
-            String ln = lines.get(i);
-            if (ln == null || ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 4);
-            if (p.length < 4) continue;
-            try {
-                long uid = Long.parseLong(p[0]);
-                long nid = Long.parseLong(p[1]);
-                if (uid == userId && nid == notifId) {
-                    boolean curRead = Boolean.parseBoolean(p[2]);
-                    boolean curHidden = Boolean.parseBoolean(p[3]);
-                    boolean newRead = (read == null) ? curRead : read;
-                    boolean newHidden = (hidden == null) ? curHidden : hidden;
-                    lines.set(i, uid + "," + nid + "," + newRead + "," + newHidden);
-                    found = true;
-                    break;
-                }
-            } catch (Exception ignored) {
-            }
+        try {
+            com.hourai.prts.service.NotificationStateService nsService = new com.hourai.prts.service.NotificationStateService();
+            boolean r = read == null ? false : read;
+            boolean h = hidden == null ? false : hidden;
+            com.hourai.prts.entity.NotificationState ns = new com.hourai.prts.entity.NotificationState(userId, notifId, r, h);
+            nsService.upsert(ns);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new IOException("failed to upsert notification state", e);
         }
-        if (!found) {
-            boolean newRead = read != null && read;
-            boolean newHidden = hidden != null && hidden;
-            lines.add(userId + "," + notifId + "," + newRead + "," + newHidden);
-        }
-        Files.write(STATE_FILE, lines, StandardCharsets.UTF_8);
     }
 
     private static String toJson(Map<String, Object> obj) {

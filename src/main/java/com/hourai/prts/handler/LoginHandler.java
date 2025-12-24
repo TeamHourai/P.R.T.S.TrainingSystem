@@ -40,7 +40,7 @@ public class LoginHandler implements HttpHandler {
             return;
         }
 
-        // 优先从数据库校验
+        // 使用数据库进行校验（不再回退到本地 CSV）
         com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
         User matchedUser = null;
         try {
@@ -52,17 +52,9 @@ public class LoginHandler implements HttpHandler {
                 matchedUser = ou.get();
             }
         } catch (Exception e) {
-            // ignore, fallback to CSV
-        }
-        // 数据库异常或未找到时，回退到 CSV
-        if (matchedUser == null) {
-            List<User> users = DataStore.loadUsers();
-            java.util.Optional<User> ou = users.stream()
-                    .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
-                    .findFirst();
-            if (ou.isPresent()) {
-                matchedUser = ou.get();
-            }
+            e.printStackTrace();
+            Utils.send(exchange, 500, "{\"success\":false,\"message\":\"database error\"}");
+            return;
         }
         if (matchedUser != null) {
             User u = matchedUser;

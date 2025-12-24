@@ -56,7 +56,7 @@ public class Main {
         }
 
         // 用 HandlerRegistry.getWrapped(...) 统一获取已包裹 CORS 的 handler
-        server.createContext("/register", HandlerRegistry.getWrapped("register"));
+        /*server.createContext("/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/login", HandlerRegistry.getWrapped("login"));
         server.createContext("/notifications_state", HandlerRegistry.getWrapped("notifications_state"));
         server.createContext("/logout", HandlerRegistry.getWrapped("logout"));
@@ -69,10 +69,10 @@ public class Main {
         server.createContext("/stats", HandlerRegistry.getWrapped("stats"));
         server.createContext("/announcements", HandlerRegistry.getWrapped("announcements"));
         server.createContext("/admin/announcements", HandlerRegistry.getWrapped("announcements"));
-        server.createContext("/notifications", HandlerRegistry.getWrapped("notifications"));
+        server.createContext("/notifications", HandlerRegistry.getWrapped("notifications"));*/
 
         // ===== 为兼容前端，增加带 /api 和 /api/v1 前缀的路由 =====
-        server.createContext("/api/auth/register", HandlerRegistry.getWrapped("register"));
+        /*server.createContext("/api/auth/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/api/auth/login", HandlerRegistry.getWrapped("login"));
         server.createContext("/api/auth/logout", HandlerRegistry.getWrapped("logout"));
         server.createContext("/api/auth/profile", HandlerRegistry.getWrapped("auth_profile"));
@@ -86,12 +86,12 @@ public class Main {
         server.createContext("/api/stats", HandlerRegistry.getWrapped("stats"));
         server.createContext("/api/announcements", HandlerRegistry.getWrapped("announcements"));
         server.createContext("/api/admin/announcements", HandlerRegistry.getWrapped("announcements"));
-        server.createContext("/api/notifications", HandlerRegistry.getWrapped("notifications"));
+        server.createContext("/api/notifications", HandlerRegistry.getWrapped("notifications"));*/
 
         // 用户答题设置
-        server.createContext("/api/user/answer-settings", HandlerRegistry.getWrapped("answer_settings"));
+        //server.createContext("/api/user/answer-settings", HandlerRegistry.getWrapped("answer_settings"));
         // 入职培训答题记录
-        server.createContext("/api/user/training-records", HandlerRegistry.getWrapped("training_records"));
+        //server.createContext("/api/user/training-records", HandlerRegistry.getWrapped("training_records"));
 
         server.createContext("/api/v1/auth/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/api/v1/auth/login", HandlerRegistry.getWrapped("login"));
@@ -108,6 +108,8 @@ public class Main {
         server.createContext("/api/v1/announcements", HandlerRegistry.getWrapped("announcements"));
         server.createContext("/api/v1/admin/announcements", HandlerRegistry.getWrapped("announcements"));
         server.createContext("/api/v1/notifications", HandlerRegistry.getWrapped("notifications"));
+        // 兼容旧前端路径：也提供无前缀的 /notifications 路由（并保证 CORS 包裹）
+        server.createContext("/notifications", HandlerRegistry.getWrapped("notifications"));
 
         // 用户答题设置
         server.createContext("/api/v1/user/answer-settings", HandlerRegistry.getWrapped("answer_settings"));
@@ -126,7 +128,7 @@ public class Main {
         server.createContext("/admin/questions/batch-delete", HandlerRegistry.getWrapped("admin_questions"));
         // 关键词列表
         server.createContext("/api/v1/keywords", HandlerRegistry.getWrapped("keywords"));
-        server.createContext("/keywords", HandlerRegistry.getWrapped("keywords"));
+        //server.createContext("/keywords", HandlerRegistry.getWrapped("keywords"));
 
         // ======================================================
 

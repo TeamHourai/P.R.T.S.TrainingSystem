@@ -546,7 +546,7 @@
 
         <!-- 系统公告弹窗（优化为通知中心） -->
         <div class="modal-overlay" v-if="showSystemNotice" @click="showSystemNotice = false">
-            <div class="modal-content notification-modal" @click.stop style="max-width: 520px; width: 95vw;">
+            <div class="modal-content notification-modal" @click.stop style="max-width: 800px; width: 95vw; height: 80vh; display: flex; flex-direction: column;">
                 <div class="modal-header">
                     <h3>通知中心</h3>
                     <button class="modal-close" @click="showSystemNotice = false"><i class="fas fa-times"></i></button>
@@ -561,7 +561,7 @@
                         <span v-if="unreadCount > 0" class="badge badge-danger" style="margin-left:6px;">{{ unreadCount }}</span>
                     </div>
                 </div>
-                <div class="update-container" style="min-height:320px;">
+                <div class="update-container" style="flex: 1; overflow-y: auto; min-height: 0;">
                     <!-- 通知列表 -->
                     <div>
                         <div v-if="loadingNotifications" style="text-align:center;padding:40px 0;">
@@ -579,12 +579,12 @@
                                         @mouseenter="notif._hover = true" @mouseleave="notif._hover = false"
                                         :style="{background: notif._hover ? '#f5f7fa' : '', fontWeight: !notif.isRead ? 600 : 400, opacity: notif.isRead ? 0.7 : 1, borderLeft: notif.isImportant ? '4px solid #e53935' : ''}">
                                         <div class="notif-badge"
-                                            :style="{background:notif.badgeColor||'#2196F3',borderRadius:'50%',width:'32px',height:'32px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',color:'#fff'}">
-                                            {{ notif.badgeIcon || '🔔' }}
+                                            :style="{background:notif.typeInfo ? notif.typeInfo.color : '#2196F3',borderRadius:'50%',width:'32px',height:'32px',display:'flex',alignItems:'center',justifyContent:'center',fontSize:'1.3rem',color:'#fff'}">
+                                            {{ notif.typeInfo ? notif.typeInfo.icon : '🔔' }}
                                         </div>
                                         <div style="flex:1;">
                                             <div style="font-weight:600;">
-                                                {{ notif.title || notif.typeInfo?.name || '通知' }}
+                                                {{ notif.title || (notif.typeInfo ? notif.typeInfo.name : '通知') }}
                                                 <span v-if="!notif.isRead" class="badge badge-danger" style="margin-left:8px;">未读</span>
                                                 <span v-if="notif.isImportant" class="badge badge-warning" style="margin-left:8px;">重要</span>
                                             </div>
@@ -605,32 +605,33 @@
                                         </div>
                                     </div>
                                 </div>
-                                <!-- 分页 -->
-                                <div class="pagination" style="margin:12px 0;text-align:center;">
-                                    <button @click="changeNoticePage(noticePage-1)" :disabled="noticePage<=1" :class="{disabled: noticePage<=1}">上一页</button>
-                                    <span style="margin:0 10px;">第 {{ noticePage }} 页</span>
-                                    <button @click="changeNoticePage(noticePage+1)" :disabled="!hasMoreNotifications" :class="{disabled: !hasMoreNotifications}">下一页</button>
-                                    <button v-if="notifications.length>0" style="margin-left:16px;" @click="confirmMarkAllRead" :disabled="unreadCount===0" :class="{disabled: unreadCount===0}">
-                                        全部标记已读
-                                    </button>
-                                    <button v-if="notifications.length>0" style="margin-left:8px;" @click="confirmClearAllNotifications" :class="{disabled: notifications.length===0}">
-                                        清空全部
-                                    </button>
-                                </div>
                             </div>
                         </div>
                     </div>
-                    <!-- 二次确认弹窗 -->
-                    <div v-if="showConfirmDialog" class="modal-overlay confirm-modal" @click="showConfirmDialog=false">
-                        <div class="modal-content" @click.stop style="max-width:320px;">
-                            <div class="modal-header">
-                                <h4>操作确认</h4>
-                            </div>
-                            <div style="padding:20px 0; text-align:center;">{{ confirmMessage }}</div>
-                            <div style="text-align:center;">
-                                <button class="nav-btn primary" @click="handleConfirmAction">确定</button>
-                                <button class="nav-btn secondary" @click="showConfirmDialog=false" style="margin-left:16px;">取消</button>
-                            </div>
+                </div>
+                <!-- 分页固定在底部 -->
+                <div class="pagination" style="padding: 12px 0; text-align: center; border-top: 1px solid var(--border-color); background: var(--bg-card);" v-if="!loadingNotifications && notifications.length > 0">
+                    <button @click="changeNoticePage(noticePage-1)" :disabled="noticePage<=1" :class="{disabled: noticePage<=1}">上一页</button>
+                    <span style="margin:0 10px;">第 {{ noticePage }} 页</span>
+                    <button @click="changeNoticePage(noticePage+1)" :disabled="!hasMoreNotifications" :class="{disabled: !hasMoreNotifications}">下一页</button>
+                    <button v-if="notifications.length>0" style="margin-left:16px;" @click="confirmMarkAllRead" :disabled="unreadCount===0" :class="{disabled: unreadCount===0}">
+                        全部标记已读
+                    </button>
+                    <button v-if="notifications.length>0" style="margin-left:8px;" @click="confirmClearAllNotifications" :class="{disabled: notifications.length===0}">
+                        清空全部
+                    </button>
+                </div>
+
+                <!-- 二次确认弹窗 -->
+                <div v-if="showConfirmDialog" class="modal-overlay confirm-modal" @click="showConfirmDialog=false">
+                    <div class="modal-content" @click.stop style="max-width:320px;">
+                        <div class="modal-header">
+                            <h4>操作确认</h4>
+                        </div>
+                        <div style="padding:20px 0; text-align:center;">{{ confirmMessage }}</div>
+                        <div style="text-align:center; display: flex; justify-content: center; gap: 16px;">
+                            <button class="nav-btn primary" @click="handleConfirmAction">确定</button>
+                            <button class="nav-btn secondary" @click="showConfirmDialog=false">取消</button>
                         </div>
                     </div>
                 </div>
@@ -639,12 +640,12 @@
 
         <!-- 公告详情弹窗 -->
         <div v-if="showNoticeDetail" class="modal-overlay" @click="closeNoticeDetail">
-            <div class="modal-content notice-detail-modal" @click.stop style="max-width: 720px; width: 95vw;">
+            <div class="modal-content notice-detail-modal" @click.stop style="max-width: 800px; width: 95vw; height: 80vh; display: flex; flex-direction: column;">
                 <div class="modal-header">
                     <h3>公告详情</h3>
                     <button class="modal-close" @click="closeNoticeDetail"><i class="fas fa-times"></i></button>
                 </div>
-                <div class="notice-detail-body">
+                <div class="notice-detail-body" style="flex: 1; overflow-y: auto;">
                     <div class="notice-detail-title">
                         <span>{{ currentNoticeDetail?.title || '公告' }}</span>
                         <span v-if="currentNoticeDetail?.isImportant" class="badge badge-warning" style="margin-left:10px;">重要</span>

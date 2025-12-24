@@ -50,7 +50,7 @@ window._appData = {
     },
     // 系统公告
     showSystemNotice: false,
-    systemNoticeTab: 'all',
+    systemNoticeTab: 'unread', // 默认改为 'unread'
     selectedVersion: {},
     updateVersions: [],
     systemTips: '',

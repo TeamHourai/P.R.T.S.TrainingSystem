@@ -55,7 +55,9 @@
 /* 老版 body 背景，保证整体视觉一致 */
 body {
     font-family: 'Segoe UI', 'Microsoft YaHei', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, rgba(30, 30, 60, 0.9) 0%, rgba(10, 10, 30, 0.95) 100%);
+      background:
+            linear-gradient(135deg, rgba(30, 30, 60, 0.6) 0%, rgba(10, 10, 30, 0.7) 100%),
+            url('../images/bg-3.png') no-repeat center center fixed;
     background-size: cover;
     background-attachment: fixed;
     color: var(--text-primary);

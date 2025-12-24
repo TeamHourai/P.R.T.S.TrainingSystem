@@ -71,7 +71,10 @@
 
 /* 卡片组件 */
 .dashboard-card {
-    background: var(--bg-card);
+    background:
+        linear-gradient(90deg, var(--bg-card) 0%, rgba(30, 30, 46, 0) 100%),
+        url('../images/bg-8.png') no-repeat center center;
+    background-size: cover;
     border-radius: var(--border-radius-lg);
     padding: 30px;
     box-shadow: var(--shadow);
@@ -81,6 +84,49 @@
     position: relative;
     overflow: hidden;
     animation: fadeIn 0.5s ease-out;
+}
+
+/* 为每个卡片设置不同的背景图（使用 nth-child 选择器） */
+.dashboard-grid .dashboard-card:nth-child(1) {
+    background:
+        linear-gradient(90deg, var(--bg-card) 0%, rgba(30, 30, 46, 0) 100%),
+        url('../images/bg-1.png') no-repeat center center;
+    background-size: cover;
+}
+
+.dashboard-grid .dashboard-card:nth-child(2) {
+    background:
+        linear-gradient(90deg, var(--bg-card) 0%, rgba(30, 30, 46, 0) 100%),
+        url('../images/bg-2.png') no-repeat center center;
+    background-size: cover;
+}
+
+.dashboard-grid .dashboard-card:nth-child(3) {
+    background:
+        linear-gradient(90deg, var(--bg-card) 0%, rgba(30, 30, 46, 0) 100%),
+        url('../images/bg-4.png') no-repeat center center;
+    background-size: cover;
+}
+
+.dashboard-grid .dashboard-card:nth-child(4) {
+    background:
+        linear-gradient(90deg, var(--bg-card) 0%, rgba(30, 30, 46, 0) 100%),
+        url('../images/bg-5.png') no-repeat center center;
+    background-size: cover;
+}
+
+.dashboard-grid .dashboard-card:nth-child(5) {
+    background:
+        linear-gradient(90deg, var(--bg-card) 0%, rgba(30, 30, 46, 0) 100%),
+        url('../images/bg-6.png') no-repeat center center;
+    background-size: cover;
+}
+
+.dashboard-grid .dashboard-card:nth-child(6) {
+    background:
+        linear-gradient(90deg, var(--bg-card) 0%, rgba(30, 30, 46, 0) 100%),
+        url('../images/bg-7.png') no-repeat center center;
+    background-size: cover;
 }
 
 .dashboard-card::before {

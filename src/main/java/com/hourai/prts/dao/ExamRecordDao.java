@@ -55,7 +55,7 @@ public class ExamRecordDao {
     public int insert(ExamRecord er) throws SQLException {
         String sql = "INSERT INTO exam_record (user_id, exam_name, total_questions, correct_count, score, duration) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, er.getUserId());
             ps.setString(2, er.getExamName());
             ps.setInt(3, er.getTotalQuestions());
@@ -66,7 +66,13 @@ public class ExamRecordDao {
             } else {
                 ps.setNull(6, Types.INTEGER);
             }
-            return ps.executeUpdate();
+            int rows = ps.executeUpdate();
+            try (ResultSet gk = ps.getGeneratedKeys()) {
+                if (gk != null && gk.next()) {
+                    er.setId(gk.getLong(1));
+                }
+            }
+            return rows;
         }
     }
 

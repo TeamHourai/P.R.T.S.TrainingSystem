@@ -1,6 +1,6 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
+// Exam history loaded from DB only
 import com.hourai.prts.entity.ExamRecord;
 import com.hourai.prts.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
@@ -40,7 +40,9 @@ public class ExamHistoryHandler implements HttpHandler {
             com.hourai.prts.service.ExamRecordService examRecordService = new com.hourai.prts.service.ExamRecordService();
             all = examRecordService.getAllExamRecords();
         } catch (Exception dbEx) {
-            all = DataStore.loadExamRecords();
+            dbEx.printStackTrace();
+            Utils.send(exchange, 500, "{\"success\":false,\"message\":\"database error\"}");
+            return;
         }
         // 按 createdAt 倒序（null 视为最早）
         List<ExamRecord> sorted = all.stream()

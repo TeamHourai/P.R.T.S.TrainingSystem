@@ -1,6 +1,5 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
 import com.hourai.prts.entity.UserAnswer;
 import com.hourai.prts.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
@@ -76,15 +75,13 @@ public class StatsHandler implements HttpHandler {
         }
 
         List<UserAnswer> answers = null;
-        boolean dbOk = true;
         try {
             com.hourai.prts.service.UserAnswerService userAnswerService = new com.hourai.prts.service.UserAnswerService();
             answers = userAnswerService.getAllUserAnswers();
         } catch (Exception e) {
-            dbOk = false;
-        }
-        if (!dbOk) {
-            answers = DataStore.loadUserAnswers();
+            e.printStackTrace();
+            Utils.send(exchange, 500, "{\"error\":\"failed to load answers\"}");
+            return;
         }
         int total = 0;
         int correct = 0;

@@ -13,7 +13,7 @@ package com.hourai.prts;/*
     POST /exam/submit   userId=2&answers=1:2,3:1
     GET  /user/2/wrong
 */
-import com.hourai.prts.data.DataStore;
+// DataStore CSV bootstrapping removed; runtime uses DB
 import com.hourai.prts.handler.*;
 import com.sun.net.httpserver.HttpServer;
 
@@ -26,7 +26,7 @@ import java.net.InetSocketAddress;
 
 public class Main {
     public static void main(String[] args) throws Exception {
-        DataStore.ensureDataFiles();
+        // CSV bootstrapping removed: runtime no longer creates local data files
 
         // ALWAYS use port 8080.
         // To avoid BindException when re-running from IDE, try to free the port first.

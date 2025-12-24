@@ -1,14 +1,10 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
 import com.hourai.prts.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 public class KeywordsHandler implements HttpHandler {
@@ -28,44 +24,26 @@ public class KeywordsHandler implements HttpHandler {
         String fullPath = exchange.getRequestURI().getPath() == null ? "" : exchange.getRequestURI().getPath();
         boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
         java.util.List<com.hourai.prts.entity.Question> all;
-        Path target;
-        if (useOnboarding) {
-            target = DataStore.getQuestionsFile().resolveSibling("questions_onboarding.csv");
-            try {
-                com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+        try {
+            com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+            if (useOnboarding) {
                 all = questionService.getAllQuestionsByType(2);
-            } catch (Exception dbEx) {
-                all = com.hourai.prts.data.DataStore.loadQuestions(target);
-            }
-        } else {
-            target = DataStore.getQuestionsFile();
-            try {
-                com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+            } else {
                 all = questionService.getAllQuestions();
-            } catch (Exception dbEx) {
-                all = com.hourai.prts.data.DataStore.loadQuestions(target);
             }
-        }
-
-        if (!Files.exists(target)) {
-            Utils.send(exchange, 200, "[]");
+        } catch (Exception dbEx) {
+            dbEx.printStackTrace();
+            Utils.send(exchange, 500, "{\"success\":false,\"message\":\"database error\"}");
             return;
         }
 
-        List<String> lines = Files.readAllLines(target, StandardCharsets.UTF_8);
         Set<String> kws = new LinkedHashSet<>();
-        for (String ln : lines) {
-            if (ln == null || ln.trim().isEmpty()) continue;
-            // Accept both ASCII comma and full-width Chinese comma as column separators
-            String[] p = ln.split("[,，]", 10);
-            if (p.length >= 10) {
-                String k = Utils.unescapeCsv(p[9]);
-                if (!k.trim().isEmpty()) {
-                    for (String part : k.split("\\|")) {
-                        String t = part.trim();
-                        if (!t.isEmpty()) kws.add(t);
-                    }
-                }
+        for (com.hourai.prts.entity.Question question : all) {
+            String k = question.getKeywords();
+            if (k == null || k.trim().isEmpty()) continue;
+            for (String part : k.split("\\|")) {
+                String t = part.trim();
+                if (!t.isEmpty()) kws.add(t);
             }
         }
 

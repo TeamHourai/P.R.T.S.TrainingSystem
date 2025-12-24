@@ -53,19 +53,42 @@ public class UserAnswerDao {
     private final String password = "p.r.t.s.data115";
 
     public int insert(UserAnswer ua) throws SQLException {
-        String sql = "INSERT INTO user_answers (user_id, question_id, selected_answer, is_correct, answer_time) VALUES (?, ?, ?, ?, ?)";
+        // If an explicit id is provided (e.g. during CSV import), insert with id.
+        if (ua.getId() != null) {
+            String sqlWithId = "INSERT INTO user_answers (id, user_id, question_id, selected_answer, is_correct, answer_time, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            try (Connection conn = DriverManager.getConnection(url, user, password);
+                 PreparedStatement ps = conn.prepareStatement(sqlWithId)) {
+                ps.setLong(1, ua.getId());
+                ps.setLong(2, ua.getUserId());
+                ps.setLong(3, ua.getQuestionId());
+                ps.setString(4, ua.getSelectedAnswer());
+                ps.setBoolean(5, ua.isCorrect());
+                if (ua.getAnswerTime() != null) ps.setInt(6, ua.getAnswerTime());
+                else ps.setNull(6, Types.INTEGER);
+                if (ua.getCreatedAt() != null) ps.setTimestamp(7, ua.getCreatedAt());
+                else ps.setNull(7, Types.TIMESTAMP);
+                return ps.executeUpdate();
+            }
+        }
+
+        String sql = "INSERT INTO user_answers (user_id, question_id, selected_answer, is_correct, answer_time, created_at) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, ua.getUserId());
             ps.setLong(2, ua.getQuestionId());
             ps.setString(3, ua.getSelectedAnswer());
             ps.setBoolean(4, ua.isCorrect());
-            if (ua.getAnswerTime() != null) {
-                ps.setInt(5, ua.getAnswerTime());
-            } else {
-                ps.setNull(5, Types.INTEGER);
+            if (ua.getAnswerTime() != null) ps.setInt(5, ua.getAnswerTime());
+            else ps.setNull(5, Types.INTEGER);
+            if (ua.getCreatedAt() != null) ps.setTimestamp(6, ua.getCreatedAt());
+            else ps.setNull(6, Types.TIMESTAMP);
+            int rows = ps.executeUpdate();
+            try (ResultSet gk = ps.getGeneratedKeys()) {
+                if (gk != null && gk.next()) {
+                    ua.setId(gk.getLong(1));
+                }
             }
-            return ps.executeUpdate();
+            return rows;
         }
     }
 

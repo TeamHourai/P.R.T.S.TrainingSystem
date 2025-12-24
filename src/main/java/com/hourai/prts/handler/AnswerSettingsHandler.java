@@ -1,6 +1,6 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
+import com.hourai.prts.entity.AnswerSettings;
 import com.hourai.prts.service.AnswerSettingsService;
 import com.hourai.prts.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
@@ -37,7 +37,7 @@ public class AnswerSettingsHandler implements HttpHandler {
         String method = exchange.getRequestMethod();
         if ("GET".equalsIgnoreCase(method)) {
             try {
-                DataStore.AnswerSettings s = new AnswerSettingsService().getForUser(userId);
+                AnswerSettings s = new AnswerSettingsService().getForUser(userId);
                 Utils.send(exchange, 200,
                         "{\"success\":true,\"autoSubmit\":" + s.autoSubmit + ",\"autoNextCorrect\":" + s.autoNextCorrect + "}");
             } catch (Exception e) {
@@ -48,9 +48,9 @@ public class AnswerSettingsHandler implements HttpHandler {
         }
 
         if ("PUT".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method)) {
-            DataStore.AnswerSettings payload;
+            AnswerSettings payload;
             try {
-                payload = Utils.parseJson(exchange, DataStore.AnswerSettings.class);
+                payload = Utils.parseJson(exchange, AnswerSettings.class);
             } catch (Exception e) {
                 Utils.send(exchange, 400, "{\"success\":false,\"message\":\"invalid json\"}");
                 return;
@@ -59,9 +59,9 @@ public class AnswerSettingsHandler implements HttpHandler {
             boolean autoSubmit = payload.autoSubmit;
             boolean autoNextCorrect = payload.autoNextCorrect;
             try {
-                DataStore.AnswerSettings saved = new AnswerSettingsService().upsert(userId, autoSubmit, autoNextCorrect);
+                AnswerSettings saved = new AnswerSettingsService().upsert(userId, autoSubmit, autoNextCorrect);
                 Utils.send(exchange, 200,
-                        "{\"success\":true,\"autoSubmit\":" + saved.autoSubmit + ",\"autoNextCorrect\":" + saved.autoNextCorrect + "}");
+                    "{\"success\":true,\"autoSubmit\":" + saved.autoSubmit + ",\"autoNextCorrect\":" + saved.autoNextCorrect + "}");
             } catch (Exception e) {
                 e.printStackTrace();
                 Utils.send(exchange, 500, "{\"success\":false,\"message\":\"db error\"}");

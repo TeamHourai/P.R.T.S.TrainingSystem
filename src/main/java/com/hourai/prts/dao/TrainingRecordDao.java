@@ -1,6 +1,6 @@
 package com.hourai.prts.dao;
 
-import com.hourai.prts.data.DataStore;
+import com.hourai.prts.entity.TrainingRecord;
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,9 +10,9 @@ public class TrainingRecordDao {
     private final String user = "root";
     private final String password = "p.r.t.s.data115";
 
-    public Map<Long, DataStore.TrainingRecord> selectByUserId(long userId) throws SQLException {
+    public Map<Long, TrainingRecord> selectByUserId(long userId) throws SQLException {
         String sql = "SELECT question_id, attempts, correct, last_at FROM training_records WHERE user_id = ?";
-        Map<Long, DataStore.TrainingRecord> out = new HashMap<>();
+        Map<Long, TrainingRecord> out = new HashMap<>();
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, userId);
@@ -22,7 +22,7 @@ public class TrainingRecordDao {
                     int attempts = rs.getInt("attempts");
                     boolean correct = rs.getBoolean("correct");
                     long lastAt = rs.getLong("last_at");
-                    out.put(qid, new DataStore.TrainingRecord(qid, attempts, correct, lastAt));
+                    out.put(qid, new TrainingRecord(qid, attempts, correct, lastAt));
                 }
             }
         }

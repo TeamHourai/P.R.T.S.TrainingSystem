@@ -1,6 +1,6 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
+import com.hourai.prts.entity.TrainingRecord;
 import com.hourai.prts.service.TrainingRecordService;
 import com.hourai.prts.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
@@ -39,7 +39,7 @@ public class TrainingRecordsHandler implements HttpHandler {
 
         String method = exchange.getRequestMethod();
         if ("GET".equalsIgnoreCase(method)) {
-            Map<Long, DataStore.TrainingRecord> recs;
+            Map<Long, TrainingRecord> recs;
             try {
                 recs = new TrainingRecordService().getRecordsForUser(userId);
             } catch (Exception e) {
@@ -50,10 +50,10 @@ public class TrainingRecordsHandler implements HttpHandler {
             StringBuilder sb = new StringBuilder();
             sb.append("{\"success\":true,\"records\":{");
             boolean first = true;
-            for (Map.Entry<Long, DataStore.TrainingRecord> e : recs.entrySet()) {
+            for (Map.Entry<Long, TrainingRecord> e : recs.entrySet()) {
                 if (!first) sb.append(",");
                 first = false;
-                DataStore.TrainingRecord r = e.getValue();
+                TrainingRecord r = e.getValue();
                 sb.append("\"").append(e.getKey()).append("\":{\"attempts\":").append(r.attempts)
                         .append(",\"correct\":").append(r.correct)
                         .append(",\"lastAt\":").append(r.lastAt).append("}");
@@ -75,9 +75,9 @@ public class TrainingRecordsHandler implements HttpHandler {
         }
 
         if ("PUT".equalsIgnoreCase(method) || "POST".equalsIgnoreCase(method)) {
-            DataStore.TrainingRecord payload;
+            TrainingRecord payload;
             try {
-                payload = Utils.parseJson(exchange, DataStore.TrainingRecord.class);
+                payload = Utils.parseJson(exchange, TrainingRecord.class);
             } catch (Exception e) {
                 Utils.send(exchange, 400, "{\"success\":false,\"message\":\"invalid json\"}");
                 return;
@@ -95,7 +95,7 @@ public class TrainingRecordsHandler implements HttpHandler {
             if (lastAt <= 0) lastAt = System.currentTimeMillis();
 
             try {
-                DataStore.TrainingRecord saved = new TrainingRecordService().upsert(userId, qid, attempts, correct, lastAt);
+                TrainingRecord saved = new TrainingRecordService().upsert(userId, qid, attempts, correct, lastAt);
                 Utils.send(exchange, 200,
                     "{\"success\":true,\"questionId\":" + qid + ",\"attempts\":" + saved.attempts + ",\"correct\":" + saved.correct + ",\"lastAt\":" + saved.lastAt + "}");
             } catch (Exception e) {

@@ -1,6 +1,6 @@
 package com.hourai.prts.dao;
 
-import com.hourai.prts.data.DataStore;
+import com.hourai.prts.entity.AnswerSettings;
 import java.sql.*;
 
 public class AnswerSettingsDao {
@@ -8,7 +8,7 @@ public class AnswerSettingsDao {
     private final String user = "root";
     private final String password = "p.r.t.s.data115";
 
-    public DataStore.AnswerSettings selectByUserId(long userId) throws SQLException {
+    public AnswerSettings selectByUserId(long userId) throws SQLException {
         String sql = "SELECT auto_submit, auto_next_correct FROM answer_settings WHERE user_id = ?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -17,11 +17,11 @@ public class AnswerSettingsDao {
                 if (rs.next()) {
                     boolean autoSubmit = rs.getBoolean("auto_submit");
                     boolean autoNext = rs.getBoolean("auto_next_correct");
-                    return new DataStore.AnswerSettings(autoSubmit, autoNext);
+                    return new AnswerSettings(autoSubmit, autoNext);
                 }
             }
         }
-        return new DataStore.AnswerSettings(false, false);
+        return new AnswerSettings(false, false);
     }
 
     public int upsert(long userId, boolean autoSubmit, boolean autoNextCorrect) throws SQLException {

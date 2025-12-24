@@ -1,6 +1,5 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
 import com.hourai.prts.entity.Announcement;
 import com.hourai.prts.entity.User;
 import com.hourai.prts.utils.Utils;
@@ -8,9 +7,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -33,17 +29,14 @@ import java.util.*;
  */
 public class NotificationsHandler implements HttpHandler {
 
-    private static final Path STATE_FILE = Optional.ofNullable(DataStore.getAnnouncementsFile().getParent())
-            .orElse(Path.of("data"))
-            .resolve("notifications_state.csv");
+    // Notification states are persisted in DB via NotificationStateService
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String method = exchange.getRequestMethod();
         String path = exchange.getRequestURI().getPath();
 
-        ensureStateFile();
-
+        // state persisted in DB; no local file required
         if ("GET".equalsIgnoreCase(method)) {
             if (path.endsWith("/unread-count")) {
                 handleUnreadCount(exchange);
@@ -233,14 +226,7 @@ public class NotificationsHandler implements HttpHandler {
 
     // ===== helpers =====
 
-    private static void ensureStateFile() throws IOException {
-        if (!Files.exists(STATE_FILE)) {
-            if (!Files.exists(STATE_FILE.getParent())) {
-                Files.createDirectories(STATE_FILE.getParent());
-            }
-            Files.createFile(STATE_FILE);
-        }
-    }
+    // no local state file
 
     private static int parseInt(String s, int def) {
         try { return Integer.parseInt(s); } catch (Exception e) { return def; }

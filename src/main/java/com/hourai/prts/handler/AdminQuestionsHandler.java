@@ -1,14 +1,11 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
 import com.hourai.prts.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -18,7 +15,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class AdminQuestionsHandler implements HttpHandler {
-    private static final Path QUESTIONS_FILE = DataStore.getQuestionsFile(); // default questions file
+    // Admin batch-delete operates on DB via QuestionService
 
     @Override
     public void handle(HttpExchange exchange) throws IOException {
@@ -74,31 +71,20 @@ public class AdminQuestionsHandler implements HttpHandler {
         }
 
         Set<Long> del = new HashSet<>(ids);
-        // read file, filter out lines with id in del
-        if (!Files.exists(QUESTIONS_FILE)) {
-            Utils.send(exchange, 404, "{\"error\":\"questions file not found\"}");
-            return;
-        }
-        List<String> lines = Files.readAllLines(QUESTIONS_FILE, StandardCharsets.UTF_8);
-        List<String> newLines = new ArrayList<>();
-        boolean any = false;
-        for (String ln : lines) {
-            if (ln == null || ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 2);
-            if (p.length < 1) continue;
+        com.hourai.prts.service.QuestionService qs = new com.hourai.prts.service.QuestionService();
+        boolean anyDeleted = false;
+        for (Long qid : del) {
             try {
-                long qid = Long.parseLong(p[0].trim());
-                if (del.contains(qid)) { any = true; continue; }
-            } catch (Exception ignored) { }
-            newLines.add(ln);
+                int changed = qs.deleteQuestion(qid);
+                if (changed > 0) anyDeleted = true;
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
-
-        if (!any) {
+        if (!anyDeleted) {
             Utils.send(exchange, 404, "{\"error\":\"no matching ids found\"}");
             return;
         }
-
-        Files.write(QUESTIONS_FILE, newLines, StandardCharsets.UTF_8);
         Utils.send(exchange, 200, "{\"success\":true}");
     }
 

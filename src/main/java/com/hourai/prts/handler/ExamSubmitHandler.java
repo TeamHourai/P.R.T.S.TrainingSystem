@@ -1,6 +1,6 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
+import com.hourai.prts.service.UserAnswerService;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.hourai.prts.utils.Utils;
@@ -44,12 +44,12 @@ public class ExamSubmitHandler implements HttpHandler {
             }
 
             Map<Long, Integer> answers = Utils.parseAnswers(answersS);
-            List<Question> questions = DataStore.loadQuestions();
+            com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+            List<Question> questions = questionService.getAllQuestions();
             Map<Long, Question> qm = questions.stream().collect(java.util.stream.Collectors.toMap(Question::getId, q -> q));
 
             int score = 0;
-            List<UserAnswer> ualist = DataStore.loadUserAnswers();
-            long uaNext = DataStore.nextId(ualist);
+            UserAnswerService userAnswerService = new UserAnswerService();
 
             for (Map.Entry<Long, Integer> e : answers.entrySet()) {
                 Long qid = e.getKey();
@@ -68,29 +68,36 @@ public class ExamSubmitHandler implements HttpHandler {
                     }
                 }
 
-                UserAnswer ua = new UserAnswer(uaNext++, userId, qid, "normal", correct, sel, Utils.now());
-                DataStore.appendUserAnswer(ua);
-                // 同步写入MySQL
+                UserAnswer ua = new UserAnswer();
+                ua.setUserId(userId);
+                ua.setQuestionId(qid);
+                ua.setSelectedAnswer(String.valueOf(sel));
+                ua.setCorrect(correct);
+                ua.setAnswerTime(null);
                 try {
-                    com.hourai.prts.service.UserAnswerService userAnswerService = new com.hourai.prts.service.UserAnswerService();
+                    ua.setCreatedAt(java.sql.Timestamp.valueOf(Utils.now()));
+                } catch (Exception ignored) {}
+                try {
                     userAnswerService.addUserAnswer(ua);
                 } catch (Exception ex1) {
                     ex1.printStackTrace();
                 }
             }
 
-            List<ExamRecord> ers = DataStore.loadExamRecords();
-            long erId = DataStore.nextId(ers);
-            ExamRecord rec = new ExamRecord(erId, userId, score, Utils.now());
-            DataStore.appendExamRecord(rec);
-            // 同步写入MySQL
+            com.hourai.prts.service.ExamRecordService examRecordService = new com.hourai.prts.service.ExamRecordService();
+            ExamRecord rec = new ExamRecord();
+            rec.setUserId(userId);
+            rec.setScore(java.math.BigDecimal.valueOf(score));
+            rec.setExamName("auto");
+            rec.setTotalQuestions(0);
+            rec.setCorrectCount(score);
             try {
-                com.hourai.prts.service.ExamRecordService examRecordService = new com.hourai.prts.service.ExamRecordService();
                 examRecordService.addExamRecord(rec);
             } catch (Exception ex2) {
                 ex2.printStackTrace();
             }
-            Utils.send(exchange, 200, "{\"examId\":" + erId + ",\"score\":" + score + "}");
+            Long erId = rec.getId();
+            Utils.send(exchange, 200, "{\"examId\":" + (erId == null ? -1 : erId) + ",\"score\":" + score + "}");
         } catch (Exception ex) {
             ex.printStackTrace();
             // Never drop the connection: always respond

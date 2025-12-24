@@ -1,6 +1,5 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
 import com.hourai.prts.entity.User;
 import com.hourai.prts.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;

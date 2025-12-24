@@ -1,6 +1,6 @@
 package com.hourai.prts.handler;
 
-import com.hourai.prts.data.DataStore;
+// Questions are loaded from DB via QuestionService
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.hourai.prts.utils.Utils;
@@ -28,7 +28,15 @@ public class ExamPaperHandler implements HttpHandler {
             return;
         }
 
-        List<Question> all = DataStore.loadQuestions();
+        List<Question> all;
+        try {
+            com.hourai.prts.service.QuestionService qs = new com.hourai.prts.service.QuestionService();
+            all = qs.getAllQuestions();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Utils.send(exchange, 500, "{\"success\":false,\"message\":\"database error\"}");
+            return;
+        }
 
         // Group questions: Type -> Difficulty -> List<Question>
         Map<Integer, Map<Integer, List<Question>>> matrix = new HashMap<>();

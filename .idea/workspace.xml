@@ -5,28 +5,22 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="已完成数据同步数据库">
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-1.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-2.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-4.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-5.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-6.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-7.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/bg-8.png" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/base.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/exam/base.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/base.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/base.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/components.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/components.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/ExamPaperHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/ExamPaperHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/NotificationsHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/NotificationsHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamPaperHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamPaperHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/NotificationsHandler$State.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/NotificationsHandler$State.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/NotificationsHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/NotificationsHandler.class" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/tool/CsvBatchImporter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_BRANCH_BY_REPOSITORY">

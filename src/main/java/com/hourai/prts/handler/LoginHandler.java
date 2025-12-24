@@ -40,18 +40,33 @@ public class LoginHandler implements HttpHandler {
             return;
         }
 
-        List<User> users = DataStore.loadUsers();
-        Optional<User> ou = users.stream()
-                .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
-                .findFirst();
-
-        if (ou.isPresent()) {
-            User u = ou.get();
-
-            // 兼容前端：返回 success/message/user/token（token 先用一个可用的轻量占位值）
-            // 前端的 userApi.login 会优先识别 token，其次可识别 id/username。
+        // 优先从数据库校验
+        com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
+        User matchedUser = null;
+        try {
+            List<User> users = userService.getAllUsers();
+            java.util.Optional<User> ou = users.stream()
+                    .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
+                    .findFirst();
+            if (ou.isPresent()) {
+                matchedUser = ou.get();
+            }
+        } catch (Exception e) {
+            // ignore, fallback to CSV
+        }
+        // 数据库异常或未找到时，回退到 CSV
+        if (matchedUser == null) {
+            List<User> users = DataStore.loadUsers();
+            java.util.Optional<User> ou = users.stream()
+                    .filter(u -> u.getUsername().equals(username) && u.getPassword().equals(password))
+                    .findFirst();
+            if (ou.isPresent()) {
+                matchedUser = ou.get();
+            }
+        }
+        if (matchedUser != null) {
+            User u = matchedUser;
             String token = "user-" + u.getId();
-
             String body = "{"
                     + "\"success\":true,"
                     + "\"message\":\"登录成功\","

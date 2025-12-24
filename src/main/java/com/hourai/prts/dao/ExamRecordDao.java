@@ -8,6 +8,7 @@ import com.hourai.prts.entity.ExamRecord;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.math.BigDecimal;
 
 /**
  * ExamRecordDao 提供对考试记录表的数据库操作方法。
@@ -53,7 +54,7 @@ public class ExamRecordDao {
     private final String password = "p.r.t.s.data115";
 
     public int insert(ExamRecord er) throws SQLException {
-        String sql = "INSERT INTO exam_record (user_id, exam_name, total_questions, correct_count, score, duration) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO exam_records (user_id, exam_name, total_questions, correct_count, score, duration) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, er.getUserId());
@@ -77,21 +78,33 @@ public class ExamRecordDao {
     }
 
     public ExamRecord selectById(Long id) throws SQLException {
-        String sql = "SELECT * FROM exam_record WHERE id = ?";
+        String sql = "SELECT * FROM exam_records WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
             ResultSet rs = ps.executeQuery();
             if (rs.next()) {
                 ExamRecord er = new ExamRecord();
+                ResultSetMetaData md = rs.getMetaData();
+                boolean hasExamName = hasColumn(md, "exam_name");
+                boolean hasExamId = hasColumn(md, "exam_id");
+                boolean hasTotalQuestions = hasColumn(md, "total_questions");
+                boolean hasCorrectCount = hasColumn(md, "correct_count");
+                boolean hasScore = hasColumn(md, "score");
+                boolean hasDuration = hasColumn(md, "duration");
+                boolean hasCreatedAt = hasColumn(md, "created_at");
+                boolean hasSubmitTime = hasColumn(md, "submit_time");
+
                 er.setId(rs.getLong("id"));
-                er.setUserId(rs.getLong("user_id"));
-                er.setExamName(rs.getString("exam_name"));
-                er.setTotalQuestions(rs.getInt("total_questions"));
-                er.setCorrectCount(rs.getInt("correct_count"));
-                er.setScore(rs.getBigDecimal("score"));
-                er.setDuration(rs.getInt("duration"));
-                er.setCreatedAt(rs.getTimestamp("created_at"));
+                if (hasColumn(md, "user_id")) er.setUserId(rs.getLong("user_id"));
+                if (hasExamName) er.setExamName(rs.getString("exam_name"));
+                else if (hasExamId) er.setExamName(String.valueOf(rs.getLong("exam_id")));
+                if (hasTotalQuestions) er.setTotalQuestions(rs.getInt("total_questions"));
+                if (hasCorrectCount) er.setCorrectCount(rs.getInt("correct_count"));
+                if (hasScore) er.setScore(rs.getBigDecimal("score"));
+                if (hasDuration) er.setDuration(rs.getInt("duration"));
+                if (hasCreatedAt) er.setCreatedAt(rs.getTimestamp("created_at"));
+                else if (hasSubmitTime) er.setCreatedAt(rs.getTimestamp("submit_time"));
                 return er;
             }
         }
@@ -99,29 +112,49 @@ public class ExamRecordDao {
     }
 
     public List<ExamRecord> selectAll() throws SQLException {
-        String sql = "SELECT * FROM exam_record";
+        String sql = "SELECT * FROM exam_records";
         List<ExamRecord> list = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(url, user, password);
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
+            ResultSetMetaData md = rs.getMetaData();
+            boolean hasExamName = hasColumn(md, "exam_name");
+            boolean hasExamId = hasColumn(md, "exam_id");
+            boolean hasTotalQuestions = hasColumn(md, "total_questions");
+            boolean hasCorrectCount = hasColumn(md, "correct_count");
+            boolean hasScore = hasColumn(md, "score");
+            boolean hasDuration = hasColumn(md, "duration");
+            boolean hasCreatedAt = hasColumn(md, "created_at");
+            boolean hasSubmitTime = hasColumn(md, "submit_time");
+
             while (rs.next()) {
                 ExamRecord er = new ExamRecord();
                 er.setId(rs.getLong("id"));
-                er.setUserId(rs.getLong("user_id"));
-                er.setExamName(rs.getString("exam_name"));
-                er.setTotalQuestions(rs.getInt("total_questions"));
-                er.setCorrectCount(rs.getInt("correct_count"));
-                er.setScore(rs.getBigDecimal("score"));
-                er.setDuration(rs.getInt("duration"));
-                er.setCreatedAt(rs.getTimestamp("created_at"));
+                if (hasColumn(md, "user_id")) er.setUserId(rs.getLong("user_id"));
+                if (hasExamName) er.setExamName(rs.getString("exam_name"));
+                else if (hasExamId) er.setExamName(String.valueOf(rs.getLong("exam_id")));
+                if (hasTotalQuestions) er.setTotalQuestions(rs.getInt("total_questions"));
+                if (hasCorrectCount) er.setCorrectCount(rs.getInt("correct_count"));
+                if (hasScore) er.setScore(rs.getBigDecimal("score"));
+                if (hasDuration) er.setDuration(rs.getInt("duration"));
+                if (hasCreatedAt) er.setCreatedAt(rs.getTimestamp("created_at"));
+                else if (hasSubmitTime) er.setCreatedAt(rs.getTimestamp("submit_time"));
                 list.add(er);
             }
         }
         return list;
     }
 
+    private boolean hasColumn(ResultSetMetaData md, String col) throws SQLException {
+        int cnt = md.getColumnCount();
+        for (int i = 1; i <= cnt; i++) {
+            if (md.getColumnLabel(i).equalsIgnoreCase(col)) return true;
+        }
+        return false;
+    }
+
     public int update(ExamRecord er) throws SQLException {
-        String sql = "UPDATE exam_record SET user_id=?, exam_name=?, total_questions=?, correct_count=?, score=?, duration=? WHERE id=?";
+        String sql = "UPDATE exam_records SET user_id=?, exam_name=?, total_questions=?, correct_count=?, score=?, duration=? WHERE id=?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, er.getUserId());
@@ -140,7 +173,7 @@ public class ExamRecordDao {
     }
 
     public int delete(Long id) throws SQLException {
-        String sql = "DELETE FROM exam_record WHERE id=?";
+        String sql = "DELETE FROM exam_records WHERE id=?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);

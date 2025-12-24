@@ -40,8 +40,16 @@ public class WrongAnswersHandler implements HttpHandler {
         }
 
         if ("GET".equalsIgnoreCase(method)) {
-            List<Question> qs = wrongQuestionService.getVisibleWrongQuestions(userId);
-            Utils.send(exchange, 200, Utils.questionsToJson(qs));
+            try {
+                List<Question> qs = wrongQuestionService.getVisibleWrongQuestions(userId);
+                Utils.send(exchange, 200, Utils.questionsToJson(qs));
+            } catch (Exception e) {
+                // Log server-side for diagnostics and return 500 with error message
+                System.err.println("[ERROR] Failed to handle /api/v1/answers/wrong: " + e.getMessage());
+                e.printStackTrace(System.err);
+                String msg = "{\"success\":false,\"message\":\"internal server error: " + Utils.escapeJson(e.getMessage()) + "\"}";
+                Utils.send(exchange, 500, msg);
+            }
             return;
         }
 

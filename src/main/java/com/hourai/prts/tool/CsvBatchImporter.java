@@ -5,6 +5,9 @@ import java.sql.*;
 import java.util.*;
 
 public class CsvBatchImporter {
+    static {
+        System.out.println("WARNING: CsvBatchImporter is a one-time migration tool. Do not run in production environments.");
+    }
     // 配置数据库连接
     static final String url = "jdbc:mysql://localhost:3306/p.r.t.s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     static final String user = "root";

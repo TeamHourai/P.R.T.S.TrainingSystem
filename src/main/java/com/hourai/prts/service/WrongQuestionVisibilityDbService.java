@@ -4,8 +4,8 @@ import com.hourai.prts.dao.WrongQuestionVisibilityDbDao;
 import com.hourai.prts.entity.WrongQuestionVisibility;
 import java.sql.SQLException;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.sql.*;
 
 public class WrongQuestionVisibilityDbService {
     private final WrongQuestionVisibilityDbDao dbDao = new WrongQuestionVisibilityDbDao();
@@ -16,19 +16,22 @@ public class WrongQuestionVisibilityDbService {
 
     public Set<Long> getHiddenQuestionIdsForUser(long userId) throws SQLException {
         Set<Long> ids = new HashSet<>();
-        String url = "jdbc:mysql://localhost:3306/p.r.t.s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
-        String user = "root";
-        String password = "p.r.t.s.data115";
-        String sql = "SELECT question_id FROM wrong_question_visibility WHERE user_id = ? AND hidden = 1";
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, userId);
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    ids.add(rs.getLong("question_id"));
-                }
-            }
+        List<WrongQuestionVisibility> all = dbDao.selectAll();
+        for (WrongQuestionVisibility w : all) {
+            if (w.getUserId() == userId && w.isHidden()) ids.add(w.getQuestionId());
         }
         return ids;
+    }
+
+    public List<WrongQuestionVisibility> selectAll() throws SQLException {
+        return dbDao.selectAll();
+    }
+
+    public WrongQuestionVisibility findByUserAndQuestion(long userId, long questionId) throws SQLException {
+        return dbDao.findByUserAndQuestion(userId, questionId);
+    }
+
+    public long nextId() throws SQLException {
+        return dbDao.nextId();
     }
 }

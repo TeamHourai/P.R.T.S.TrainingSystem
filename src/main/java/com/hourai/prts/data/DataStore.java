@@ -46,48 +46,12 @@ public class DataStore {
      * 确保数据目录和文件存在，如不存在则创建并写入初始数据
      */
     public static void ensureDataFiles() throws IOException {
-        if (!Files.exists(DATA_DIR)) Files.createDirectories(DATA_DIR);
-        // NOTE: users.csv is no longer auto-created. User data is expected to be stored in the database.
-        // If you need to seed users for a fallback or local testing, create the file manually.
-        if (!Files.exists(QUESTIONS_FILE)) {
-            List<String> qlines = new ArrayList<>();
-            qlines.add(Utils.csvQ(1, 1, 2, "", "以下哪个是 Java 的关键字？", false, "function|class|static|define", 3, "static 是关键字"));
-            qlines.add(Utils.csvQ(2, 2, 1, "", "2 + 2 = ?", false, "3|4|5|22", 2, "2+2=4"));
-            for (int i = 3; i <= 12; i++) {
-                qlines.add(Utils.csvQ(i, 1, 1, "", "示例题：" + (i - 2), false, "A|B|C|D", (i % 4 == 0 ? 4 : i % 4), "示例解析"));
-            }
-            Files.write(QUESTIONS_FILE, qlines, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
-        }
-        // ensure onboarding file exists (initial content can mirror QUESTIONS_FILE or be left empty)
-        if (!Files.exists(ONBOARDING_QUESTIONS_FILE)) {
-            List<String> qlines = new ArrayList<>();
-            qlines.add(Utils.csvQ(1, 1, 2, "", "以下哪个是 Java 的关键字？", false, "function|class|static|define", 3, "static 是关键字"));
-            qlines.add(Utils.csvQ(2, 2, 1, "", "2 + 2 = ?", false, "3|4|5|22", 2, "2+2=4"));
-            for (int i = 3; i <= 12; i++) {
-                qlines.add(Utils.csvQ(i, 1, 1, "", "示例题：" + (i - 2), false, "A|B|C|D", (i % 4 == 0 ? 4 : i % 4), "示例解析"));
-            }
-            Files.write(ONBOARDING_QUESTIONS_FILE, qlines, StandardCharsets.UTF_8, StandardOpenOption.CREATE);
-        }
-        if (!Files.exists(USER_ANSWERS_FILE)) {
-            Files.createFile(USER_ANSWERS_FILE);
-        }
-        if (!Files.exists(EXAM_RECORDS_FILE)) {
-            Files.createFile(EXAM_RECORDS_FILE);
-        }
-        if (!Files.exists(WRONG_VISIBILITY_FILE)) {
-            Files.createFile(WRONG_VISIBILITY_FILE);
-        }
-        if (!Files.exists(ANNOUNCEMENTS_FILE)) {
-            Files.createFile(ANNOUNCEMENTS_FILE);
-        }
-        // 用户答题设置（按用户维度持久化）
-        if (!Files.exists(ANSWER_SETTINGS_FILE)) {
-            Files.createFile(ANSWER_SETTINGS_FILE);
-        }
-        // 入职培训答题记录
-        if (!Files.exists(TRAINING_RECORDS_FILE)) {
-            Files.createFile(TRAINING_RECORDS_FILE);
-        }
+        // Deprecated for runtime: CSV bootstrapping is disabled.
+        // Data is expected to be in the database. This method is kept for
+        // compatibility with one-off import tools which may reference the
+        // file paths exposed by DataStore. Calling this at application
+        // startup will no longer create files.
+        return;
     }
 
     // ===================== 用户答题设置（CSV: user_id,auto_submit,auto_next_correct,updated_at） =====================

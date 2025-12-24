@@ -53,9 +53,20 @@ public class UserAnswerDao {
     private final String password = "p.r.t.s.data115";
 
     public int insert(UserAnswer ua) throws SQLException {
-        // If an explicit id is provided (e.g. during CSV import), insert with id.
+        // Determine column names to use based on DB schema
+        String selCol = DbCompat.columnExists("user_answers", "selected_answer") ? "selected_answer"
+                : (DbCompat.columnExists("user_answers", "answer") ? "answer" : "selected_answer");
+        String correctCol = DbCompat.columnExists("user_answers", "is_correct") ? "is_correct"
+                : (DbCompat.columnExists("user_answers", "correct") ? "correct" : "is_correct");
+        String answerTimeCol = DbCompat.columnExists("user_answers", "answer_time") ? "answer_time"
+                : (DbCompat.columnExists("user_answers", "submit_time") ? "submit_time" : "answer_time");
+        String createdAtCol = DbCompat.columnExists("user_answers", "created_at") ? "created_at"
+                : (DbCompat.columnExists("user_answers", "submit_time") ? "submit_time" : "created_at");
+
+        // If explicit id provided
         if (ua.getId() != null) {
-            String sqlWithId = "INSERT INTO user_answers (id, user_id, question_id, selected_answer, is_correct, answer_time, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)";
+            String sqlWithId = String.format("INSERT INTO user_answers (id, user_id, question_id, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    selCol, correctCol, answerTimeCol, createdAtCol);
             try (Connection conn = DriverManager.getConnection(url, user, password);
                  PreparedStatement ps = conn.prepareStatement(sqlWithId)) {
                 ps.setLong(1, ua.getId());
@@ -71,7 +82,8 @@ public class UserAnswerDao {
             }
         }
 
-        String sql = "INSERT INTO user_answers (user_id, question_id, selected_answer, is_correct, answer_time, created_at) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = String.format("INSERT INTO user_answers (user_id, question_id, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)",
+                selCol, correctCol, answerTimeCol, createdAtCol);
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setLong(1, ua.getUserId());
@@ -103,7 +115,7 @@ public class UserAnswerDao {
                 ua.setId(rs.getLong("id"));
                 ua.setUserId(rs.getLong("user_id"));
                 ua.setQuestionId(rs.getLong("question_id"));
-                ua.setSelectedAnswer(rs.getString("selected_answer"));
+                ua.setSelectedAnswer(readSelectedAnswer(rs));
                 ua.setCorrect(rs.getBoolean("is_correct"));
                 ua.setAnswerTime(rs.getInt("answer_time"));
                 ua.setCreatedAt(rs.getTimestamp("created_at"));
@@ -124,7 +136,7 @@ public class UserAnswerDao {
                 ua.setId(rs.getLong("id"));
                 ua.setUserId(rs.getLong("user_id"));
                 ua.setQuestionId(rs.getLong("question_id"));
-                ua.setSelectedAnswer(rs.getString("selected_answer"));
+                ua.setSelectedAnswer(readSelectedAnswer(rs));
                 ua.setCorrect(rs.getBoolean("is_correct"));
                 ua.setAnswerTime(rs.getInt("answer_time"));
                 ua.setCreatedAt(rs.getTimestamp("created_at"));
@@ -134,8 +146,35 @@ public class UserAnswerDao {
         return list;
     }
 
+    // Helper: try multiple candidate column names for selected answer to tolerate schema variations.
+    private String readSelectedAnswer(ResultSet rs) {
+        try {
+            if (hasColumn(rs, "selected_answer")) return rs.getString("selected_answer");
+            if (hasColumn(rs, "selected_option")) return rs.getString("selected_option");
+            if (hasColumn(rs, "selectedOption")) return rs.getString("selectedOption");
+            if (hasColumn(rs, "selected")) return rs.getString("selected");
+        } catch (SQLException ignored) { }
+        return null;
+    }
+
+    private boolean hasColumn(ResultSet rs, String column) {
+        try {
+            rs.findColumn(column);
+            return true;
+        } catch (SQLException e) {
+            return false;
+        }
+    }
+
     public int update(UserAnswer ua) throws SQLException {
-        String sql = "UPDATE user_answers SET user_id=?, question_id=?, selected_answer=?, is_correct=?, answer_time=? WHERE id=?";
+        String selCol = DbCompat.columnExists("user_answers", "selected_answer") ? "selected_answer"
+                : (DbCompat.columnExists("user_answers", "answer") ? "answer" : "selected_answer");
+        String correctCol = DbCompat.columnExists("user_answers", "is_correct") ? "is_correct"
+                : (DbCompat.columnExists("user_answers", "correct") ? "correct" : "is_correct");
+        String answerTimeCol = DbCompat.columnExists("user_answers", "answer_time") ? "answer_time"
+                : (DbCompat.columnExists("user_answers", "submit_time") ? "submit_time" : "answer_time");
+
+        String sql = String.format("UPDATE user_answers SET user_id=?, question_id=?, %s=?, %s=?, %s=? WHERE id=?", selCol, correctCol, answerTimeCol);
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, ua.getUserId());

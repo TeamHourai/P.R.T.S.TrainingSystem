@@ -24,6 +24,7 @@ public class QuestionsImportTool {
     private static final String PASS = "p.r.t.s.data115";
 
     public static void main(String[] args) {
+        System.out.println("WARNING: QuestionsImportTool is a one-time migration tool. Do not run in production without review.");
         Path csv = args != null && args.length > 0 ? Paths.get(args[0]) : DEFAULT;
         System.out.println("Importing questions from: " + csv.toAbsolutePath());
         try {

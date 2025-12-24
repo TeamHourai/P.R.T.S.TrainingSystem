@@ -11,7 +11,12 @@ public class NotificationStateDao {
     private final String password = "p.r.t.s.data115";
 
     public List<NotificationState> selectByUserId(long userId) throws SQLException {
-        String sql = "SELECT notification_id, is_read, is_hidden FROM notifications_state WHERE user_id = ?";
+        // Select columns adaptively depending on DB schema
+        String readCol = DbCompat.columnExists("notifications_state", "is_read") ? "is_read"
+                : (DbCompat.columnExists("notifications_state", "read") ? "read" : "is_read");
+        String hiddenCol = DbCompat.columnExists("notifications_state", "is_hidden") ? "is_hidden"
+                : (DbCompat.columnExists("notifications_state", "deleted") ? "deleted" : "is_hidden");
+        String sql = String.format("SELECT notification_id, %s, %s FROM notifications_state WHERE user_id = ?", readCol, hiddenCol);
         List<NotificationState> out = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -19,8 +24,8 @@ public class NotificationStateDao {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     long nid = rs.getLong("notification_id");
-                    boolean read = rs.getBoolean("is_read");
-                    boolean hidden = rs.getBoolean("is_hidden");
+                    boolean read = rs.getBoolean(readCol);
+                    boolean hidden = rs.getBoolean(hiddenCol);
                     out.add(new NotificationState(userId, nid, read, hidden));
                 }
             }
@@ -29,7 +34,12 @@ public class NotificationStateDao {
     }
 
     public int upsert(NotificationState ns) throws SQLException {
-        String sqlInsert = "INSERT INTO notifications_state (user_id, notification_id, is_read, is_hidden) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE is_read = VALUES(is_read), is_hidden = VALUES(is_hidden)";
+        String readCol = DbCompat.columnExists("notifications_state", "is_read") ? "is_read"
+            : (DbCompat.columnExists("notifications_state", "read") ? "read" : "is_read");
+        String hiddenCol = DbCompat.columnExists("notifications_state", "is_hidden") ? "is_hidden"
+            : (DbCompat.columnExists("notifications_state", "deleted") ? "deleted" : "is_hidden");
+        String sqlInsert = String.format("INSERT INTO notifications_state (user_id, notification_id, %s, %s) VALUES (?, ?, ?, ?) ON DUPLICATE KEY UPDATE %s = VALUES(%s), %s = VALUES(%s)",
+            readCol, hiddenCol, readCol, readCol, hiddenCol, hiddenCol);
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sqlInsert)) {
             ps.setLong(1, ns.getUserId());

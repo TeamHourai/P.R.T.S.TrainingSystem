@@ -1,6 +1,7 @@
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\CorsFilter.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\dao\AnnouncementDao.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\dao\AnswerSettingsDao.java
+D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\dao\DbCompat.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\dao\ExamDetailDao.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\dao\ExamRecordDao.java
 D:\Code\Java\big work\new\P.R.T.S.TrainingSystem\src\main\java\com\hourai\prts\dao\NotificationsStateDao.java

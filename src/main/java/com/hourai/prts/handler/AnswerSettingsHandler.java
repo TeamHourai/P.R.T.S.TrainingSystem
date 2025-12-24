@@ -1,6 +1,7 @@
 package com.hourai.prts.handler;
 
 import com.hourai.prts.data.DataStore;
+import com.hourai.prts.service.AnswerSettingsService;
 import com.hourai.prts.utils.Utils;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -35,9 +36,14 @@ public class AnswerSettingsHandler implements HttpHandler {
 
         String method = exchange.getRequestMethod();
         if ("GET".equalsIgnoreCase(method)) {
-            DataStore.AnswerSettings s = DataStore.loadAnswerSettings(userId);
-            Utils.send(exchange, 200,
-                    "{\"success\":true,\"autoSubmit\":" + s.autoSubmit + ",\"autoNextCorrect\":" + s.autoNextCorrect + "}");
+            try {
+                DataStore.AnswerSettings s = new AnswerSettingsService().getForUser(userId);
+                Utils.send(exchange, 200,
+                        "{\"success\":true,\"autoSubmit\":" + s.autoSubmit + ",\"autoNextCorrect\":" + s.autoNextCorrect + "}");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Utils.send(exchange, 500, "{\"success\":false,\"message\":\"db error\"}");
+            }
             return;
         }
 
@@ -52,10 +58,14 @@ public class AnswerSettingsHandler implements HttpHandler {
 
             boolean autoSubmit = payload.autoSubmit;
             boolean autoNextCorrect = payload.autoNextCorrect;
-
-            DataStore.AnswerSettings saved = DataStore.upsertAnswerSettings(userId, autoSubmit, autoNextCorrect);
-            Utils.send(exchange, 200,
-                    "{\"success\":true,\"autoSubmit\":" + saved.autoSubmit + ",\"autoNextCorrect\":" + saved.autoNextCorrect + "}");
+            try {
+                DataStore.AnswerSettings saved = new AnswerSettingsService().upsert(userId, autoSubmit, autoNextCorrect);
+                Utils.send(exchange, 200,
+                        "{\"success\":true,\"autoSubmit\":" + saved.autoSubmit + ",\"autoNextCorrect\":" + saved.autoNextCorrect + "}");
+            } catch (Exception e) {
+                e.printStackTrace();
+                Utils.send(exchange, 500, "{\"success\":false,\"message\":\"db error\"}");
+            }
             return;
         }
 

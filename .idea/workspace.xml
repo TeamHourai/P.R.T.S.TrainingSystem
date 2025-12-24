@@ -4,26 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="优化UX；使入职培训不再使用本地存储，而是使用后端">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/notifications_state.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/notifications_state.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/data/training_records.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/training_records.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/AnnouncementDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/AnnouncementDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/Announcement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/Announcement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminUserListHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminUserListHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AnnouncementsHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AnnouncementsHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AuthProfileHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AuthProfileHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/NotificationsHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/NotificationsHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/RegisterHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/RegisterHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/TrainingRecordsHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/TrainingRecordsHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/AnnouncementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/AnnouncementService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry$1.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry.class" afterDir="false" />
+    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="已将user Announcement notifications_state TrainingRecord 成功迁移至数据库">
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/AnswerSettingsDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/NotificationStateDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/TrainingRecordDao.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/NotificationState.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/NotificationStateService.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/TrainingRecordService.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -131,7 +118,7 @@
       <workItem from="1765001151557" duration="3593000" />
       <workItem from="1766541868395" duration="420000" />
       <workItem from="1766542306256" duration="2274000" />
-      <workItem from="1766581634857" duration="6999000" />
+      <workItem from="1766581634857" duration="7318000" />
     </task>
     <task id="LOCAL-00001" summary="更新">
       <option name="closed" value="true" />
@@ -349,7 +336,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766567506168</updated>
     </task>
-    <option name="localTasksCounter" value="28" />
+    <task id="LOCAL-00028" summary="已将user Announcement notifications_state TrainingRecord 成功迁移至数据库">
+      <option name="closed" value="true" />
+      <created>1766589499515</created>
+      <option name="number" value="00028" />
+      <option name="presentableId" value="LOCAL-00028" />
+      <option name="project" value="LOCAL" />
+      <updated>1766589499515</updated>
+    </task>
+    <option name="localTasksCounter" value="29" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -428,7 +423,9 @@
     <MESSAGE value="修复小bug；添加答题设置功能" />
     <MESSAGE value="给若干重要文件添加git管理" />
     <MESSAGE value="优化UX；使入职培训不再使用本地存储，而是使用后端" />
-    <option name="LAST_COMMIT_MESSAGE" value="优化UX；使入职培训不再使用本地存储，而是使用后端" />
+    <MESSAGE value="优化UI；新添“薄弱练习”功能。" />
+    <MESSAGE value="已将user Announcement notifications_state TrainingRecord 成功迁移至数据库" />
+    <option name="LAST_COMMIT_MESSAGE" value="已将user Announcement notifications_state TrainingRecord 成功迁移至数据库" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -17,204 +17,236 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
 
     <script src="js/config.js"></script>
+    <!-- 引入 UI Modal -->
+    <script src="js/ui/modal.js"></script>
 </head>
 
 <body>
-    <div class="qe-page">
-        <header class="qe-header">
-            <div>
-                <h1 class="qe-title">题库编辑器</h1>
-                <p class="qe-subtitle">管理正式题库（questions）</p>
+    <div id="app">
+        <!-- 侧边导航 -->
+        <div class="sidebar active">
+            <div class="sidebar-header">
+                <h1>博士考核系统</h1>
+                <p>业务能力评估平台</p>
             </div>
-            <div class="qe-header-actions">
-                <a class="back-btn" href="index.html" style="text-decoration:none;"><i class="fas fa-arrow-left"></i>
-                    返回首页</a>
+            <div class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='index.html'">
+                    <i class="fas fa-home"></i><span>返回首页</span>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-database"></i><span>题库编辑器</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='training-editor.html'">
+                    <i class="fas fa-graduation-cap"></i><span>培训题目编辑器</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='announcement-editor.html'">
+                    <i class="fas fa-bullhorn"></i><span>发布公告</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='admin_permissions.html'">
+                    <i class="fas fa-user-shield"></i><span>权限管理</span>
+                </div>
             </div>
-        </header>
+            <div class="sidebar-footer">
+                <p>博士考核系统 v2.0</p>
+                <p>© 2025 罗德岛制药</p>
+            </div>
+        </div>
 
-        <main class="qe-main">
-            <section class="qe-card qe-left">
-                <div class="qe-toolbar">
-                    <div class="qe-filters">
-                        <div class="qe-field">
-                            <label>关键词</label>
-                            <input id="qe-keyword" type="text" placeholder="题干/解析/关键词" />
-                        </div>
-                        <div class="qe-field">
-                            <label>类型</label>
-                            <select id="qe-type">
-                                <option value="">全部</option>
-                                <option value="1">1 干员调配与特性化决策</option>
-                                <option value="2">2 空间部署与极致化战术</option>
-                                <option value="3">3 效能审计与生态位界定</option>
-                                <option value="4">4 横向分析与竞争力评估</option>
-                                <option value="5">5 作战环境与档案类记录</option>
-                            </select>
-                        </div>
-                        <div class="qe-field">
-                            <label>难度</label>
-                            <select id="qe-difficulty">
-                                <option value="">全部</option>
-                                <option value="1">1 常识</option>
-                                <option value="2">2 基操</option>
-                                <option value="3">3 娴熟</option>
-                                <option value="4">4 明智</option>
-                                <option value="5">5 深邃</option>
-                            </select>
-                        </div>
-                        <div class="qe-field qe-field-sm">
-                            <label>每页</label>
-                            <select id="qe-size">
-                                <option value="20">20</option>
-                                <option value="50" selected>50</option>
-                                <option value="100">100</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="qe-toolbar-actions">
-                        <button class="nav-btn secondary" id="qe-search-btn"><i class="fas fa-search"></i> 查询</button>
-                        <button class="nav-btn secondary" id="qe-reset-btn"><i class="fas fa-undo"></i> 重置</button>
-                        <button class="nav-btn primary" id="qe-new-btn"><i class="fas fa-plus"></i> 新建题目</button>
-                        <button class="nav-btn secondary" id="qe-batch-del-btn" disabled><i class="fas fa-trash"></i>
-                            批量删除</button>
-                    </div>
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">题库编辑器</h1>
+                    <p class="page-subtitle">管理正式题库（questions）</p>
                 </div>
+                <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> 返回首页
+                </button>
+            </div>
 
-                <div class="qe-table-wrap">
-                    <table class="qe-table">
-                        <thead>
-                            <tr>
-                                <th style="width:44px;"><input type="checkbox" id="qe-check-all" /></th>
-                                <th style="width:70px;">ID</th>
-                                <th style="width:90px;">类型</th>
-                                <th style="width:90px;">难度</th>
-                                <th>题干</th>
-                                <th style="width:140px;">操作</th>
-                            </tr>
-                        </thead>
-                        <tbody id="qe-tbody"></tbody>
-                    </table>
-                </div>
-
-                <div class="qe-pagination">
-                    <button class="nav-btn secondary" id="qe-prev" disabled><i class="fas fa-arrow-left"></i>
-                        上一页</button>
-                    <div class="qe-pageinfo" id="qe-pageinfo">第 1 页</div>
-                    <button class="nav-btn secondary" id="qe-next" disabled>下一页 <i
-                            class="fas fa-arrow-right"></i></button>
-                </div>
-
-                <div class="qe-hint" id="qe-hint"></div>
-            </section>
-
-            <section class="qe-card qe-right">
-                <div class="qe-form-header">
-                    <h2 class="qe-form-title" id="qe-form-title">新建题目</h2>
-                    <div class="qe-form-sub" id="qe-form-sub">填写题目内容并保存</div>
-                </div>
-
-                <form id="qe-form" class="qe-form">
-                    <input type="hidden" id="qe-id" />
-
-                    <div class="qe-form-grid">
-                        <div class="qe-field">
-                            <label>类型 *</label>
-                            <select id="qe-form-type" required>
-                                <option value="">请选择</option>
-                                <option value="1">1 干员调配与特性化决策</option>
-                                <option value="2">2 空间部署与极致化战术</option>
-                                <option value="3">3 效能审计与生态位界定</option>
-                                <option value="4">4 横向分析与竞争力评估</option>
-                                <option value="5">5 作战环境与档案类记录</option>
-                            </select>
-                        </div>
-
-                        <div class="qe-field">
-                            <label>难度 *</label>
-                            <select id="qe-form-difficulty" required>
-                                <option value="">请选择</option>
-                                <option value="1">1 常识</option>
-                                <option value="2">2 基操</option>
-                                <option value="3">3 娴熟</option>
-                                <option value="4">4 明智</option>
-                                <option value="5">5 深邃</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="qe-field">
-                        <label>题干 *</label>
-                        <textarea id="qe-form-question" rows="4" required placeholder="请输入题干"></textarea>
-                    </div>
-
-                    <div class="qe-options">
-                        <div class="qe-options-header">
-                            <div>选项 *</div>
-                            <div class="qe-answer">
-                                <label>正确答案</label>
-                                <select id="qe-form-answer" required>
-                                    <option value="">请选择</option>
-                                    <option value="1">A</option>
-                                    <option value="2">B</option>
-                                    <option value="3">C</option>
-                                    <option value="4">D</option>
+            <div class="qe-main" style="grid-template-columns: 1.2fr 0.8fr;">
+                <section class="qe-card qe-left">
+                    <div class="qe-toolbar">
+                        <div class="qe-filters">
+                            <div class="qe-field">
+                                <label>关键词</label>
+                                <input id="qe-keyword" type="text" placeholder="题干/解析/关键词" />
+                            </div>
+                            <div class="qe-field">
+                                <label>类型</label>
+                                <select id="qe-type">
+                                    <option value="">全部</option>
+                                    <option value="1">1 干员调配与特性化决策</option>
+                                    <option value="2">2 空间部署与极致化战术</option>
+                                    <option value="3">3 效能审计与生态位界定</option>
+                                    <option value="4">4 横向分析与竞争力评估</option>
+                                    <option value="5">5 作战环境与档案类记录</option>
+                                </select>
+                            </div>
+                            <div class="qe-field">
+                                <label>难度</label>
+                                <select id="qe-difficulty">
+                                    <option value="">全部</option>
+                                    <option value="1">1 常识</option>
+                                    <option value="2">2 基操</option>
+                                    <option value="3">3 娴熟</option>
+                                    <option value="4">4 明智</option>
+                                    <option value="5">5 深邃</option>
+                                </select>
+                            </div>
+                            <div class="qe-field qe-field-sm">
+                                <label>每页</label>
+                                <select id="qe-size">
+                                    <option value="20">20</option>
+                                    <option value="50" selected>50</option>
+                                    <option value="100">100</option>
                                 </select>
                             </div>
                         </div>
-                        <div class="qe-options-grid">
-                            <div class="qe-field">
-                                <label>A</label>
-                                <textarea id="qe-opt-a" rows="2" required></textarea>
-                            </div>
-                            <div class="qe-field">
-                                <label>B</label>
-                                <textarea id="qe-opt-b" rows="2" required></textarea>
-                            </div>
-                            <div class="qe-field">
-                                <label>C</label>
-                                <textarea id="qe-opt-c" rows="2" required></textarea>
-                            </div>
-                            <div class="qe-field">
-                                <label>D</label>
-                                <textarea id="qe-opt-d" rows="2" required></textarea>
-                            </div>
+
+                        <div class="qe-toolbar-actions">
+                            <button class="nav-btn secondary" id="qe-search-btn"><i class="fas fa-search"></i> 查询</button>
+                            <button class="nav-btn secondary" id="qe-reset-btn"><i class="fas fa-undo"></i> 重置</button>
+                            <button class="nav-btn primary" id="qe-new-btn"><i class="fas fa-plus"></i> 新建题目</button>
+                            <button class="nav-btn secondary" id="qe-batch-del-btn" disabled><i class="fas fa-trash"></i>
+                                批量删除</button>
                         </div>
                     </div>
 
-                    <div class="qe-field">
-                        <label>解析</label>
-                        <textarea id="qe-form-analysis" rows="4" placeholder="可选"></textarea>
+                    <div class="qe-table-wrap">
+                        <table class="qe-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:44px;"><input type="checkbox" id="qe-check-all" /></th>
+                                    <th style="width:70px;">ID</th>
+                                    <th style="width:90px;">类型</th>
+                                    <th style="width:90px;">难度</th>
+                                    <th>题干</th>
+                                    <th style="width:140px;">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="qe-tbody"></tbody>
+                        </table>
                     </div>
 
-                    <div class="qe-form-grid">
+                    <div class="qe-pagination">
+                        <button class="nav-btn secondary" id="qe-prev" disabled><i class="fas fa-arrow-left"></i>
+                            上一页</button>
+                        <div class="qe-pageinfo" id="qe-pageinfo">第 1 页</div>
+                        <button class="nav-btn secondary" id="qe-next" disabled>下一页 <i
+                                class="fas fa-arrow-right"></i></button>
+                    </div>
+
+                    <div class="qe-hint" id="qe-hint"></div>
+                </section>
+
+                <section class="qe-card qe-right">
+                    <div class="qe-form-header">
+                        <h2 class="qe-form-title" id="qe-form-title">新建题目</h2>
+                        <div class="qe-form-sub" id="qe-form-sub">填写题目内容并保存</div>
+                    </div>
+
+                    <form id="qe-form" class="qe-form">
+                        <input type="hidden" id="qe-id" />
+
+                        <div class="qe-form-grid">
+                            <div class="qe-field">
+                                <label>类型 *</label>
+                                <select id="qe-form-type" required>
+                                    <option value="">请选择</option>
+                                    <option value="1">1 干员调配与特性化决策</option>
+                                    <option value="2">2 空间部署与极致化战术</option>
+                                    <option value="3">3 效能审计与生态位界定</option>
+                                    <option value="4">4 横向分析与竞争力评估</option>
+                                    <option value="5">5 作战环境与档案类记录</option>
+                                </select>
+                            </div>
+
+                            <div class="qe-field">
+                                <label>难度 *</label>
+                                <select id="qe-form-difficulty" required>
+                                    <option value="">请选择</option>
+                                    <option value="1">1 常识</option>
+                                    <option value="2">2 基操</option>
+                                    <option value="3">3 娴熟</option>
+                                    <option value="4">4 明智</option>
+                                    <option value="5">5 深邃</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <div class="qe-field">
-                            <label>题源</label>
-                            <input id="qe-form-resource" type="text" placeholder="可选" />
+                            <label>题干 *</label>
+                            <textarea id="qe-form-question" rows="4" required placeholder="请输入题干"></textarea>
                         </div>
+
+                        <div class="qe-options">
+                            <div class="qe-options-header">
+                                <div>选项 *</div>
+                                <div class="qe-answer">
+                                    <label>正确答案</label>
+                                    <select id="qe-form-answer" required>
+                                        <option value="">请选择</option>
+                                        <option value="1">A</option>
+                                        <option value="2">B</option>
+                                        <option value="3">C</option>
+                                        <option value="4">D</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="qe-options-grid">
+                                <div class="qe-field">
+                                    <label>A</label>
+                                    <textarea id="qe-opt-a" rows="2" required></textarea>
+                                </div>
+                                <div class="qe-field">
+                                    <label>B</label>
+                                    <textarea id="qe-opt-b" rows="2" required></textarea>
+                                </div>
+                                <div class="qe-field">
+                                    <label>C</label>
+                                    <textarea id="qe-opt-c" rows="2" required></textarea>
+                                </div>
+                                <div class="qe-field">
+                                    <label>D</label>
+                                    <textarea id="qe-opt-d" rows="2" required></textarea>
+                                </div>
+                            </div>
+                        </div>
+
                         <div class="qe-field">
-                            <label>关键词（逗号分隔）</label>
-                            <input id="qe-form-keywords" type="text" placeholder="例如：职业,基础" list="qe-keywords-list" />
-                            <datalist id="qe-keywords-list"></datalist>
+                            <label>解析</label>
+                            <textarea id="qe-form-analysis" rows="4" placeholder="可选"></textarea>
                         </div>
-                    </div>
 
-                    <div class="qe-field qe-inline">
-                        <input id="qe-form-picture" type="checkbox" />
-                        <label for="qe-form-picture" style="margin:0;">包含图片（picture=true）</label>
-                    </div>
+                        <div class="qe-form-grid">
+                            <div class="qe-field">
+                                <label>题源</label>
+                                <input id="qe-form-resource" type="text" placeholder="可选" />
+                            </div>
+                            <div class="qe-field">
+                                <label>关键词（逗号分隔）</label>
+                                <input id="qe-form-keywords" type="text" placeholder="例如：职业,基础" list="qe-keywords-list" />
+                                <datalist id="qe-keywords-list"></datalist>
+                            </div>
+                        </div>
 
-                    <div class="qe-actions">
-                        <button class="nav-btn primary" id="qe-save-btn" type="submit"><i class="fas fa-save"></i>
-                            保存</button>
-                        <button class="nav-btn secondary" id="qe-clear-btn" type="button"><i class="fas fa-broom"></i>
-                            清空表单</button>
-                    </div>
+                        <div class="qe-field qe-inline">
+                            <input id="qe-form-picture" type="checkbox" />
+                            <label for="qe-form-picture" style="margin:0;">包含图片（picture=true）</label>
+                        </div>
 
-                    <div class="qe-hint" id="qe-form-hint"></div>
-                </form>
-            </section>
-        </main>
+                        <div class="qe-actions">
+                            <button class="nav-btn primary" id="qe-save-btn" type="submit"><i class="fas fa-save"></i>
+                                保存</button>
+                            <button class="nav-btn secondary" id="qe-clear-btn" type="button"><i class="fas fa-broom"></i>
+                                清空表单</button>
+                        </div>
+
+                        <div class="qe-hint" id="qe-form-hint"></div>
+                    </form>
+                </section>
+            </div>
+        </div>
     </div>
 
     <!-- API依赖：axios + request + apiapp + 各模块 -->

@@ -4,20 +4,24 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="已完成数据同步数据库">
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/head-bg.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/question-bg.png" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/images/side-bg.png" afterDir="false" />
+    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="优化UI，添加题目图片">
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/admin_permissions.html" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminSetPermissionsHandler.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminUserListHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/components.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/components.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/exam-pages.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/exam-pages.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/layout.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/layout.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/responsive.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/responsive.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/search-pages.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/search-pages.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/study-pages.css" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/css/index/study-pages.css" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/announcement-editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/announcement-editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/editor.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/config.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/training-editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/training-editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry$1.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry$1.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -105,8 +109,7 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-26cb7f24e5b0-intellij.indexing.shared.core-IU-253.29346.138" />
-        <option value="bundled-js-predefined-d6986cc7102b-9b0f141eb926-JavaScript-IU-253.29346.138" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
       </set>
     </attachedChunks>
   </component>
@@ -302,7 +305,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766539894412</updated>
     </task>
-    <option name="localTasksCounter" value="23" />
+    <task id="LOCAL-00023" summary="优化UI，添加题目图片">
+      <option name="closed" value="true" />
+      <created>1766557888817</created>
+      <option name="number" value="00023" />
+      <option name="presentableId" value="LOCAL-00023" />
+      <option name="project" value="LOCAL" />
+      <updated>1766557888817</updated>
+    </task>
+    <option name="localTasksCounter" value="24" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -353,19 +364,7 @@
       <map>
         <entry key="MAIN">
           <value>
-            <State>
-              <option name="FILTERS">
-                <map>
-                  <entry key="branch">
-                    <value>
-                      <list>
-                        <option value="origin/无数据库" />
-                      </list>
-                    </value>
-                  </entry>
-                </map>
-              </option>
-            </State>
+            <State />
           </value>
         </entry>
       </map>
@@ -388,7 +387,8 @@
     <MESSAGE value="添加题库" />
     <MESSAGE value="已完成.csv文件同步至数据库，仅对users.csv进行测试" />
     <MESSAGE value="已完成数据同步数据库" />
-    <option name="LAST_COMMIT_MESSAGE" value="已完成数据同步数据库" />
+    <MESSAGE value="优化UI，添加题目图片" />
+    <option name="LAST_COMMIT_MESSAGE" value="优化UI，添加题目图片" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

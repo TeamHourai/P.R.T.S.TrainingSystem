@@ -104,6 +104,12 @@ public class Main {
         server.createContext("/api/v1/admin/announcements", HandlerRegistry.getWrapped("announcements"));
         server.createContext("/api/v1/notifications", HandlerRegistry.getWrapped("notifications"));
 
+        // 新增：管理员设置用户权限
+        server.createContext("/api/v1/admin/user/permission", HandlerRegistry.getWrapped("admin_set_permissions"));
+
+        // 新增：管理员获取用户列表
+        server.createContext("/api/v1/admin/users", HandlerRegistry.getWrapped("admin_user_list"));
+
         server.createContext("/api/v1/training/questions", HandlerRegistry.getWrapped("questions"));
 
         // 支持旧版管理接口的批量删除

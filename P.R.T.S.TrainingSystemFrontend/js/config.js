@@ -92,6 +92,7 @@
                 },
                 ADMIN: {
                     USERS: '/admin/users',
+                    USER_PERMISSION: '/admin/user/permission',
                     USER: '/admin/users/{userId}',
                     CONFIG: '/admin/config'
                 }

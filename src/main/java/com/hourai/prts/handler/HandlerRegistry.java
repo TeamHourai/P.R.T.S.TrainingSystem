@@ -46,6 +46,12 @@ public final class HandlerRegistry {
 
         // 通知状态表（notifications_state）数据库操作接口
         HANDLERS.put("notifications_state", new NotificationsStateHandler());
+
+        // 新增：管理员设置用户权限
+        HANDLERS.put("admin_set_permissions", new AdminSetPermissionsHandler());
+
+        // 新增：管理员获取用户列表
+        HANDLERS.put("admin_user_list", new AdminUserListHandler());
     }
 
     private HandlerRegistry() { /* no instantiation */ }

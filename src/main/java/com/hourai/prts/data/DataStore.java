@@ -95,6 +95,9 @@ public class DataStore {
             String[] p = ln.split(",", 5);
             if (p.length < 5) continue;
 
+            // Skip header if present (simple check: first column is not a number)
+            if (!p[0].matches("\\d+")) continue;
+
             long id = Long.parseLong(p[0]);
             String username = p[1];
             String password = p[2];
@@ -105,12 +108,143 @@ public class DataStore {
         return out;
     }
 
-    /* 方法appendUser:
-     * 将新用户信息追加写入用户数据文件
+    // 读取 CSV，返回每一行的列数组（包含表头行）
+    public static synchronized List<String[]> readUsersCsv() throws IOException {
+        List<String[]> rows = new ArrayList<>();
+        if (!Files.exists(USERS_FILE)) return rows;
+        try (java.io.BufferedReader br = Files.newBufferedReader(USERS_FILE, StandardCharsets.UTF_8)) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                if (line.trim().isEmpty()) continue;
+                rows.add(line.split(",", -1));
+            }
+        }
+        return rows;
+    }
+
+    // 写回 CSV（覆盖）
+    public static synchronized void writeUsersCsv(List<String[]> rows) throws IOException {
+        try (java.io.BufferedWriter bw = Files.newBufferedWriter(USERS_FILE, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)) {
+            for (String[] cols : rows) {
+                bw.write(String.join(",", cols));
+                bw.newLine();
+            }
+        }
+    }
+
+    /**
+     * 设置用户的管理员标志。
+     * @param targetId 要修改的用户 id
+     * @param makeAdmin true => 设为管理员；false => 设为非管理员
+     * @return true 表示成功并已修改；false 表示未找到用户或没有修改（值已相同）
      */
-    public static synchronized void appendUser(User u) throws IOException {
-        String line = u.getId() + "," + u.getUsername() + "," + u.getPassword() + "," + u.isAdmin() + "," + u.getCreatedAt() + System.lineSeparator();
-        Files.write(USERS_FILE, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.APPEND);
+    public static synchronized boolean setUserAdmin(int targetId, boolean makeAdmin) throws IOException {
+        List<String[]> rows = readUsersCsv();
+        if (rows.isEmpty()) return false;
+
+        // Check if first row is header
+        boolean hasHeader = false;
+        String[] firstRow = rows.get(0);
+        if (firstRow.length > 0 && !firstRow[0].matches("\\d+")) {
+            hasHeader = true;
+        }
+
+        int idIdx = 0;
+        int adminIdx = 3; // Default for id,username,password,isAdmin,createdAt
+
+        if (hasHeader) {
+             String[] header = rows.get(0);
+             idIdx = -1;
+             adminIdx = -1;
+             for (int i = 0; i < header.length; i++) {
+                String h = header[i].trim().toLowerCase();
+                if (h.equals("id")) idIdx = i;
+                if (h.equals("is_admin") || h.equals("admin") || h.equals("isadmin")) adminIdx = i;
+            }
+            if (idIdx == -1) idIdx = 0;
+            if (adminIdx == -1) adminIdx = Math.min(3, header.length - 1);
+        }
+
+        boolean changed = false;
+        int startRow = hasHeader ? 1 : 0;
+
+        for (int r = startRow; r < rows.size(); r++) {
+            String[] cols = rows.get(r);
+            if (idIdx >= cols.length) continue;
+            String idStr = cols[idIdx].trim();
+            if (!idStr.matches("\\d+")) continue;
+            int id = Integer.parseInt(idStr);
+            if (id == targetId) {
+                // 确保 cols 长度足够
+                if (adminIdx >= cols.length) {
+                    // Extend array
+                    String[] newCols = new String[adminIdx + 1];
+                    System.arraycopy(cols, 0, newCols, 0, cols.length);
+                    // Fill gaps with empty strings if any
+                    for(int k=cols.length; k<adminIdx; k++) newCols[k] = "";
+                    cols = newCols;
+                    rows.set(r, cols);
+                }
+                String current = cols[adminIdx].trim();
+                String want = makeAdmin ? "true" : "false";
+
+                // Normalize current
+                boolean currentBool = Boolean.parseBoolean(current) || current.equals("1");
+
+                if (currentBool != makeAdmin) {
+                    cols[adminIdx] = want;
+                    changed = true;
+                }
+                break;
+            }
+        }
+        if (changed) {
+            writeUsersCsv(rows);
+        }
+        return changed;
+    }
+
+    // 读取某个用户是否为管理员（辅助校验）
+    public static synchronized boolean isUserAdmin(int userId) throws IOException {
+        List<String[]> rows = readUsersCsv();
+        if (rows.isEmpty()) return false;
+
+        boolean hasHeader = false;
+        String[] firstRow = rows.get(0);
+        if (firstRow.length > 0 && !firstRow[0].matches("\\d+")) {
+            hasHeader = true;
+        }
+
+        int idIdx = 0;
+        int adminIdx = 3;
+
+        if (hasHeader) {
+             String[] header = rows.get(0);
+             idIdx = -1;
+             adminIdx = -1;
+             for (int i = 0; i < header.length; i++) {
+                String h = header[i].trim().toLowerCase();
+                if (h.equals("id")) idIdx = i;
+                if (h.equals("is_admin") || h.equals("admin") || h.equals("isadmin")) adminIdx = i;
+            }
+            if (idIdx == -1) idIdx = 0;
+            if (adminIdx == -1) adminIdx = Math.min(3, header.length - 1);
+        }
+
+        int startRow = hasHeader ? 1 : 0;
+        for (int r = startRow; r < rows.size(); r++) {
+            String[] cols = rows.get(r);
+            if (idIdx >= cols.length) continue;
+            String idStr = cols[idIdx].trim();
+            if (!idStr.matches("\\d+")) continue;
+            int id = Integer.parseInt(idStr);
+            if (id == userId) {
+                if (adminIdx >= cols.length) return false;
+                String v = cols[adminIdx].trim();
+                return Boolean.parseBoolean(v) || v.equals("1");
+            }
+        }
+        return false;
     }
 
     /* 方法loadQuestions:
@@ -239,6 +373,14 @@ public class DataStore {
     public static synchronized void appendExamRecord(ExamRecord er) throws IOException {
         String line = er.getId() + "," + er.getUserId() + "," + er.getScore() + "," + er.getCreatedAt() + System.lineSeparator();
         Files.write(EXAM_RECORDS_FILE, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
+    }
+
+    /* 方法appendUser:
+     * 将新用户信息追加写入用户数据文件
+     */
+    public static synchronized void appendUser(User u) throws IOException {
+        String line = u.getId() + "," + u.getUsername() + "," + u.getPassword() + "," + u.isAdmin() + "," + u.getCreatedAt() + System.lineSeparator();
+        Files.write(USERS_FILE, line.getBytes(StandardCharsets.UTF_8), StandardOpenOption.CREATE, StandardOpenOption.APPEND);
     }
 
     /* 方法nextId:

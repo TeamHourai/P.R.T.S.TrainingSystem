@@ -403,68 +403,12 @@ window._appMethods4 = {
         window.open(map[type], '_blank');
     },
     goToAnnouncementEditor() {
-        // 独立页面，避免把公告编辑逻辑塞进首页 Vue
         window.location.href = 'announcement-editor.html';
     },
-    toggleCategory(key) {
-        const updatedCategories = { ...this.categories };
-        updatedCategories[key].isOpen = !updatedCategories[key].isOpen;
-        Object.keys(updatedCategories).forEach(k => {
-            if (k !== key) {
-                updatedCategories[k].isOpen = false;
-            }
-        });
-        this.categories = updatedCategories;
+    goToAdminPermissions() {
+        window.location.href = 'admin_permissions.html';
     },
-    toggleWrongCategory(key) {
-        const updatedCategories = { ...this.wrongCategories };
-        updatedCategories[key].isOpen = !updatedCategories[key].isOpen;
-        Object.keys(updatedCategories).forEach(k => {
-            if (k !== key) {
-                updatedCategories[k].isOpen = false;
-            }
-        });
-        this.wrongCategories = updatedCategories;
-    },
-    deleteWrongCategory(key) {
-        if (confirm('确定要删除这个分类的所有错题吗？')) {
-            const type = parseInt(key.split('_')[1]);
-            const idsToDelete = this.wrongQuestionsDetail.filter(q => q.type === type).map(q => q.id);
-
-            // hide on backend (one by one)
-            Promise.all(idsToDelete.map(id => this.removeFromWrongBook(id)))
-                .then(() => {
-                    // then update UI
-                    this.wrongQuestionsDetail = this.wrongQuestionsDetail.filter(q => q.type !== type);
-                    this.wrongQuestions = this.wrongQuestionsDetail.map(q => q.id);
-                    this.updateWrongCategories();
-                });
-        }
-    },
-    deleteWrongQuestion(id) {
-        if (confirm('确定要删除这道错题吗？')) {
-            this.removeFromWrongBook(id);
-        }
-    },
-    clearWrongRecords() {
-        if (confirm('确定要清除所有错题记录吗？')) {
-            const idsToDelete = (this.wrongQuestionsDetail || []).map(q => q.id);
-            Promise.all(idsToDelete.map(id => this.removeFromWrongBook(id)))
-                .then(() => {
-                    this.wrongQuestions = [];
-                    this.wrongQuestionsDetail = [];
-                    this.updateWrongCategories();
-                    this.showSuccess('已清除所有错题记录');
-                });
-        }
-    },
-    goToFirstUnansweredTraining() {
-        if (this.trainingQuestions.length > 0) {
-            this.goToTrainingQuestion(this.trainingQuestions[0].id);
-        } else {
-            this.showError('暂无培训题目');
-        }
-    },
+    // ============ 通知中心相关方法 ============
     async loadNotifications() {
         // 必须登录才能查看公告
         if (!this.isLoggedIn) {

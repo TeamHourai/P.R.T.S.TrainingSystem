@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户权限管理 - 博士考核系统</title>
+
+    <!-- 引入与主页一致的样式 -->
+    <link rel="stylesheet" href="css/index/base.css">
+    <link rel="stylesheet" href="css/index/layout.css">
+    <link rel="stylesheet" href="css/index/components.css">
+    <link rel="stylesheet" href="css/index/admin.css">
+    <link rel="stylesheet" href="css/index/responsive.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- 引入全局配置 -->
+    <script src="js/config.js"></script>
+    <!-- 引入 UI Modal -->
+    <script src="js/ui/modal.js"></script>
+
+    <style>
+        /* 针对本页面的特定样式补充 */
+        .admin-container {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: var(--bg-card);
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background: var(--bg-main);
+            color: var(--text-main);
+        }
+
+        .user-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--bg-card);
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-table th, .user-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .user-table th {
+            background: var(--bg-main);
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .user-table tr:hover {
+            background: var(--bg-hover);
+        }
+
+        .role-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .role-admin {
+            background: rgba(233, 30, 99, 0.1);
+            color: #E91E63;
+        }
+
+        .role-user {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+
+        .btn-promote {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-demote {
+            background: var(--bg-main);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        .btn-demote:hover {
+            border-color: #E91E63;
+            color: #E91E63;
+        }
+
+        .current-actor-info {
+            margin-bottom: 20px;
+            padding: 10px;
+            background: rgba(33, 150, 243, 0.1);
+            border-radius: 4px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .current-actor-info input {
+            width: 60px;
+            padding: 4px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+        }
+
+        .current-actor-info input[readonly] {
+            background-color: #e9ecef;
+            cursor: not-allowed;
+            color: #495057;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- 侧边导航 (静态复刻) -->
+        <div class="sidebar active">
+            <div class="sidebar-header">
+                <h1>博士考核系统</h1>
+                <p>业务能力评估平台</p>
+            </div>
+            <div class="nav-menu">
+                <div class="nav-item" onclick="window.location.href='index.html'">
+                    <i class="fas fa-home"></i><span>返回首页</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='editor.html'">
+                    <i class="fas fa-database"></i><span>题库编辑器</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='training-editor.html'">
+                    <i class="fas fa-graduation-cap"></i><span>培训题目编辑器</span>
+                </div>
+                <div class="nav-item" onclick="window.location.href='announcement-editor.html'">
+                    <i class="fas fa-bullhorn"></i><span>发布公告</span>
+                </div>
+                <div class="nav-item active">
+                    <i class="fas fa-user-shield"></i><span>权限管理</span>
+                </div>
+            </div>
+            <div class="sidebar-footer">
+                <p>博士考核系统 v2.0</p>
+                <p>© 2025 罗德岛制药</p>
+            </div>
+        </div>
+
+        <!-- 主内容区域 -->
+        <div class="main-content">
+            <div class="page-header">
+                <div>
+                    <h1 class="page-title">用户权限管理</h1>
+                    <p class="page-subtitle">管理系统用户及其管理员权限</p>
+                </div>
+                <button class="back-btn" onclick="window.location.href='index.html'"><i class="fas fa-arrow-left"></i> 返回首页</button>
+            </div>
+
+            <div class="admin-container">
+                <!-- 模拟当前操作者ID (实际应从登录态获取，这里保留输入框以便测试) -->
+                <div class="current-actor-info">
+                    <i class="fas fa-info-circle"></i>
+                    <span>当前操作管理员ID (Actor ID): </span>
+                    <input type="number" id="actorId" value="1" min="1" readonly>
+                    <span style="font-size: 0.85em; color: var(--text-muted);">(仅 ID=1 的超级管理员可降级其他管理员)</span>
+                </div>
+
+                <!-- 搜索栏 -->
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="搜索用户名或ID..." onkeyup="if(event.key==='Enter') searchUsers()">
+                    <button class="nav-btn primary" onclick="searchUsers()">
+                        <i class="fas fa-search"></i> 搜索
+                    </button>
+                </div>
+
+                <!-- 用户列表 -->
+                <div style="overflow-x: auto;">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>注册时间</th>
+                                <th>当前角色</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="userTableBody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; padding: 30px;">
+                                    <i class="fas fa-spinner fa-spin"></i> 加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 脚本逻辑 -->
+    <script>
+        // 页面加载完成后获取用户列表
+        document.addEventListener('DOMContentLoaded', function() {
+            // 尝试从 localStorage 获取当前登录用户 ID
+            try {
+                // 优先尝试 auth-manager.js 使用的键名 'userInfo'
+                let userInfoStr = localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
+
+                // 如果没有，尝试旧的键名 'ark_exam_user_info'
+                if (!userInfoStr) {
+                    userInfoStr = localStorage.getItem('ark_exam_user_info');
+                }
+
+                // 如果还没有，尝试 'user_info'
+                if (!userInfoStr) {
+                    userInfoStr = localStorage.getItem('user_info');
+                }
+
+                if (userInfoStr) {
+                    const userInfo = JSON.parse(userInfoStr);
+                    if (userInfo && userInfo.id) {
+                        const actorInput = document.getElementById('actorId');
+                        if (actorInput) {
+                            actorInput.value = userInfo.id;
+                        }
+                    }
+                }
+            } catch (e) {
+                console.warn('无法获取当前用户信息', e);
+            }
+
+            searchUsers();
+        });
+
+        function searchUsers() {
+            const keyword = document.getElementById('searchInput').value;
+            const tbody = document.getElementById('userTableBody');
+
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>';
+
+            // 使用 config.js 中的 getApiBaseUrl() 获取基础路径
+            // 如果 getApiBaseUrl() 返回空字符串（相对路径），则直接使用 /api/...
+            // 如果是绝对路径（如 http://localhost:8080），则拼接
+            let baseUrl = '';
+            if (typeof getApiBaseUrl === 'function') {
+                baseUrl = getApiBaseUrl();
+            } else if (typeof CONFIG !== 'undefined' && CONFIG.API && CONFIG.API.BASE_URL) {
+                baseUrl = CONFIG.API.BASE_URL;
+            } else if (window.API_BASE_URL) {
+                baseUrl = window.API_BASE_URL;
+            }
+
+            // 移除 baseUrl 末尾的斜杠（如果有）
+            if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+
+            const url = `${baseUrl}/api/v1/admin/users?q=${encodeURIComponent(keyword)}`;
+
+            fetch(url)
+                .then(response => {
+                    if (!response.ok) throw new Error('网络响应异常');
+                    return response.json();
+                })
+                .then(users => {
+                    renderTable(users);
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--warning-color);">加载失败: ${error.message}</td></tr>`;
+                });
+        }
+
+        function renderTable(users) {
+            const tbody = document.getElementById('userTableBody');
+            if (!users || users.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px; color: var(--text-muted);">未找到匹配的用户</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = users.map(user => `
+                <tr>
+                    <td>${user.id}</td>
+                    <td>${escapeHtml(user.username)}</td>
+                    <td>${user.createdAt || '-'}</td>
+                    <td>
+                        <span class="role-badge ${user.isAdmin ? 'role-admin' : 'role-user'}">
+                            ${user.isAdmin ? '<i class="fas fa-user-shield"></i> 管理员' : '<i class="fas fa-user"></i> 普通用户'}
+                        </span>
+                    </td>
+                    <td>
+                        ${getActionButtons(user)}
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function getActionButtons(user) {
+            // 简单的逻辑：如果是管理员显示降级按钮，否则显示升级按钮
+            // 注意：实际权限校验在后端，前端只做展示
+            if (user.isAdmin) {
+                // 不允许对自己操作（简单前端限制，后端也会校验）
+                const currentActorId = document.getElementById('actorId').value;
+                if (user.id == currentActorId) return '<span style="color:#ccc">当前用户</span>';
+
+                return `<button class="action-btn btn-demote" onclick="changePermission(${user.id}, false, '${escapeHtml(user.username)}')">
+                            <i class="fas fa-arrow-down"></i> 降为普通用户
+                        </button>`;
+            } else {
+                return `<button class="action-btn btn-promote" onclick="changePermission(${user.id}, true, '${escapeHtml(user.username)}')">
+                            <i class="fas fa-arrow-up"></i> 设为管理员
+                        </button>`;
+            }
+        }
+
+        function changePermission(targetId, makeAdmin, username) {
+            const actorId = document.getElementById('actorId').value;
+            const actionText = makeAdmin ? "设为管理员" : "降为普通用户";
+
+            if (typeof uiModal !== 'undefined') {
+                uiModal.confirm(`确定要将用户 "${username}" (ID:${targetId}) ${actionText} 吗？`, {
+                    okText: '确定',
+                    cancelText: '取消'
+                }).then(confirmed => {
+                    if (confirmed) {
+                        performChangePermission(actorId, targetId, makeAdmin);
+                    }
+                });
+            } else {
+                if (confirm(`确定要将用户 "${username}" (ID:${targetId}) ${actionText} 吗？`)) {
+                    performChangePermission(actorId, targetId, makeAdmin);
+                }
+            }
+        }
+
+        function performChangePermission(actorId, targetId, makeAdmin) {
+            const body = `actor_id=${encodeURIComponent(actorId)}&target_id=${encodeURIComponent(targetId)}&make_admin=${makeAdmin}`;
+
+            let baseUrl = '';
+            if (typeof getApiBaseUrl === 'function') {
+                baseUrl = getApiBaseUrl();
+            } else if (typeof CONFIG !== 'undefined' && CONFIG.API && CONFIG.API.BASE_URL) {
+                baseUrl = CONFIG.API.BASE_URL;
+            } else if (window.API_BASE_URL) {
+                baseUrl = window.API_BASE_URL;
+            }
+            if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+
+            fetch(`${baseUrl}/api/v1/admin/user/permission`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+                body: body
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    if (typeof uiModal !== 'undefined') {
+                        uiModal.success('操作成功');
+                    } else {
+                        alert('操作成功');
+                    }
+                    searchUsers(); // 刷新列表
+                } else {
+                    if (typeof uiModal !== 'undefined') {
+                        uiModal.error('操作失败: ' + data.message);
+                    } else {
+                        alert('操作失败: ' + data.message);
+                    }
+                }
+            })
+            .catch(err => {
+                if (typeof uiModal !== 'undefined') {
+                    uiModal.error('请求出错: ' + err);
+                } else {
+                    alert('请求出错: ' + err);
+                }
+            });
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            return text
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+    </script>
+</body>
+</html>

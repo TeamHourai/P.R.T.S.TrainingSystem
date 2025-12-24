@@ -449,76 +449,79 @@
                     </div>
                     <button class="back-btn" @click="goBackFromQuestion"><i class="fas fa-arrow-left"></i> 返回</button>
                 </div>
-                <div class="question-card">
-                    <div class="question-meta">
-                        <div class="meta-tag" :style="{ backgroundColor: getTypeColor(currentQuestion.type) }">
-                            <i class="fas fa-tag"></i> 类型: {{ currentQuestion.typeText }}
+                <div class="question-layout" :class="{ 'has-answer': showAnswer }">
+                    <div class="question-card">
+                        <div class="question-meta">
+                            <div class="meta-tag" :style="{ backgroundColor: getTypeColor(currentQuestion.type) }">
+                                <i class="fas fa-tag"></i> 类型: {{ currentQuestion.typeText }}
+                            </div>
+                            <div class="meta-tag"
+                                :style="{ backgroundColor: getDifficultyColor(currentQuestion.difficulty) }">
+                                <i class="fas fa-star"></i> 难度: {{ currentQuestion.difficultyText }}
+                            </div>
+                            <div class="meta-tag"><i class="fas fa-hashtag"></i> 题目ID: {{ currentQuestion.id }}</div>
                         </div>
-                        <div class="meta-tag"
-                            :style="{ backgroundColor: getDifficultyColor(currentQuestion.difficulty) }">
-                            <i class="fas fa-star"></i> 难度: {{ currentQuestion.difficultyText }}
+                        <div class="question-source" v-if="currentQuestion.resource">
+                            <i class="fas fa-map-marker-alt"></i> 题源: {{ currentQuestion.resource }}
                         </div>
-                        <div class="meta-tag"><i class="fas fa-hashtag"></i> 题目ID: {{ currentQuestion.id }}</div>
-                    </div>
-                    <div class="question-source" v-if="currentQuestion.resource">
-                        <i class="fas fa-map-marker-alt"></i> 题源: {{ currentQuestion.resource }}
-                    </div>
-                    <div class="question-text">
-                        <p v-html="currentQuestion.question"></p>
-                        <img v-if="currentQuestion.picture"
-                            :src="(questionMode==='training'?'./training-images/':'./images/')+currentQuestion.id+'.png'"
-                            alt="题目图片" style="max-width: 100%; margin-top: 20px; border-radius: 8px;">
-                    </div>
-                    <div class="options-container">
-                        <div v-for="(option, index) in currentQuestion.options" :key="index"
-                            :class="['option', { selected: selectedOption === index + 1,
-                                     correct: showAnswer && index + 1 === currentQuestion.answer,
-                                     wrong: showAnswer && selectedOption === index + 1 && selectedOption !== currentQuestion.answer }]" @click="selectOption(index + 1)">
-                            <span class="option-label">{{ String.fromCharCode(65 + index) }}</span>
-                            <span class="option-text" v-html="option"></span>
+                        <div class="question-text">
+                            <p v-html="currentQuestion.question"></p>
+                            <img v-if="currentQuestion.picture"
+                                :src="(questionMode==='training'?'./training-images/':'./images/')+currentQuestion.id+'.png'"
+                                alt="题目图片" style="max-width: 100%; margin-top: 20px; border-radius: 8px;">
+                        </div>
+                        <div class="options-container">
+                            <div v-for="(option, index) in currentQuestion.options" :key="index"
+                                :class="['option', { selected: selectedOption === index + 1,
+                                         correct: showAnswer && index + 1 === currentQuestion.answer,
+                                         wrong: showAnswer && selectedOption === index + 1 && selectedOption !== currentQuestion.answer }]" @click="selectOption(index + 1)">
+                                <span class="option-label">{{ String.fromCharCode(65 + index) }}</span>
+                                <span class="option-text" v-html="option"></span>
+                            </div>
+                        </div>
+                        <div class="navigation-buttons">
+                            <button class="nav-btn secondary" @click="prevQuestion" :disabled="!hasPrevQuestion">
+                                <i class="fas fa-arrow-left"></i> 上一题
+                            </button>
+                            <button class="nav-btn primary" @click="checkAnswer" v-if="!showAnswer">
+                                <i class="fas fa-check"></i> 提交答案
+                            </button>
+                            <button class="nav-btn primary" @click="nextQuestion" :disabled="!hasNextQuestion">
+                                下一题 <i class="fas fa-arrow-right"></i>
+                            </button>
                         </div>
                     </div>
-                    <div class="navigation-buttons">
-                        <button class="nav-btn secondary" @click="prevQuestion" :disabled="!hasPrevQuestion">
-                            <i class="fas fa-arrow-left"></i> 上一题
-                        </button>
-                        <button class="nav-btn primary" @click="checkAnswer" v-if="!showAnswer">
-                            <i class="fas fa-check"></i> 提交答案
-                        </button>
-                        <button class="nav-btn primary" @click="nextQuestion" :disabled="!hasNextQuestion">
-                            下一题 <i class="fas fa-arrow-right"></i>
-                        </button>
-                    </div>
-                </div>
-                <div class="question-card answer-analysis" v-if="showAnswer" ref="answerAnalysis">
-                    <h3 :style="{ color: isAnswerCorrect ? 'var(--success-color)' : 'var(--warning-color)' }">
-                        <i :class="isAnswerCorrect ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
-                        {{ isAnswerCorrect ? '回答正确!' : '回答错误!' }}
-                    </h3>
-                    <p><strong>正确答案: {{ String.fromCharCode(64 + currentQuestion.answer) }}</strong></p>
-                    <p v-if="!isAnswerCorrect"><strong>您的选择: {{ String.fromCharCode(64 + selectedOption) }}</strong></p>
+                    <div class="question-card answer-analysis" v-if="showAnswer" ref="answerAnalysis">
+                        <h3 :style="{ color: isAnswerCorrect ? 'var(--success-color)' : 'var(--warning-color)' }">
+                            <i :class="isAnswerCorrect ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
+                            {{ isAnswerCorrect ? '回答正确!' : '回答错误!' }}
+                        </h3>
+                        <p><strong>正确答案: {{ String.fromCharCode(64 + currentQuestion.answer) }}</strong></p>
+                        <p v-if="!isAnswerCorrect"><strong>您的选择: {{ String.fromCharCode(64 + selectedOption) }}</strong>
+                        </p>
 
-                    <!-- 题目统计信息 -->
-                    <div class="question-stats" v-if="questionStats && questionStats.totalUsers > 0">
-                        <h4>题目统计</h4>
-                        <div class="stats-grid">
-                            <div class="stat-item">
-                                <div class="stat-value">{{ questionStats.totalUsers }}</div>
-                                <div class="stat-label">做过此题的用户数</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value">{{ (questionStats.correctRate * 100).toFixed(1) }}%</div>
-                                <div class="stat-label">正确率</div>
-                            </div>
-                            <div class="stat-item" v-if="questionStats.mostCommonWrongOption">
-                                <div class="stat-value">{{ String.fromCharCode(64 + questionStats.mostCommonWrongOption)
-                                    }}</div>
-                                <div class="stat-label">最常错选选项</div>
+                        <!-- 题目统计信息 -->
+                        <div class="question-stats" v-if="questionStats && questionStats.totalUsers > 0">
+                            <h4>题目统计</h4>
+                            <div class="stats-grid">
+                                <div class="stat-item">
+                                    <div class="stat-value">{{ questionStats.totalUsers }}</div>
+                                    <div class="stat-label">做过此题的用户数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-value">{{ (questionStats.correctRate * 100).toFixed(1) }}%</div>
+                                    <div class="stat-label">正确率</div>
+                                </div>
+                                <div class="stat-item" v-if="questionStats.mostCommonWrongOption">
+                                    <div class="stat-value">{{ String.fromCharCode(64 + questionStats.mostCommonWrongOption)
+                                        }}</div>
+                                    <div class="stat-label">最常错选选项</div>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <p style="margin-top: 15px;" v-html="currentQuestion.analysis"></p>
+                        <p style="margin-top: 15px;" v-html="currentQuestion.analysis"></p>
+                    </div>
                 </div>
             </div>
         </div>

@@ -101,6 +101,20 @@
         justify-content: center;
     }
 
+    .question-layout {
+        flex-direction: column;
+    }
+
+    .question-card {
+        max-width: 100% !important;
+    }
+
+    .answer-analysis {
+        max-width: 100% !important;
+        border-left: none;
+        border-top: 5px solid var(--accent-color);
+    }
+
     .tips-grid {
         grid-template-columns: 1fr;
     }

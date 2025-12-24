@@ -151,6 +151,10 @@ window._appMethods4 = {
         this.selectedOption = null;
         this.showAnswer = false;
         this.questionStats = {};
+        // 切换题目后自动滚到页面顶部
+        this.$nextTick(() => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     },
     getPrevTrainingQuestion() {
         if (!this.currentQuestion) return null;
@@ -270,7 +274,9 @@ window._appMethods4 = {
     },
     truncateQuestion(question) {
         if (!question) return '';
-        const text = question.replace(/<br>/g, ' ').replace(/<[^>]*>/g, '');
+        // 替换 <br> 为换行符，保留换行格式
+        const text = question.replace(/\\n/g, '\n').replace(/<br\s*\/?>/gi, '\n').replace(/<[^>]*>/g, '');
+        // 如果需要截断，可以按长度截断，但保留换行符
         return text.length > 120 ? text.substring(0, 120) + '...' : text;
     },
     getTypeText(type) {

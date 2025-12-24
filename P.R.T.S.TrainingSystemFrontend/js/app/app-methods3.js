@@ -296,15 +296,9 @@ window._appMethods3 = {
             this.questionMode === 'training' ? 'training' : 'normal'
         );
 
-        // 提交后自动滑到解析区
+        // 提交后自动滚到页面顶部
         this.$nextTick(() => {
-            const analysisElement = this.$refs.answerAnalysis;
-            if (analysisElement && typeof analysisElement.scrollIntoView === 'function') {
-                analysisElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            } else {
-                // fallback: scroll to bottom
-                window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
-            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     },
     async addToWrongBook(questionId) {

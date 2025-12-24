@@ -132,10 +132,14 @@
     grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
     gap: 12px;
     padding: 25px;
+    max-height: 240px; /* 限制高度，约等于3排（每排约60px+gap） */
+    overflow-y: auto; /* 超出部分显示滚动条 */
 }
 
 .training-grid {
     grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    max-height: none; /* 入职培训页面不限制高度 */
+    overflow-y: visible;
 }
 
 /* 入职培训题号：更明显（仅作用于 training-grid） */

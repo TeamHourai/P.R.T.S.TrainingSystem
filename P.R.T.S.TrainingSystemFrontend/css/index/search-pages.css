@@ -5,7 +5,7 @@
 
 /* 搜索页面样式 */
 .search-container {
-    max-width: 1000px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
@@ -127,6 +127,7 @@
     align-items: center;
     padding-top: 15px;
     border-top: 1px solid var(--border-color);
+    min-height: 50px; /* 确保即使没有题源，footer也有高度 */
 }
 
 .result-source {
@@ -135,6 +136,7 @@
     display: flex;
     align-items: center;
     gap: 5px;
+    flex: 1; /* 占据剩余空间 */
 }
 
 .result-action-btn {
@@ -149,7 +151,7 @@
     transition: var(--transition);
     display: flex;
     align-items: center;
-    gap: 5px;
+    margin-left: auto; /* 强制推到右侧 */
 }
 
 .result-action-btn:hover {

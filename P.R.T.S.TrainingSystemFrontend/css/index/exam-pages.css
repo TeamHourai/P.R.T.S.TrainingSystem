@@ -47,18 +47,46 @@
 
 /* 答题页面样式 */
 .question-container {
-    max-width: 900px;
+    max-width: 1200px;
     margin: 0 auto;
 }
 
+.question-layout {
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    justify-content: center;
+}
+
 .question-card {
-    background: var(--bg-card);
+    background:
+        linear-gradient(rgba(30, 30, 46, 0.8), rgba(30, 30, 46, 0.5)),
+        url('../images/question-bg.png') no-repeat center center;
+    background-size: cover;
     border-radius: var(--border-radius-lg);
     padding: 30px;
     box-shadow: var(--shadow);
     margin-bottom: 25px;
     border: 1px solid var(--border-color);
     animation: fadeIn 0.5s ease-out;
+    flex: 1;
+    max-width: 800px;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+/* 暗色模式适配（如果存在） */
+@media (prefers-color-scheme: dark) {
+    .question-card {
+        background:
+            linear-gradient(rgba(30, 30, 46, 0.9), rgba(30, 30, 46, 0.9)),
+            url('../images/question-bg.png') no-repeat center center;
+        background-size: cover;
+    }
+}
+
+.question-layout.has-answer .question-card:not(.answer-analysis) {
+    max-width: 600px;
 }
 
 .question-meta {
@@ -131,6 +159,9 @@
 
 .answer-analysis {
     border-left: 5px solid var(--accent-color);
+    flex: 1;
+    max-width: 600px;
+    margin-bottom: 0;
 }
 
 /* 考试相关样式 */

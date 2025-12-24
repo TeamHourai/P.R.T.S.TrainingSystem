@@ -72,7 +72,8 @@ window._appMethods1 = {
                 // ignore
             }
 
-            this.showSuccess('登录成功！');
+            // 登录成功不弹窗
+            return;
         } else {
             this.showError(result.message || '登录失败');
         }
@@ -107,9 +108,9 @@ window._appMethods1 = {
         this.isAdmin = false;
         this.wrongQuestions = [];
         this.wrongQuestionsDetail = [];
-        // 退出登录后清空本地培训记录（登录后会从后端重新拉取）
         this.trainingRecords = {};
-        this.showSuccess('已退出登录');
+
+        // 退出登录成功不弹窗
 
         // 退出登录后自动刷新页面
         try {

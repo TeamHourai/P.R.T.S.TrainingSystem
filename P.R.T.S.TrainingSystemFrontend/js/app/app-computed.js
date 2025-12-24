@@ -15,6 +15,9 @@ window._appComputed = {
             return prevId !== null;
         } else if (this.questionMode === 'search') {
             return Array.isArray(this.searchResults) && this.searchCurrentIndex > 0;
+        } else if (this.questionMode === 'weak') {
+            const idx = this.weakPractice && typeof this.weakPractice.index === 'number' ? this.weakPractice.index : -1;
+            return idx > 0;
         }
         return false;
     },
@@ -35,6 +38,10 @@ window._appComputed = {
             return nextId !== null;
         } else if (this.questionMode === 'search') {
             return Array.isArray(this.searchResults) && this.searchCurrentIndex < this.searchResults.length - 1;
+        } else if (this.questionMode === 'weak') {
+            const q = this.weakPractice && Array.isArray(this.weakPractice.queue) ? this.weakPractice.queue : [];
+            const idx = this.weakPractice && typeof this.weakPractice.index === 'number' ? this.weakPractice.index : -1;
+            return idx >= 0 && idx < q.length - 1;
         }
         return false;
     },

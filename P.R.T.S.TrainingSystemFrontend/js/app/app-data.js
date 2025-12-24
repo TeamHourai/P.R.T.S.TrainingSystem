@@ -75,4 +75,12 @@ window._appData = {
         autoNextCorrect: false
     },
     _autoAnswerBusy: false,
+
+    // ================== 薄弱练习（推荐） ==================
+    weakPractice: {
+        queue: [],          // 推荐题目列表（Question[]）
+        index: -1,          // 当前在 queue 中的位置
+        profile: null,      // { avgDifficulty, dominantType, keywordsTop: [..], scoreByType: {...} }
+        minRequiredWrong: 5 // 记录太少时的阈值
+    },
 };

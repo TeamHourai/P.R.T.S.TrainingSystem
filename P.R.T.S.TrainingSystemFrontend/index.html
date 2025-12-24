@@ -244,6 +244,15 @@
                         <button class="nav-btn primary quickjump-btn" @click="startJump"><i class="fas fa-play"></i>
                             跳转到题目</button>
                     </div>
+
+                    <!-- 新增：薄弱练习 -->
+                    <div class="quickjump-card" @click="startWeakPractice" style="cursor: pointer;">
+                        <div class="card-icon"><i class="fas fa-heart-crack"></i></div>
+                        <h3 class="card-title">薄弱练习</h3>
+                        <p class="card-description">基于错题记录的平均难度、易错类型、易错关键词（tag）推荐相似题目。</p>
+                        <button class="nav-btn primary quickjump-btn" @click.stop="startWeakPractice"><i class="fas fa-play"></i>
+                            开始薄弱练习</button>
+                    </div>
                 </div>
             </div>
 
@@ -310,7 +319,14 @@
                     <button class="nav-btn secondary" @click="clearWrongRecords"><i class="fas fa-eraser"></i>
                         清除所有错题</button>
                 </div>
-                <div class="categories-container">
+
+                <!-- 空状态：没有任何错题时提示（无背景框） -->
+                <div v-if="wrongQuestions.length === 0" style="text-align:center; color: var(--text-muted); padding: 30px 10px;">
+                    <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;">暂无错题</div>
+                    <div style="font-size: 0.95rem;">去题库练习做几道题吧，答错的题会自动出现在这里。</div>
+                </div>
+
+                <div class="categories-container" v-else>
                     <div class="category-card" v-for="(category, key) in wrongCategories" :key="key">
                         <div class="category-header" @click="toggleWrongCategory(key)">
                             <div class="category-title">{{ category.name }}</div>
@@ -353,8 +369,14 @@
                         </div>
                     </div>
 
+                    <!-- 未搜索提示：关键词为空时显示（无背景框） -->
+                    <div v-if="!searchKeyword" style="text-align:center; color: var(--text-muted); padding: 50px 10px;">
+                        <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;">输入关键词开始搜索</div>
+                        <div style="font-size: 0.95rem;">可以搜索题干、选项、关键词（tag）或解析内容。</div>
+                    </div>
+
                     <!-- 搜索结果区域 -->
-                    <div class="search-results-section" v-if="searchResults.length > 0">
+                    <div class="search-results-section" v-else-if="searchResults.length > 0">
                         <div class="results-grid">
                             <div v-for="result in searchResults" :key="result.id" class="result-card"
                                 @click="goToSearchResult(result.id)">
@@ -393,7 +415,7 @@
                     </div>
 
                     <!-- 无结果提示 -->
-                    <div v-else-if="searchKeyword" class="no-results-section">
+                    <div v-else class="no-results-section">
                         <div class="no-results-content">
                             <i class="fas fa-search"
                                 style="font-size: 4rem; color: var(--text-muted); margin-bottom: 20px;"></i>
@@ -477,7 +499,7 @@
                         <div class="question-text">
                             <p v-html="currentQuestion.question"></p>
                             <img v-if="currentQuestion.picture"
-                                :src="(questionMode==='training'?'./training-images/':'./css/images/')+currentQuestion.id+'.png'"
+                                :src="(questionMode==='training'?'./images/':'./images/')+currentQuestion.id+'.png'"
                                 @error="onQuestionImageError"
                                 alt="题目图片" style="max-width: 100%; margin-top: 20px; border-radius: 8px;">
                         </div>

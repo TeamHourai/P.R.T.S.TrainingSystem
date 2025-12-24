@@ -91,22 +91,97 @@
 /* 快速跳题容器 */
 .quickjump-container {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 25px;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    align-items: stretch;
 }
 
+/* 快速跳题卡片：复用首页 dashboard-card 的视觉语言（背景图 + 半透明渐变蒙版） */
 .quickjump-card {
-    background: var(--bg-card);
+    background:
+        linear-gradient(90deg, rgba(30, 30, 46, 0.85) 0%, rgba(30, 30, 46, 0.45) 55%, rgba(30, 30, 46, 0.15) 100%),
+        url('../images/bg-8.png') no-repeat center center;
+    background-size: cover;
     border-radius: var(--border-radius-lg);
-    padding: 40px;
+    padding: 26px;
     box-shadow: var(--shadow);
-    text-align: center;
+    text-align: left;
     border: 1px solid var(--border-color);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: var(--transition);
+    min-height: 240px;
+    display: flex;
+    flex-direction: column;
 }
 
+/* 让标题/描述区域占满剩余高度，把按钮推到底部 */
+.quickjump-card .card-description {
+    margin-bottom: auto;
+}
+
+/* 输入框与按钮间距更一致 */
+.quickjump-card .jump-input {
+    margin-top: 12px;
+    margin-bottom: 12px;
+}
+
+/* 快速跳题按钮固定到底部（借助 flex 的 margin-top:auto） */
+.quickjump-card .quickjump-btn {
+    margin-top: auto;
+}
+
+.quickjump-card:hover {
+    transform: translateY(-6px);
+    box-shadow: var(--shadow-lg);
+    border-color: var(--primary-light);
+}
+
+/* 顶部渐变条，保持与 dashboard-card 一致 */
+.quickjump-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+/* 三张卡分别指定不同背景图（依赖 index.html 里 quickjump-card 的顺序） */
+.quickjump-container .quickjump-card:nth-child(1) {
+    background:
+        linear-gradient(90deg, rgba(30, 30, 46, 0.85) 0%, rgba(30, 30, 46, 0.45) 55%, rgba(30, 30, 46, 0.15) 100%),
+        url('../images/bg-9.png') no-repeat center center;
+    background-size: cover;
+}
+
+.quickjump-container .quickjump-card:nth-child(2) {
+    background:
+        linear-gradient(90deg, rgba(30, 30, 46, 0.85) 0%, rgba(30, 30, 46, 0.45) 55%, rgba(30, 30, 46, 0.15) 100%),
+        url('../images/bg-10.png') no-repeat center center;
+    background-size: cover;
+}
+
+.quickjump-container .quickjump-card:nth-child(3) {
+    background:
+        linear-gradient(90deg, rgba(30, 30, 46, 0.85) 0%, rgba(30, 30, 46, 0.45) 55%, rgba(30, 30, 46, 0.15) 100%),
+        url('../images/bg-11.png') no-repeat center center;
+    background-size: cover;
+}
+
+/* 快速跳题按钮 */
 .quickjump-btn {
     width: 100%;
     justify-content: center;
+    margin-top: 14px;
+}
+
+/* 快速跳题输入框宽度收敛一点，避免撑破一排布局 */
+.jump-input {
+    width: 100%;
+    margin-top: 10px;
 }
 
 /* 错题辑录控制区域 */
@@ -292,4 +367,47 @@
     flex: 1;
     padding: 30px;
     overflow-y: auto;
+}
+
+/* 管理员面板布局：正常电脑屏幕一排两个 */
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+    align-items: stretch;
+}
+
+/* 管理员面板卡片更大（仅作用于 admin 页面中的 dashboard-card） */
+.admin-grid .dashboard-card {
+    padding: 38px;
+    min-height: 260px;
+}
+
+.admin-grid .dashboard-card .card-icon {
+    width: 78px;
+    height: 78px;
+    font-size: 2.0rem;
+}
+
+/* 响应式：窄屏回到单列 */
+@media (max-width: 1024px) {
+    .admin-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    .quickjump-container {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 640px) {
+    .quickjump-container {
+        grid-template-columns: 1fr;
+    }
+    .quickjump-card {
+        padding: 22px;
+        min-height: 220px;
+    }
 }

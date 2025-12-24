@@ -92,6 +92,18 @@ window._appMethods4 = {
                     this.resetQuestionState();
                 }
             }
+        } else if (this.questionMode === 'weak') {
+            const q = this.weakPractice && Array.isArray(this.weakPractice.queue) ? this.weakPractice.queue : [];
+            const idx = this.weakPractice && typeof this.weakPractice.index === 'number' ? this.weakPractice.index : -1;
+            if (idx > 0) {
+                const nextIdx = idx - 1;
+                this.weakPractice.index = nextIdx;
+                const item = q[nextIdx];
+                if (item) {
+                    this.loadQuestionForDisplay(item, 'practice');
+                    this.resetQuestionState();
+                }
+            }
         }
     },
     nextQuestion() {
@@ -170,6 +182,20 @@ window._appMethods4 = {
                 }
             } else {
                 this.showInfo('已经是搜索结果中的最后一题了！');
+            }
+        } else if (this.questionMode === 'weak') {
+            const q = this.weakPractice && Array.isArray(this.weakPractice.queue) ? this.weakPractice.queue : [];
+            const idx = this.weakPractice && typeof this.weakPractice.index === 'number' ? this.weakPractice.index : -1;
+            if (idx >= 0 && idx < q.length - 1) {
+                const nextIdx = idx + 1;
+                this.weakPractice.index = nextIdx;
+                const item = q[nextIdx];
+                if (item) {
+                    this.loadQuestionForDisplay(item, 'practice');
+                    this.resetQuestionState();
+                }
+            } else {
+                this.showInfo('已经是推荐列表中的最后一题了！');
             }
         }
     },
@@ -407,7 +433,7 @@ window._appMethods4 = {
         }
         if (this.questionMode === 'practice') {
             this.currentPage = 'practice';
-        } else if (this.questionMode === 'random' || this.questionMode === 'jump') {
+        } else if (this.questionMode === 'random' || this.questionMode === 'jump' || this.questionMode === 'weak') {
             this.currentPage = 'quickjump';
         } else if (this.questionMode === 'training') {
             this.currentPage = 'training';
@@ -628,5 +654,174 @@ window._appMethods4 = {
         this.wrongQuestions = (this.wrongQuestions || []).filter(id => !toRemove.has(id));
         this.wrongQuestionsDetail = (this.wrongQuestionsDetail || []).filter(q => !toRemove.has(q.id));
         this.updateWrongCategories();
+    },
+
+    // ================== 薄弱练习（推荐） ==================
+
+    // 计算“推荐指数”画像：从错题记录统计易错类型、平均难度、易错关键词
+    computeWeakProfile() {
+        const wrong = Array.isArray(this.wrongQuestionsDetail) ? this.wrongQuestionsDetail : [];
+        if (wrong.length === 0) return null;
+
+        const typeCount = {};
+        const keywordCount = {};
+        let diffSum = 0;
+
+        wrong.forEach(q => {
+            if (!q) return;
+            const t = q.type;
+            if (t) typeCount[t] = (typeCount[t] || 0) + 1;
+            diffSum += (q.difficulty || 0);
+
+            // keywords 字段：可能是数组或字符串
+            let kws = q.keywords;
+            if (typeof kws === 'string') {
+                kws = kws.split(/[,|\s]+/).map(s => s.trim()).filter(Boolean);
+            }
+            if (Array.isArray(kws)) {
+                kws.forEach(k => {
+                    if (!k) return;
+                    keywordCount[k] = (keywordCount[k] || 0) + 1;
+                });
+            }
+        });
+
+        const avgDifficulty = wrong.length > 0 ? (diffSum / wrong.length) : 0;
+
+        // 主导易错类型
+        let dominantType = null;
+        let dominantTypeCount = 0;
+        Object.keys(typeCount).forEach(k => {
+            const c = typeCount[k];
+            if (c > dominantTypeCount) {
+                dominantTypeCount = c;
+                dominantType = parseInt(k);
+            }
+        });
+
+        const keywordsTop = Object.entries(keywordCount)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([k]) => k);
+
+        return {
+            wrongCount: wrong.length,
+            avgDifficulty,
+            dominantType,
+            typeCount,
+            keywordCount,
+            keywordsTop
+        };
+    },
+
+    // 推荐指数算法：对每道候选题计算一个 score，分数越高越推荐
+    // 设计目标：
+    //  - 类型匹配更重要
+    //  - 与错题平均难度越接近越好（越难也略加分）
+    //  - 关键词/Tag 匹配越多越好
+    computeRecommendScore(question, profile) {
+        if (!question || !profile) return 0;
+
+        const typeWeight = 0.55;
+        const diffWeight = 0.25;
+        const kwWeight = 0.20;
+
+        // 1) type score
+        let typeScore = 0;
+        if (profile.dominantType && question.type === profile.dominantType) {
+            typeScore = 1;
+        } else if (question.type && profile.typeCount && profile.typeCount[question.type]) {
+            // 次优：也是常错类型之一
+            typeScore = Math.min(0.7, profile.typeCount[question.type] / Math.max(1, profile.wrongCount));
+        }
+
+        // 2) difficulty score: closer to avg => higher; also slightly favor >= avg
+        const avg = profile.avgDifficulty || 0;
+        const d = question.difficulty || 0;
+        const dist = Math.abs(d - avg);
+        let diffScore = Math.max(0, 1 - dist / 4); // difficulty range 1-5 => dist max 4
+        if (d >= avg) diffScore = Math.min(1, diffScore + 0.1);
+
+        // 3) keyword score
+        let kwScore = 0;
+        const top = new Set(profile.keywordsTop || []);
+        let kws = question.keywords;
+        if (typeof kws === 'string') {
+            kws = kws.split(/[,|\s]+/).map(s => s.trim()).filter(Boolean);
+        }
+        if (Array.isArray(kws) && kws.length > 0 && top.size > 0) {
+            const hit = kws.filter(k => top.has(k)).length;
+            kwScore = Math.min(1, hit / Math.min(3, top.size));
+        }
+
+        const score = typeWeight * typeScore + diffWeight * diffScore + kwWeight * kwScore;
+        return score;
+    },
+
+    // 构建推荐队列：只在进入薄弱练习时计算一次
+    buildWeakPracticeQueue(profile) {
+        const pool = Array.isArray(this.rawQuestions) ? this.rawQuestions : [];
+        const wrongSet = new Set((this.wrongQuestions || []).map(Number));
+
+        // 过滤掉培训题、过滤掉 pool 为空
+        const candidates = pool.filter(q => q && q.id && !wrongSet.has(Number(q.id)));
+
+        // 计算分数并排序
+        const scored = candidates
+            .map(q => ({ q, score: this.computeRecommendScore(q, profile) }))
+            .filter(x => x.score > 0)
+            .sort((a, b) => b.score - a.score);
+
+        // 取前 N；不足则返回空
+        const N = 30;
+        return scored.slice(0, N).map(x => x.q);
+    },
+
+    async startWeakPractice() {
+        if (!this.isLoggedIn) {
+            this.showError('请先登录');
+            this.showAuthModal = true;
+            this.authMode = 'login';
+            return;
+        }
+
+        // 确保最新错题数据
+        try {
+            if (typeof this.loadWrongQuestions === 'function') {
+                await this.loadWrongQuestions();
+            }
+        } catch (e) {
+            // ignore
+        }
+
+        const minRequired = (this.weakPractice && this.weakPractice.minRequiredWrong) ? this.weakPractice.minRequiredWrong : 5;
+        const wrongCount = Array.isArray(this.wrongQuestionsDetail) ? this.wrongQuestionsDetail.length : 0;
+        if (wrongCount < minRequired) {
+            this.showInfo('请多做一些题目再来吧');
+            return;
+        }
+
+        const profile = this.computeWeakProfile();
+        if (!profile) {
+            this.showInfo('请多做一些题目再来吧');
+            return;
+        }
+
+        const queue = this.buildWeakPracticeQueue(profile);
+        if (!Array.isArray(queue) || queue.length === 0) {
+            this.showInfo('暂无可推荐的相似题（可能题库太小或都做过了）');
+            return;
+        }
+
+        this.weakPractice.profile = profile;
+        this.weakPractice.queue = queue;
+        this.weakPractice.index = 0;
+
+        // 进入答题页，以 weak 模式导航
+        this.questionMode = 'weak';
+        const first = queue[0];
+        this.loadQuestionForDisplay(first, 'practice');
+        this.currentPage = 'question';
+        this.resetQuestionState();
     },
 };

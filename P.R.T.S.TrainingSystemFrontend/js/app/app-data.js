@@ -67,4 +67,12 @@ window._appData = {
     // 公告详情弹窗
     showNoticeDetail: false,
     currentNoticeDetail: null,
+
+    // ================== 用户答题设置 ==================
+    showAnswerSettingsModal: false,
+    answerSettings: {
+        autoSubmit: false,
+        autoNextCorrect: false
+    },
+    _autoAnswerBusy: false,
 };

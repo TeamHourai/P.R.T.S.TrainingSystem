@@ -247,6 +247,15 @@ window._appMethods3 = {
     selectOption(option) {
         if (!this.showAnswer) {
             this.selectedOption = option;
+
+            // 自动提交答案：避免连点导致重复提交
+            if (this.answerSettings && this.answerSettings.autoSubmit) {
+                if (this._autoAnswerBusy) return;
+                this._autoAnswerBusy = true;
+                Promise.resolve()
+                    .then(() => this.checkAnswer())
+                    .finally(() => { this._autoAnswerBusy = false; });
+            }
         }
     },
     async checkAnswer() {
@@ -256,11 +265,18 @@ window._appMethods3 = {
             return;
         }
 
-        // 先显示答案/解析（无论是否登录都能看）
+        // 先计算正确性（后续会根据设置决定是否展示解析）
+        const isCorrectNow = this.currentQuestion && this.selectedOption === this.currentQuestion.answer;
+        const autoNextOnCorrect = !!(this.answerSettings && this.answerSettings.autoNextCorrect);
+        const shouldAutoAdvanceCorrect = autoNextOnCorrect && isCorrectNow;
+
+        // 显示逻辑：
+        // - 普通情况：showAnswer=true 显示解析
+        // - 开启“答对自动下一题”且答对：也让 showAnswer=true 以便选项变绿，但解析面板在模板里被隐藏（见 index.html 改动）
         this.showAnswer = true;
 
         // 如果是培训题目，把结果保存到本地 trainingRecords
-        const isCorrect = this.currentQuestion && this.selectedOption === this.currentQuestion.answer;
+        const isCorrect = isCorrectNow;
         if (this.questionMode === 'training') {
             try {
                 this.saveTrainingRecord(this.currentQuestion.id, !!isCorrect);
@@ -296,10 +312,25 @@ window._appMethods3 = {
             this.questionMode === 'training' ? 'training' : 'normal'
         );
 
-        // 提交后自动滚到页面顶部
-        this.$nextTick(() => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        // 普通提交：滚动；自动下一题（答对）不滚动，避免视觉跳动
+        if (!shouldAutoAdvanceCorrect) {
+            this.$nextTick(() => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // 答对自动下一题：停留 1s 展示选项变绿，然后翻页（不显示解析）
+        if (shouldAutoAdvanceCorrect) {
+            setTimeout(() => {
+                try {
+                    if (this.hasNextQuestion) {
+                        this.nextQuestion();
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            }, 1000);
+        }
     },
     async addToWrongBook(questionId) {
         // ...existing code...
@@ -341,5 +372,99 @@ window._appMethods3 = {
         if (typeof this.loadWrongQuestions === 'function') {
             await this.loadWrongQuestions();
         }
-    }
+    },
+
+    // ================= 用户答题设置 =================
+    openAnswerSettings() {
+        this.showAnswerSettingsModal = true;
+        // 打开时尝试刷新一次（已登录时从后端拉）
+        this.loadAnswerSettings();
+    },
+    closeAnswerSettings() {
+        this.showAnswerSettingsModal = false;
+    },
+    async loadAnswerSettings() {
+        // 未登录：仅用本地默认值（也可改成 localStorage 临时保存，这里先不扩展）
+        if (!this.isLoggedIn) return;
+
+        if (window.answerSettingsApi && typeof window.answerSettingsApi.get === 'function') {
+            try {
+                const res = await window.answerSettingsApi.get();
+                if (res && res.success) {
+                    this.answerSettings.autoSubmit = !!res.autoSubmit;
+                    this.answerSettings.autoNextCorrect = !!res.autoNextCorrect;
+                }
+            } catch (e) {
+                // 静默失败，不阻断正常答题
+                console.warn('loadAnswerSettings failed', e);
+            }
+        }
+    },
+    async saveAnswerSettings() {
+        if (!this.isLoggedIn) {
+            this.showError('请先登录后保存设置');
+            return;
+        }
+        if (window.answerSettingsApi && typeof window.answerSettingsApi.update === 'function') {
+            try {
+                const payload = {
+                    autoSubmit: !!this.answerSettings.autoSubmit,
+                    autoNextCorrect: !!this.answerSettings.autoNextCorrect
+                };
+                const res = await window.answerSettingsApi.update(payload);
+                if (res && res.success) {
+                    this.answerSettings.autoSubmit = !!res.autoSubmit;
+                    this.answerSettings.autoNextCorrect = !!res.autoNextCorrect;
+                    this.showSuccess('设置已保存');
+                    this.showAnswerSettingsModal = false;
+                    return;
+                }
+            } catch (e) {
+                console.warn('saveAnswerSettings failed', e);
+                this.showError('保存失败，请稍后重试');
+                return;
+            }
+        }
+        this.showError('答题设置接口未初始化');
+    },
+    onQuestionImageError(e) {
+        try {
+            if (e && e.target) {
+                e.target.onerror = null;
+                e.target.style.display = 'none';
+            }
+        } catch (ignored) {}
+        try {
+            if (this.currentQuestion) {
+                this.$set(this.currentQuestion, 'picture', false);
+            }
+        } catch (ignored) {}
+    },
+
+    // 入职培训：跳转到第一个未正确完成的题目
+    goToFirstUnansweredTraining() {
+        try {
+            const questions = Array.isArray(this.trainingQuestions) ? this.trainingQuestions : [];
+            if (questions.length === 0) {
+                this.showError('暂无培训题目');
+                return;
+            }
+
+            // trainingRecords: { [id]: { correct: boolean, ... } }
+            const recs = this.trainingRecords || {};
+            const firstUnanswered = questions.find(q => {
+                const r = recs[q.id];
+                return !(r && r.correct === true);
+            });
+
+            const target = firstUnanswered || questions[0];
+            this.goToTrainingQuestion(target.id);
+        } catch (e) {
+            console.warn('goToFirstUnansweredTraining failed', e);
+            // 兜底：直接进第一题
+            if (this.trainingQuestions && this.trainingQuestions[0]) {
+                this.goToTrainingQuestion(this.trainingQuestions[0].id);
+            }
+        }
+    },
 };

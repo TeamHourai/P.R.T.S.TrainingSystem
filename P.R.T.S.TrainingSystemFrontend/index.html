@@ -452,9 +452,14 @@
                         <h1 class="page-title">答题</h1>
                         <p class="page-subtitle">认真阅读题目并选择正确答案</p>
                     </div>
-                    <button class="back-btn" @click="goBackFromQuestion"><i class="fas fa-arrow-left"></i> 返回</button>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <button class="back-btn" @click="openAnswerSettings" title="答题设置" style="padding: 10px 14px;">
+                            <i class="fas fa-cog"></i> 设置
+                        </button>
+                        <button class="back-btn" @click="goBackFromQuestion"><i class="fas fa-arrow-left"></i> 返回</button>
+                    </div>
                 </div>
-                <div class="question-layout" :class="{ 'has-answer': showAnswer }">
+                <div class="question-layout" :class="{ 'has-answer': showAnswer && !(answerSettings && answerSettings.autoNextCorrect && isAnswerCorrect) }">
                     <div class="question-card">
                         <div class="question-meta">
                             <div class="meta-tag" :style="{ backgroundColor: getTypeColor(currentQuestion.type) }">
@@ -472,7 +477,8 @@
                         <div class="question-text">
                             <p v-html="currentQuestion.question"></p>
                             <img v-if="currentQuestion.picture"
-                                :src="(questionMode==='training'?'./training-images/':'./images/')+currentQuestion.id+'.png'"
+                                :src="(questionMode==='training'?'./training-images/':'./css/images/')+currentQuestion.id+'.png'"
+                                @error="onQuestionImageError"
                                 alt="题目图片" style="max-width: 100%; margin-top: 20px; border-radius: 8px;">
                         </div>
                         <div class="options-container">
@@ -496,7 +502,7 @@
                             </button>
                         </div>
                     </div>
-                    <div class="question-card answer-analysis" v-if="showAnswer" ref="answerAnalysis">
+                    <div class="question-card answer-analysis" v-if="showAnswer && !(answerSettings && answerSettings.autoNextCorrect && isAnswerCorrect)" ref="answerAnalysis">
                         <h3 :style="{ color: isAnswerCorrect ? 'var(--success-color)' : 'var(--warning-color)' }">
                             <i :class="isAnswerCorrect ? 'fas fa-check-circle' : 'fas fa-times-circle'"></i>
                             {{ isAnswerCorrect ? '回答正确!' : '回答错误!' }}
@@ -526,6 +532,38 @@
                         </div>
 
                         <p style="margin-top: 15px;" v-html="currentQuestion.analysis"></p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 答题设置弹窗 -->
+            <div v-if="showAnswerSettingsModal" class="modal-overlay" @click="closeAnswerSettings">
+                <div class="modal-content" @click.stop style="max-width: 460px;">
+                    <div class="modal-header">
+                        <h3>答题设置</h3>
+                        <button class="modal-close" @click="closeAnswerSettings"><i class="fas fa-times"></i></button>
+                    </div>
+                    <div style="padding: 22px 26px;">
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 16px;">
+                            <div>
+                                <div style="font-weight:600;">自动提交答案</div>
+                                <div style="font-size:12px;color:#888; margin-top:4px;">开启后，点选任意选项会自动提交</div>
+                            </div>
+                            <input type="checkbox" v-model="answerSettings.autoSubmit" />
+                        </div>
+
+                        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom: 20px;">
+                            <div>
+                                <div style="font-weight:600;">答对自动下一题</div>
+                                <div style="font-size:12px;color:#888; margin-top:4px;">开启后，回答正确会自动跳到下一题</div>
+                            </div>
+                            <input type="checkbox" v-model="answerSettings.autoNextCorrect" />
+                        </div>
+
+                        <div style="display:flex; justify-content:flex-end; gap: 12px;">
+                            <button class="nav-btn secondary" @click="closeAnswerSettings">取消</button>
+                            <button class="nav-btn primary" @click="saveAnswerSettings">保存</button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -681,6 +719,7 @@
     <script src="js/api/user.js"></script> <!-- 定义 userApi -->
     <script src="js/api/question.js"></script> <!-- 定义 questionApi -->
     <script src="js/api/answer.js"></script> <!-- 如果存在，请放到 js/api/answer.js -->
+    <script src="js/api/answerSettings.js"></script> <!-- 用户答题设置 -->
     <script src="js/api/exam.js"></script> <!-- 如果存在，请放到 js/api/exam.js -->
     <script src="js/api/stats.js"></script> <!-- 定义 statsApi -->
     <script src="js/api/notifications.js"></script> <!-- 定义 notificationApi -->

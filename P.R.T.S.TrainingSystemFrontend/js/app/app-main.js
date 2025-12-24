@@ -15,6 +15,10 @@ new Vue({
         try {
             console.log('博士考核系统初始化...');
             await this.checkLoginStatus();
+            // 登录后拉取用户答题设置
+            if (typeof this.loadAnswerSettings === 'function') {
+                await this.loadAnswerSettings();
+            }
             await this.loadQuestions();
             await this.loadTrainingQuestions();
             // 从 localStorage 恢复入职培训记录（如果有）

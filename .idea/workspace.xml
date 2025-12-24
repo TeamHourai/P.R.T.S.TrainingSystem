@@ -4,17 +4,41 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="优化UI，添加题目图片">
-      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/admin_permissions.html" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminSetPermissionsHandler.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminUserListHandler.java" afterDir="false" />
+    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="修复小bug">
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/12.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/15.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/17.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/2.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/20.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/22.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/28.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/30.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/32.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/35.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/40.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/41.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/42.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/43.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/47.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/50.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/52.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/53.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/54.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/55.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/56.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/6.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/8.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/images/bg-3.png" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/answerSettings.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AnswerSettingsHandler.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/announcement-editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/announcement-editor.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/editor.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/training-editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/training-editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-data.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-main.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-main.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/exam_records.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/exam_records.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/user_answers.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/user_answers.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/wrong_visibility.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/wrong_visibility.csv" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" afterDir="false" />
@@ -44,12 +68,12 @@
     &quot;assignee&quot;: &quot;AdonisKlein&quot;
   }
 }</component>
-  <component name="GithubPullRequestsUISettings">{
-  &quot;selectedUrlAndAccountId&quot;: {
-    &quot;url&quot;: &quot;https://github.com/TeamHourai/P.R.T.S.TrainingSystem.git&quot;,
-    &quot;accountId&quot;: &quot;0055ab69-a480-44d8-80aa-a9abd370a267&quot;
+  <component name="GithubPullRequestsUISettings"><![CDATA[{
+  "selectedUrlAndAccountId": {
+    "url": "git@github.com:/TeamHourai/P.R.T.S.TrainingSystem.git",
+    "accountId": "ba333ae1-8110-4cf7-aadc-b1075dbd68b5"
   }
-}</component>
+}]]></component>
   <component name="ProblemsViewState">
     <option name="selectedTabId" value="CurrentFile" />
   </component>
@@ -313,7 +337,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766557888817</updated>
     </task>
-    <option name="localTasksCounter" value="24" />
+    <task id="LOCAL-00024" summary="修复小bug">
+      <option name="closed" value="true" />
+      <created>1766564627081</created>
+      <option name="number" value="00024" />
+      <option name="presentableId" value="LOCAL-00024" />
+      <option name="project" value="LOCAL" />
+      <updated>1766564627081</updated>
+    </task>
+    <option name="localTasksCounter" value="25" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -388,7 +420,8 @@
     <MESSAGE value="已完成.csv文件同步至数据库，仅对users.csv进行测试" />
     <MESSAGE value="已完成数据同步数据库" />
     <MESSAGE value="优化UI，添加题目图片" />
-    <option name="LAST_COMMIT_MESSAGE" value="优化UI，添加题目图片" />
+    <MESSAGE value="修复小bug" />
+    <option name="LAST_COMMIT_MESSAGE" value="修复小bug" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

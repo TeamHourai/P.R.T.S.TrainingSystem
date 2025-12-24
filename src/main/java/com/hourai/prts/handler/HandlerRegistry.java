@@ -52,6 +52,9 @@ public final class HandlerRegistry {
 
         // 新增：管理员获取用户列表
         HANDLERS.put("admin_user_list", new AdminUserListHandler());
+
+        // 新增：用户答题设置（自动提交/答对自动下一题）
+        HANDLERS.put("answer_settings", new AnswerSettingsHandler());
     }
 
     private HandlerRegistry() { /* no instantiation */ }

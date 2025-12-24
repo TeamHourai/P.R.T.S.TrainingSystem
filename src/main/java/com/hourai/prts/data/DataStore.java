@@ -22,6 +22,8 @@ public class DataStore {
     static final Path EXAM_RECORDS_FILE = DATA_DIR.resolve("exam_records.csv");
     static final Path WRONG_VISIBILITY_FILE = DATA_DIR.resolve("wrong_visibility.csv");
     static final Path ANNOUNCEMENTS_FILE = DATA_DIR.resolve("announcements.csv");
+    // 新增：用户答题设置
+    static final Path ANSWER_SETTINGS_FILE = DATA_DIR.resolve("answer_settings.csv");
 
     /**
      * Expose the default questions CSV path for handlers that need direct file access.
@@ -80,6 +82,96 @@ public class DataStore {
         if (!Files.exists(ANNOUNCEMENTS_FILE)) {
             Files.createFile(ANNOUNCEMENTS_FILE);
         }
+        // 用户答题设置（按用户维度持久化）
+        if (!Files.exists(ANSWER_SETTINGS_FILE)) {
+            Files.createFile(ANSWER_SETTINGS_FILE);
+        }
+    }
+
+    // ===================== 用户答题设置（CSV: user_id,auto_submit,auto_next_correct,updated_at） =====================
+
+    /**
+     * 简单 DTO：Utils.parseJson 可直接写入布尔字段。
+     */
+    public static class AnswerSettings {
+        public boolean autoSubmit;
+        public boolean autoNextCorrect;
+
+        public AnswerSettings() {
+        }
+
+        public AnswerSettings(boolean autoSubmit, boolean autoNextCorrect) {
+            this.autoSubmit = autoSubmit;
+            this.autoNextCorrect = autoNextCorrect;
+        }
+    }
+
+    public static synchronized AnswerSettings loadAnswerSettings(long userId) throws IOException {
+        if (!Files.exists(ANSWER_SETTINGS_FILE)) {
+            return new AnswerSettings(false, false);
+        }
+        List<String> lines = Files.readAllLines(ANSWER_SETTINGS_FILE, StandardCharsets.UTF_8);
+        for (String ln : lines) {
+            if (ln == null || ln.trim().isEmpty()) continue;
+            String[] p = ln.split(",", -1);
+            if (p.length < 2) continue;
+            // allow optional header, skip non-number id
+            if (!p[0].trim().matches("\\d+")) continue;
+            long uid;
+            try {
+                uid = Long.parseLong(p[0].trim());
+            } catch (Exception ignored) {
+                continue;
+            }
+            if (uid != userId) continue;
+
+            boolean autoSubmit = p.length > 1 && ("true".equalsIgnoreCase(p[1].trim()) || "1".equals(p[1].trim()));
+            boolean autoNextCorrect = p.length > 2 && ("true".equalsIgnoreCase(p[2].trim()) || "1".equals(p[2].trim()));
+            return new AnswerSettings(autoSubmit, autoNextCorrect);
+        }
+        return new AnswerSettings(false, false);
+    }
+
+    public static synchronized AnswerSettings upsertAnswerSettings(long userId, boolean autoSubmit, boolean autoNextCorrect) throws IOException {
+        if (!Files.exists(ANSWER_SETTINGS_FILE)) {
+            Files.createFile(ANSWER_SETTINGS_FILE);
+        }
+
+        List<String> lines = Files.readAllLines(ANSWER_SETTINGS_FILE, StandardCharsets.UTF_8);
+        List<String> out = new ArrayList<>();
+        boolean updated = false;
+
+        for (String ln : lines) {
+            if (ln == null || ln.trim().isEmpty()) continue;
+            String[] p = ln.split(",", -1);
+            // keep header lines or malformed lines as-is
+            if (p.length < 1 || !p[0].trim().matches("\\d+")) {
+                out.add(ln);
+                continue;
+            }
+
+            long uid;
+            try {
+                uid = Long.parseLong(p[0].trim());
+            } catch (Exception e) {
+                out.add(ln);
+                continue;
+            }
+
+            if (uid == userId) {
+                out.add(userId + "," + autoSubmit + "," + autoNextCorrect + "," + Utils.now());
+                updated = true;
+            } else {
+                out.add(ln);
+            }
+        }
+
+        if (!updated) {
+            out.add(userId + "," + autoSubmit + "," + autoNextCorrect + "," + Utils.now());
+        }
+
+        Files.write(ANSWER_SETTINGS_FILE, out, StandardCharsets.UTF_8, StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+        return new AnswerSettings(autoSubmit, autoNextCorrect);
     }
 
     /* 方法loadUsers:

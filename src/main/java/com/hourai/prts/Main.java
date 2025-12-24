@@ -88,6 +88,9 @@ public class Main {
         server.createContext("/api/admin/announcements", HandlerRegistry.getWrapped("announcements"));
         server.createContext("/api/notifications", HandlerRegistry.getWrapped("notifications"));
 
+        // 用户答题设置
+        server.createContext("/api/user/answer-settings", HandlerRegistry.getWrapped("answer_settings"));
+
         server.createContext("/api/v1/auth/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/api/v1/auth/login", HandlerRegistry.getWrapped("login"));
         server.createContext("/api/v1/auth/logout", HandlerRegistry.getWrapped("logout"));
@@ -103,6 +106,9 @@ public class Main {
         server.createContext("/api/v1/announcements", HandlerRegistry.getWrapped("announcements"));
         server.createContext("/api/v1/admin/announcements", HandlerRegistry.getWrapped("announcements"));
         server.createContext("/api/v1/notifications", HandlerRegistry.getWrapped("notifications"));
+
+        // 用户答题设置
+        server.createContext("/api/v1/user/answer-settings", HandlerRegistry.getWrapped("answer_settings"));
 
         // 新增：管理员设置用户权限
         server.createContext("/api/v1/admin/user/permission", HandlerRegistry.getWrapped("admin_set_permissions"));

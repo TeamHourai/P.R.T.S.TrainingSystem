@@ -52,7 +52,8 @@ public class LoginHandler implements HttpHandler {
             }
         } catch (Exception e) {
             e.printStackTrace();
-            Utils.send(exchange, 500, "{\"success\":false,\"message\":\"database error\"}");
+            String msg = Utils.escapeJson(e.getClass().getSimpleName() + ": " + e.getMessage());
+            Utils.send(exchange, 500, "{\"success\":false,\"message\":" + msg + "}");
             return;
         }
         if (matchedUser != null) {

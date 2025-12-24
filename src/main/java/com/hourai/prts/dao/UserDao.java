@@ -4,11 +4,13 @@ import com.hourai.prts.entity.User;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class UserDao {
     private final String url = "jdbc:mysql://localhost:3306/p.r.t.s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private final String user = "root";
     private final String password = "p.r.t.s.data115";
+    private static final String TABLE = "users";
 
     public int insert(User u) throws SQLException {
         boolean hasId = u.getId() != null;
@@ -40,9 +42,26 @@ public class UserDao {
                 u.setId(rs.getLong("id"));
                 u.setUsername(rs.getString("username"));
                 u.setPassword(rs.getString("password"));
-                u.setAdmin(rs.getBoolean("is_admin"));
-                Timestamp ts = rs.getTimestamp("register_time");
-                u.setCreatedAt(ts);
+                // Admin column compatibility
+                String adminCol = pickColumn("is_admin", "admin", "isAdmin");
+                if (adminCol != null) {
+                    u.setAdmin(rs.getBoolean(adminCol));
+                } else {
+                    u.setAdmin(false);
+                }
+
+                // Created time compatibility
+                String timeCol = pickColumn("register_time", "created_at", "createdAt");
+                if (timeCol != null) {
+                    try {
+                        Timestamp ts = rs.getTimestamp(timeCol);
+                        u.setCreatedAt(ts);
+                    } catch (SQLException ignored) {
+                        u.setCreatedAt(null);
+                    }
+                } else {
+                    u.setCreatedAt(null);
+                }
                 return u;
             }
         }
@@ -60,13 +79,45 @@ public class UserDao {
                 u.setId(rs.getLong("id"));
                 u.setUsername(rs.getString("username"));
                 u.setPassword(rs.getString("password"));
-                u.setAdmin(rs.getBoolean("is_admin"));
-                Timestamp ts = rs.getTimestamp("register_time");
-                u.setCreatedAt(ts);
+                String adminCol = pickColumn("is_admin", "admin", "isAdmin");
+                if (adminCol != null) {
+                    u.setAdmin(rs.getBoolean(adminCol));
+                } else {
+                    u.setAdmin(false);
+                }
+
+                String timeCol = pickColumn("register_time", "created_at", "createdAt");
+                if (timeCol != null) {
+                    try {
+                        Timestamp ts = rs.getTimestamp(timeCol);
+                        u.setCreatedAt(ts);
+                    } catch (SQLException ignored) {
+                        u.setCreatedAt(null);
+                    }
+                } else {
+                    u.setCreatedAt(null);
+                }
                 list.add(u);
             }
         }
         return list;
+    }
+
+    // helper: pick first existing column name using metadata checks
+    private String pickColumn(String... candidates) {
+        for (String c : candidates) {
+            if (c == null) continue;
+            try {
+                if (DbCompat.columnExists(TABLE, c)) return c;
+            } catch (Exception ignored) {}
+            try {
+                if (DbCompat.columnExists(TABLE, c.toLowerCase())) return c.toLowerCase();
+            } catch (Exception ignored) {}
+            try {
+                if (DbCompat.columnExists(TABLE, c.toUpperCase())) return c.toUpperCase();
+            } catch (Exception ignored) {}
+        }
+        return null;
     }
 
     public int update(User u) throws SQLException {

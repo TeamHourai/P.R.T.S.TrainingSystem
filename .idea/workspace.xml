@@ -4,36 +4,15 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="已全部迁移至数据库，但未进行测试">
+    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="仅登录时存在问题">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/ExamRecordDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/ExamRecordDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/NotificationStateDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/NotificationStateDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/UserAnswerDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/UserAnswerDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/WrongQuestionVisibilityDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/WrongQuestionVisibilityDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/WrongQuestionVisibilityDbDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/WrongQuestionVisibilityDbDao.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/WrongAnswersHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/WrongAnswersHandler.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/WrongQuestionVisibilityDbService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/WrongQuestionVisibilityDbService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/tool/CsvBatchImporter.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/tool/CsvBatchImporter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/tool/QuestionsImportTool.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/tool/QuestionsImportTool.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/ExamRecordDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/ExamRecordDao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/UserAnswerDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/UserAnswerDao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/WrongQuestionVisibilityDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/WrongQuestionVisibilityDao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/WrongQuestionVisibilityDbDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/WrongQuestionVisibilityDbDao.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/AdminQuestionsHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/AdminQuestionsHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamHistoryHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamHistoryHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/KeywordsHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/KeywordsHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/QuestionsHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/QuestionsHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/WrongAnswersHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/WrongAnswersHandler.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/WrongQuestionVisibilityDbService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/WrongQuestionVisibilityDbService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/tool/CsvBatchImporter.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/tool/CsvBatchImporter.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/TEST-com.hourai.prts.dao.QuestionDaoTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/surefire-reports/TEST-com.hourai.prts.dao.QuestionDaoTest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/TEST-com.hourai.prts.service.UserServiceTest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/target/surefire-reports/TEST-com.hourai.prts.service.UserServiceTest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/com.hourai.prts.dao.QuestionDaoTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/target/surefire-reports/com.hourai.prts.dao.QuestionDaoTest.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/com.hourai.prts.service.UserServiceTest.txt" beforeDir="false" afterPath="$PROJECT_DIR$/target/surefire-reports/com.hourai.prts.service.UserServiceTest.txt" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/UserDao.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/UserDao.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/UserDao.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/UserDao.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataImportMain.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataImportMain.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ApiHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ApiHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/UserService.class" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -142,7 +121,7 @@
       <workItem from="1765001151557" duration="3593000" />
       <workItem from="1766541868395" duration="420000" />
       <workItem from="1766542306256" duration="2274000" />
-      <workItem from="1766581634857" duration="13163000" />
+      <workItem from="1766581634857" duration="13973000" />
     </task>
     <task id="LOCAL-00001" summary="更新">
       <option name="closed" value="true" />
@@ -392,7 +371,23 @@
       <option name="project" value="LOCAL" />
       <updated>1766595018494</updated>
     </task>
-    <option name="localTasksCounter" value="32" />
+    <task id="LOCAL-00032" summary="仅登录时存在问题">
+      <option name="closed" value="true" />
+      <created>1766597616712</created>
+      <option name="number" value="00032" />
+      <option name="presentableId" value="LOCAL-00032" />
+      <option name="project" value="LOCAL" />
+      <updated>1766597616712</updated>
+    </task>
+    <task id="LOCAL-00033" summary="仅登录时存在问题">
+      <option name="closed" value="true" />
+      <created>1766597624555</created>
+      <option name="number" value="00033" />
+      <option name="presentableId" value="LOCAL-00033" />
+      <option name="project" value="LOCAL" />
+      <updated>1766597624555</updated>
+    </task>
+    <option name="localTasksCounter" value="34" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -450,7 +445,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="更新" />
     <MESSAGE value="合并注释更改和数据库更新" />
     <MESSAGE value="上传了正式前端，现在在不加数据库的情况下实现了前后端的连接，用户注册和登陆的功能，无法成功答题，答案显示为乱码，无法保存错题" />
     <MESSAGE value="在未接入数据库分支中，把端口更改为8080，同时数据文件中前面的userid会随着注册用户而递增" />
@@ -475,7 +469,8 @@
     <MESSAGE value="已将user Announcement notifications_state TrainingRecord 成功迁移至数据库" />
     <MESSAGE value="已将answer_settings迁移至数据库" />
     <MESSAGE value="已全部迁移至数据库，但未进行测试" />
-    <option name="LAST_COMMIT_MESSAGE" value="已全部迁移至数据库，但未进行测试" />
+    <MESSAGE value="仅登录时存在问题" />
+    <option name="LAST_COMMIT_MESSAGE" value="仅登录时存在问题" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -1,3 +1,7 @@
+
+/**
+ * 用户答题数据访问对象（DAO），负责对 user_answer 表进行增删改查操作。
+ */
 package com.hourai.prts.dao;
 
 import com.hourai.prts.entity.UserAnswer;
@@ -5,7 +9,45 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * UserAnswerDao 提供对用户答题表的数据库操作方法。
+ */
 public class UserAnswerDao {
+    // ...existing code...
+    /**
+     * 新增用户答题记录
+     * @param userAnswer 实体
+     * @return 影响的行数
+     * @throws SQLException 数据库异常
+     */
+    // public int insert(UserAnswer userAnswer) throws SQLException { ... }
+    /**
+     * 根据主键查询用户答题
+     * @param id 用户答题ID
+     * @return 实体或 null
+     * @throws SQLException 数据库异常
+     */
+    // public UserAnswer selectById(Long id) throws SQLException { ... }
+    /**
+     * 查询所有用户答题
+     * @return 实体列表
+     * @throws SQLException 数据库异常
+     */
+    // public List<UserAnswer> selectAll() throws SQLException { ... }
+    /**
+     * 更新用户答题信息
+     * @param userAnswer 实体
+     * @return 影响的行数
+     * @throws SQLException 数据库异常
+     */
+    // public int update(UserAnswer userAnswer) throws SQLException { ... }
+    /**
+     * 删除用户答题
+     * @param id 用户答题ID
+     * @return 影响的行数
+     * @throws SQLException 数据库异常
+     */
+    // public int delete(Long id) throws SQLException { ... }
     private final String url = "jdbc:mysql://localhost:3306/p.r.t.s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private final String user = "root";
     private final String password = "p.r.t.s.data115";

@@ -1,3 +1,7 @@
+
+/**
+ * 试卷详情数据访问对象（DAO），负责对 exam_detail 表进行增删改查操作。
+ */
 package com.hourai.prts.dao;
 
 import com.hourai.prts.entity.ExamDetail;
@@ -5,7 +9,46 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * ExamDetailDao 提供对试卷详情表的数据库操作方法。
+ */
 public class ExamDetailDao {
+    // ...existing code...
+    // 建议为每个方法补充类似注释：
+    /**
+     * 新增试卷详情记录
+     * @param examDetail 实体
+     * @return 影响的行数
+     * @throws SQLException 数据库异常
+     */
+    // public int insert(ExamDetail examDetail) throws SQLException { ... }
+    /**
+     * 根据主键查询试卷详情
+     * @param id 试卷详情ID
+     * @return 实体或 null
+     * @throws SQLException 数据库异常
+     */
+    // public ExamDetail selectById(Long id) throws SQLException { ... }
+    /**
+     * 查询所有试卷详情
+     * @return 实体列表
+     * @throws SQLException 数据库异常
+     */
+    // public List<ExamDetail> selectAll() throws SQLException { ... }
+    /**
+     * 更新试卷详情信息
+     * @param examDetail 实体
+     * @return 影响的行数
+     * @throws SQLException 数据库异常
+     */
+    // public int update(ExamDetail examDetail) throws SQLException { ... }
+    /**
+     * 删除试卷详情
+     * @param id 试卷详情ID
+     * @return 影响的行数
+     * @throws SQLException 数据库异常
+     */
+    // public int delete(Long id) throws SQLException { ... }
     private final String url = "jdbc:mysql://localhost:3306/p.r.t.s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";
     private final String user = "root";
     private final String password = "p.r.t.s.data115";

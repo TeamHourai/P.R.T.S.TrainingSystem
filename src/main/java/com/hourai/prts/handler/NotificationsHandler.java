@@ -12,6 +12,8 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
+import com.hourai.prts.dao.NotificationsStateDao;
+import com.hourai.prts.entity.NotificationsState;
 
 /**
  * Notifications API used by the "通知中心" on index.html.
@@ -264,92 +266,150 @@ public class NotificationsHandler implements HttpHandler {
         auth = auth.trim();
         if (auth.toLowerCase().startsWith("bearer ")) auth = auth.substring(7).trim();
         if (!auth.startsWith("user-")) return null;
+        long uid;
         try {
-            long uid = Long.parseLong(auth.substring("user-".length()));
-            List<User> users = DataStore.loadUsers();
-            for (User u : users) {
-                if (u.getId() == uid) return u;
-            }
-        } catch (Exception ignored) {
+            uid = Long.parseLong(auth.substring("user-".length()));
+        } catch (Exception e) {
+            return null;
+        }
+        // 优先数据库查找
+        try {
+            com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
+            User u = userService.getUserById(uid);
+            if (u != null) return u;
+        } catch (Exception e) {
+            // 数据库不可用时回退CSV
+            try {
+                List<User> users = DataStore.loadUsers();
+                for (User u : users) {
+                    if (u.getId() == uid) return u;
+                }
+            } catch (Exception ignored) {}
         }
         return null;
     }
 
     private static synchronized List<Announcement> loadAnnouncements() throws IOException {
-        Path f = DataStore.getAnnouncementsFile();
-        if (!Files.exists(f)) return new ArrayList<>();
-        List<String> lines = Files.readAllLines(f, StandardCharsets.UTF_8);
-        List<Announcement> out = new ArrayList<>();
-        for (String ln : lines) {
-            if (ln == null || ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 7);
-            if (p.length < 6) continue;
-            try {
-                long id = Long.parseLong(p[0]);
-                String title = Utils.unescapeCsv(p[1]);
-                String content = Utils.unescapeCsv(p[2]);
-                boolean important = Boolean.parseBoolean(p[3]);
-                String createdAt = Utils.unescapeCsv(p[4]);
-                String createdBy = Utils.unescapeCsv(p[5]);
-                String expiresAt = p.length >= 7 ? Utils.unescapeCsv(p[6]) : "";
-                out.add(new Announcement(id, title, content, important, createdAt, createdBy, expiresAt));
-            } catch (Exception ignoreBadRow) {
+        // 优先数据库
+        try {
+            com.hourai.prts.service.AnnouncementService announcementService = new com.hourai.prts.service.AnnouncementService();
+            return announcementService.getAllAnnouncements();
+        } catch (Exception e) {
+            // 数据库不可用时回退CSV
+            Path f = DataStore.getAnnouncementsFile();
+            if (!Files.exists(f)) return new ArrayList<>();
+            List<String> lines = Files.readAllLines(f, StandardCharsets.UTF_8);
+            List<Announcement> out = new ArrayList<>();
+            for (String ln : lines) {
+                if (ln == null || ln.trim().isEmpty()) continue;
+                String[] p = ln.split(",", 7);
+                if (p.length < 6) continue;
+                try {
+                    long id = Long.parseLong(p[0]);
+                    String title = Utils.unescapeCsv(p[1]);
+                    String content = Utils.unescapeCsv(p[2]);
+                    boolean important = Boolean.parseBoolean(p[3]);
+                    String createdAt = Utils.unescapeCsv(p[4]);
+                    String createdBy = Utils.unescapeCsv(p[5]);
+                    String expiresAt = p.length >= 7 ? Utils.unescapeCsv(p[6]) : "";
+                    out.add(new Announcement(id, title, content, important, createdAt, createdBy, expiresAt));
+                } catch (Exception ignoreBadRow) {
+                }
             }
+            return out;
         }
-        return out;
     }
 
     // state row: userId,notificationId,isRead,isHidden
     private static synchronized Map<Long, State> loadStateForUser(long userId) throws IOException {
         Map<Long, State> out = new HashMap<>();
-        if (!Files.exists(STATE_FILE)) return out;
-        List<String> lines = Files.readAllLines(STATE_FILE, StandardCharsets.UTF_8);
-        for (String ln : lines) {
-            if (ln == null || ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 4);
-            if (p.length < 4) continue;
-            try {
-                long uid = Long.parseLong(p[0]);
-                if (uid != userId) continue;
-                long nid = Long.parseLong(p[1]);
-                boolean read = Boolean.parseBoolean(p[2]);
-                boolean hidden = Boolean.parseBoolean(p[3]);
-                out.put(nid, new State(read, hidden));
-            } catch (Exception ignored) {
+        // 优先数据库
+        try {
+            NotificationsStateDao dao = new NotificationsStateDao();
+            java.util.List<NotificationsState> list = dao.selectAll();
+            for (NotificationsState ns : list) {
+                if (ns.getUserId() == userId) {
+                    // 目前只支持已读，隐藏状态如有需要可扩展
+                    out.put(ns.getNotificationId(), new State(ns.isRead(), false));
+                }
             }
+            return out;
+        } catch (Exception dbEx) {
+            // 数据库不可用时回退CSV
+            if (!Files.exists(STATE_FILE)) return out;
+            List<String> lines = Files.readAllLines(STATE_FILE, StandardCharsets.UTF_8);
+            for (String ln : lines) {
+                if (ln == null || ln.trim().isEmpty()) continue;
+                String[] p = ln.split(",", 4);
+                if (p.length < 4) continue;
+                try {
+                    long uid = Long.parseLong(p[0]);
+                    if (uid != userId) continue;
+                    long nid = Long.parseLong(p[1]);
+                    boolean read = Boolean.parseBoolean(p[2]);
+                    boolean hidden = Boolean.parseBoolean(p[3]);
+                    out.put(nid, new State(read, hidden));
+                } catch (Exception ignored) {}
+            }
+            return out;
         }
-        return out;
     }
 
     private static synchronized void upsertState(long userId, long notifId, Boolean read, Boolean hidden) throws IOException {
-        List<String> lines = Files.exists(STATE_FILE) ? Files.readAllLines(STATE_FILE, StandardCharsets.UTF_8) : new ArrayList<>();
-        boolean found = false;
-        for (int i = 0; i < lines.size(); i++) {
-            String ln = lines.get(i);
-            if (ln == null || ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 4);
-            if (p.length < 4) continue;
-            try {
-                long uid = Long.parseLong(p[0]);
-                long nid = Long.parseLong(p[1]);
-                if (uid == userId && nid == notifId) {
-                    boolean curRead = Boolean.parseBoolean(p[2]);
-                    boolean curHidden = Boolean.parseBoolean(p[3]);
-                    boolean newRead = (read == null) ? curRead : read;
-                    boolean newHidden = (hidden == null) ? curHidden : hidden;
-                    lines.set(i, uid + "," + nid + "," + newRead + "," + newHidden);
-                    found = true;
+        // 优先数据库
+        try {
+            NotificationsStateDao dao = new NotificationsStateDao();
+            java.util.List<NotificationsState> list = dao.selectAll();
+            NotificationsState found = null;
+            for (NotificationsState ns : list) {
+                if (ns.getUserId() == userId && ns.getNotificationId() == notifId) {
+                    found = ns;
                     break;
                 }
-            } catch (Exception ignored) {
             }
+            if (found != null) {
+                // 只更新read
+                boolean newRead = (read == null) ? found.isRead() : read;
+                dao.updateReadState(found.getId(), newRead, newRead ? java.time.LocalDateTime.now().toString() : null);
+            } else {
+                NotificationsState ns = new NotificationsState();
+                ns.setUserId(userId);
+                ns.setNotificationId(notifId);
+                ns.setRead(read != null && read);
+                ns.setReadAt((read != null && read) ? java.time.LocalDateTime.now().toString() : null);
+                dao.insert(ns);
+            }
+            return;
+        } catch (Exception dbEx) {
+            // 数据库不可用时回退CSV
+            List<String> lines = Files.exists(STATE_FILE) ? Files.readAllLines(STATE_FILE, StandardCharsets.UTF_8) : new ArrayList<>();
+            boolean found = false;
+            for (int i = 0; i < lines.size(); i++) {
+                String ln = lines.get(i);
+                if (ln == null || ln.trim().isEmpty()) continue;
+                String[] p = ln.split(",", 4);
+                if (p.length < 4) continue;
+                try {
+                    long uid = Long.parseLong(p[0]);
+                    long nid = Long.parseLong(p[1]);
+                    if (uid == userId && nid == notifId) {
+                        boolean curRead = Boolean.parseBoolean(p[2]);
+                        boolean curHidden = Boolean.parseBoolean(p[3]);
+                        boolean newRead = (read == null) ? curRead : read;
+                        boolean newHidden = (hidden == null) ? curHidden : hidden;
+                        lines.set(i, uid + "," + nid + "," + newRead + "," + newHidden);
+                        found = true;
+                        break;
+                    }
+                } catch (Exception ignored) {}
+            }
+            if (!found) {
+                boolean newRead = read != null && read;
+                boolean newHidden = hidden != null && hidden;
+                lines.add(userId + "," + notifId + "," + newRead + "," + newHidden);
+            }
+            Files.write(STATE_FILE, lines, StandardCharsets.UTF_8);
         }
-        if (!found) {
-            boolean newRead = read != null && read;
-            boolean newHidden = hidden != null && hidden;
-            lines.add(userId + "," + notifId + "," + newRead + "," + newHidden);
-        }
-        Files.write(STATE_FILE, lines, StandardCharsets.UTF_8);
     }
 
     private static String toJson(Map<String, Object> obj) {

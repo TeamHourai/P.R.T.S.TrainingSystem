@@ -11,7 +11,7 @@ public class UserAnswerDao {
     private final String password = "p.r.t.s.data115";
 
     public int insert(UserAnswer ua) throws SQLException {
-        String sql = "INSERT INTO user_answer (user_id, question_id, selected_answer, is_correct, answer_time) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO user_answers (user_id, question_id, selected_answer, is_correct, answer_time) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, ua.getUserId());
@@ -28,7 +28,7 @@ public class UserAnswerDao {
     }
 
     public UserAnswer selectById(Long id) throws SQLException {
-        String sql = "SELECT * FROM user_answer WHERE id = ?";
+        String sql = "SELECT * FROM user_answers WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
@@ -49,7 +49,7 @@ public class UserAnswerDao {
     }
 
     public List<UserAnswer> selectAll() throws SQLException {
-        String sql = "SELECT * FROM user_answer";
+        String sql = "SELECT * FROM user_answers";
         List<UserAnswer> list = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(url, user, password);
              Statement st = conn.createStatement();
@@ -70,7 +70,7 @@ public class UserAnswerDao {
     }
 
     public int update(UserAnswer ua) throws SQLException {
-        String sql = "UPDATE user_answer SET user_id=?, question_id=?, selected_answer=?, is_correct=?, answer_time=? WHERE id=?";
+        String sql = "UPDATE user_answers SET user_id=?, question_id=?, selected_answer=?, is_correct=?, answer_time=? WHERE id=?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, ua.getUserId());
@@ -88,7 +88,7 @@ public class UserAnswerDao {
     }
 
     public int delete(Long id) throws SQLException {
-        String sql = "DELETE FROM user_answer WHERE id=?";
+        String sql = "DELETE FROM user_answers WHERE id=?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);

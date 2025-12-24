@@ -27,7 +27,22 @@ public class KeywordsHandler implements HttpHandler {
         String mode = q.getOrDefault("mode", "");
         String fullPath = exchange.getRequestURI().getPath() == null ? "" : exchange.getRequestURI().getPath();
         boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
-        Path target = useOnboarding ? DataStore.getQuestionsFile().resolveSibling("questions_onboarding.csv") : DataStore.getQuestionsFile();
+        java.util.List<com.hourai.prts.entity.Question> all;
+        if (useOnboarding) {
+            try {
+                com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+                all = questionService.getAllQuestionsByType(2);
+            } catch (Exception dbEx) {
+                all = com.hourai.prts.data.DataStore.loadQuestions(DataStore.getQuestionsFile().resolveSibling("questions_onboarding.csv"));
+            }
+        } else {
+            try {
+                com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+                all = questionService.getAllQuestions();
+            } catch (Exception dbEx) {
+                all = com.hourai.prts.data.DataStore.loadQuestions(DataStore.getQuestionsFile());
+            }
+        }
 
         if (!Files.exists(target)) {
             Utils.send(exchange, 200, "[]");

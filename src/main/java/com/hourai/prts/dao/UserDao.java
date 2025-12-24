@@ -11,22 +11,26 @@ public class UserDao {
     private final String password = "p.r.t.s.data115";
 
     public int insert(User u) throws SQLException {
-        String sql = "INSERT INTO user (username, password, nickname, avatar, email, is_admin, status) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        boolean hasId = u.getId() != null;
+        String sql = hasId ?
+            "INSERT INTO users (id, username, password, is_admin, register_time) VALUES (?, ?, ?, ?, ?)" :
+            "INSERT INTO users (username, password, is_admin, register_time) VALUES (?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, u.getUsername());
-            ps.setString(2, u.getPassword());
-            ps.setString(3, u.getNickname());
-            ps.setString(4, u.getAvatar());
-            ps.setString(5, u.getEmail());
-            ps.setBoolean(6, u.isAdmin());
-            ps.setBoolean(7, u.isStatus());
+            int idx = 1;
+            if (hasId) {
+                ps.setLong(idx++, u.getId());
+            }
+            ps.setString(idx++, u.getUsername());
+            ps.setString(idx++, u.getPassword());
+            ps.setBoolean(idx++, u.isAdmin());
+            ps.setTimestamp(idx, u.getCreatedAt() == null ? new Timestamp(System.currentTimeMillis()) : u.getCreatedAt());
             return ps.executeUpdate();
         }
     }
 
     public User selectById(Long id) throws SQLException {
-        String sql = "SELECT * FROM user WHERE id = ?";
+        String sql = "SELECT * FROM users WHERE id = ?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);
@@ -36,13 +40,9 @@ public class UserDao {
                 u.setId(rs.getLong("id"));
                 u.setUsername(rs.getString("username"));
                 u.setPassword(rs.getString("password"));
-                u.setNickname(rs.getString("nickname"));
-                u.setAvatar(rs.getString("avatar"));
-                u.setEmail(rs.getString("email"));
                 u.setAdmin(rs.getBoolean("is_admin"));
-                u.setStatus(rs.getBoolean("status"));
-                // u.setCreatedAt(rs.getTimestamp("created_at"));
-                // u.setUpdatedAt(rs.getTimestamp("updated_at"));
+                Timestamp ts = rs.getTimestamp("register_time");
+                u.setCreatedAt(ts);
                 return u;
             }
         }
@@ -50,7 +50,7 @@ public class UserDao {
     }
 
     public List<User> selectAll() throws SQLException {
-        String sql = "SELECT * FROM user";
+        String sql = "SELECT * FROM users";
         List<User> list = new ArrayList<>();
         try (Connection conn = DriverManager.getConnection(url, user, password);
              Statement st = conn.createStatement();
@@ -60,13 +60,9 @@ public class UserDao {
                 u.setId(rs.getLong("id"));
                 u.setUsername(rs.getString("username"));
                 u.setPassword(rs.getString("password"));
-                u.setNickname(rs.getString("nickname"));
-                u.setAvatar(rs.getString("avatar"));
-                u.setEmail(rs.getString("email"));
                 u.setAdmin(rs.getBoolean("is_admin"));
-                u.setStatus(rs.getBoolean("status"));
-                // u.setCreatedAt(rs.getTimestamp("created_at"));
-                // u.setUpdatedAt(rs.getTimestamp("updated_at"));
+                Timestamp ts = rs.getTimestamp("register_time");
+                u.setCreatedAt(ts);
                 list.add(u);
             }
         }
@@ -74,22 +70,18 @@ public class UserDao {
     }
 
     public int update(User u) throws SQLException {
-        String sql = "UPDATE user SET password=?, nickname=?, avatar=?, email=?, is_admin=?, status=? WHERE id=?";
+        String sql = "UPDATE users SET password=?, is_admin=? WHERE id=?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.getPassword());
-            ps.setString(2, u.getNickname());
-            ps.setString(3, u.getAvatar());
-            ps.setString(4, u.getEmail());
-            ps.setBoolean(5, u.isAdmin());
-            ps.setBoolean(6, u.isStatus());
-            ps.setLong(7, u.getId());
+            ps.setBoolean(2, u.isAdmin());
+            ps.setLong(3, u.getId());
             return ps.executeUpdate();
         }
     }
 
     public int delete(Long id) throws SQLException {
-        String sql = "DELETE FROM user WHERE id=?";
+        String sql = "DELETE FROM users WHERE id=?";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, id);

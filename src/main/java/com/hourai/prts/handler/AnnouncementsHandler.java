@@ -106,7 +106,13 @@ public class AnnouncementsHandler implements HttpHandler {
 
         Announcement a = new Announcement(id, type, title, content, important, Utils.now(), u.getUsername(), expiresAt);
         append(a);
-
+        // 同步写入MySQL
+        try {
+            com.hourai.prts.service.AnnouncementService announcementService = new com.hourai.prts.service.AnnouncementService();
+            announcementService.addAnnouncement(a);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         Utils.send(exchange, 200, "{\"success\":true,\"id\":" + id + "}");
     }
 

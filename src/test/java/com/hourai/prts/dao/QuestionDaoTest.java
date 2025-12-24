@@ -15,7 +15,7 @@ public class QuestionDaoTest {
     @Test
     public void testInsertAndSelectById() throws SQLException {
         Question q = new Question();
-        // TODO: 设置 q 的各项属性，确保插入数据完整
+        
         q.setType(1);
         q.setDifficulty(2);
         q.setCategory("测试类别");

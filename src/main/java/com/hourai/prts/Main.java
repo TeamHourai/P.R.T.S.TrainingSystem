@@ -58,6 +58,7 @@ public class Main {
         // 用 HandlerRegistry.getWrapped(...) 统一获取已包裹 CORS 的 handler
         server.createContext("/register", HandlerRegistry.getWrapped("register"));
         server.createContext("/login", HandlerRegistry.getWrapped("login"));
+        server.createContext("/notifications_state", HandlerRegistry.getWrapped("notifications_state"));
         server.createContext("/logout", HandlerRegistry.getWrapped("logout"));
         server.createContext("/questions", HandlerRegistry.getWrapped("questions"));
         server.createContext("/exam/paper", HandlerRegistry.getWrapped("exam_paper"));

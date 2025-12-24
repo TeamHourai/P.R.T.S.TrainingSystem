@@ -79,29 +79,47 @@ public class QuestionsHandler implements HttpHandler {
         Integer difficulty = q.get("difficulty") == null || q.get("difficulty").isEmpty() ? null : parseIntOrNull(q.get("difficulty"));
         String keyword = q.getOrDefault("keyword", "").trim();
 
-        // 支持 ?mode=onboarding 来读取入职培训题库，或当请求路径中包含 /training/ 时也视为培训题库
         String mode = q.getOrDefault("mode", "");
         String fullPath = exchange.getRequestURI().getPath() == null ? "" : exchange.getRequestURI().getPath();
         boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
-        List<Question> all = DataStore.loadQuestions(useOnboarding ? ONBOARDING_FILE : QUESTIONS_FILE);
-        // include keywords in search and collect results
+        List<Question> all = new ArrayList<>();
+        boolean dbOk = true;
+        try {
+            com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+            all = questionService.getAllQuestions();
+        } catch (Exception e) {
+            dbOk = false;
+        }
+        if (!dbOk) {
+            if (useOnboarding) {
+                try {
+                    com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+                    // 约定type=2为onboarding题库
+                    all = questionService.getAllQuestionsByType(2);
+                } catch (Exception dbEx) {
+                    all = DataStore.loadQuestions(ONBOARDING_FILE);
+                }
+            } else {
+                try {
+                    com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+                    all = questionService.getAllQuestions();
+                } catch (Exception dbEx) {
+                    all = DataStore.loadQuestions(QUESTIONS_FILE);
+                }
+            }
+        }
         String keywordLower = keyword == null ? "" : keyword.toLowerCase();
         List<Question> filtered = all.stream().filter(qq -> {
             if (type != null && qq.getType() != type) return false;
             if (difficulty != null && qq.getDifficulty() != difficulty) return false;
-
             if (!keywordLower.isEmpty()) {
-                // check keywords first
                 String kws = qq.getKeywords() == null ? "" : qq.getKeywords();
                 if (kws.toLowerCase().contains(keywordLower)) return true;
-                // then check question and analysis
                 String hay = (qq.getQuestion() + " " + qq.getAnalysis()).toLowerCase();
                 return hay.contains(keywordLower);
             }
             return true;
         }).collect(Collectors.toList());
-
-        // If keyword is present, prioritize items where the keyword matches the keywords field
         if (!keywordLower.isEmpty() && filtered.size() > 1) {
             List<Question> keywordMatches = new ArrayList<>();
             List<Question> otherMatches = new ArrayList<>();
@@ -110,31 +128,54 @@ public class QuestionsHandler implements HttpHandler {
                 if (kws.toLowerCase().contains(keywordLower)) keywordMatches.add(qq);
                 else otherMatches.add(qq);
             }
-            // preserve relative order within groups
             filtered = new ArrayList<>();
             filtered.addAll(keywordMatches);
             filtered.addAll(otherMatches);
         }
-
         int from = Math.min((page - 1) * size, filtered.size());
         int to = Math.min(from + size, filtered.size());
         List<Question> pageList = filtered.subList(from, to);
-
         Utils.send(exchange, 200, Utils.questionsToJson(pageList));
     }
 
     private void handleGetOne(HttpExchange exchange, long id) throws IOException {
-        // 支持 ?mode=onboarding 或路径中包含 /training/
         Map<String, String> q = Utils.parseQuery(exchange.getRequestURI().getQuery());
         String mode = q.getOrDefault("mode", "");
         String fullPath = exchange.getRequestURI().getPath() == null ? "" : exchange.getRequestURI().getPath();
         boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
-
-        List<Question> all = DataStore.loadQuestions(useOnboarding ? ONBOARDING_FILE : QUESTIONS_FILE);
-        for (Question qz : all) {
-            if (qz.getId() != null && qz.getId() == id) {
+        boolean dbOk = true;
+        try {
+            com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+            Question qz = questionService.getQuestionById(id);
+            if (qz != null) {
                 Utils.send(exchange, 200, oneQuestionToJson(qz));
                 return;
+            }
+        } catch (Exception e) {
+            dbOk = false;
+        }
+        if (!dbOk) {
+            List<Question> all;
+            if (useOnboarding) {
+                try {
+                    com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+                    all = questionService.getAllQuestionsByType(2);
+                } catch (Exception dbEx) {
+                    all = DataStore.loadQuestions(ONBOARDING_FILE);
+                }
+            } else {
+                try {
+                    com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+                    all = questionService.getAllQuestions();
+                } catch (Exception dbEx) {
+                    all = DataStore.loadQuestions(QUESTIONS_FILE);
+                }
+            }
+            for (Question qz : all) {
+                if (qz.getId() != null && qz.getId() == id) {
+                    Utils.send(exchange, 200, oneQuestionToJson(qz));
+                    return;
+                }
             }
         }
         Utils.send(exchange, 404, "{\"error\":\"not found\"}");
@@ -151,12 +192,25 @@ public class QuestionsHandler implements HttpHandler {
         boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
         Path target = useOnboarding ? ONBOARDING_FILE : QUESTIONS_FILE;
 
-        // 新建写入目标题库
-        List<Question> all = DataStore.loadQuestions(target);
-        long newId = DataStore.nextId(all);
-        Question q = buildQuestionFromBody(newId, body);
-
-        appendQuestionCsv(q, target);
+        long newId = -1;
+        Question q = null;
+        boolean dbOk = true;
+        try {
+            com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+            // 获取最大id+1
+            List<Question> all = questionService.getAllQuestions();
+            newId = all.stream().mapToLong(qq -> qq.getId() == null ? 0 : qq.getId()).max().orElse(0L) + 1;
+            q = buildQuestionFromBody(newId, body);
+            questionService.addQuestion(q);
+        } catch (Exception e) {
+            dbOk = false;
+        }
+        if (!dbOk) {
+            List<Question> all = DataStore.loadQuestions(target);
+            newId = DataStore.nextId(all);
+            q = buildQuestionFromBody(newId, body);
+            appendQuestionCsv(q, target);
+        }
         Utils.send(exchange, 200, "{\"id\":" + newId + "}");
     }
 
@@ -171,26 +225,38 @@ public class QuestionsHandler implements HttpHandler {
         boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
         Path target = useOnboarding ? ONBOARDING_FILE : QUESTIONS_FILE;
 
+        boolean dbOk = true;
         boolean found = false;
-        List<String> newLines = new ArrayList<>();
-        List<String> lines = Files.readAllLines(target, StandardCharsets.UTF_8);
-        for (String ln : lines) {
-            if (ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 9);
-            if (p.length < 9) continue;
-            long qid;
-            try { qid = Long.parseLong(p[0]); } catch (Exception e) { continue; }
-            if (qid != id) {
-                newLines.add(ln);
-                continue;
-            }
-            found = true;
+        try {
+            com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
             Question q = buildQuestionFromBody(id, body);
-            newLines.add(toCsvLine(q));
+            int updated = questionService.updateQuestion(q);
+            if (updated > 0) {
+                found = true;
+            }
+        } catch (Exception e) {
+            dbOk = false;
         }
-
-        if (!found) { Utils.send(exchange, 404, "{\"error\":\"not found\"}"); return; }
-        Files.write(target, newLines, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        if (!dbOk) {
+            List<String> newLines = new ArrayList<>();
+            List<String> lines = Files.readAllLines(target, StandardCharsets.UTF_8);
+            for (String ln : lines) {
+                if (ln.trim().isEmpty()) continue;
+                String[] p = ln.split(",", 9);
+                if (p.length < 9) continue;
+                long qid;
+                try { qid = Long.parseLong(p[0]); } catch (Exception ex) { continue; }
+                if (qid != id) {
+                    newLines.add(ln);
+                    continue;
+                }
+                found = true;
+                Question q = buildQuestionFromBody(id, body);
+                newLines.add(toCsvLine(q));
+            }
+            if (!found) { Utils.send(exchange, 404, "{\"error\":\"not found\"}"); return; }
+            Files.write(target, newLines, StandardCharsets.UTF_8, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        }
         Utils.send(exchange, 200, "{\"success\":true}");
     }
 
@@ -202,22 +268,34 @@ public class QuestionsHandler implements HttpHandler {
         boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
         Path target = useOnboarding ? ONBOARDING_FILE : QUESTIONS_FILE;
 
-        if (!Files.exists(target)) { Utils.send(exchange, 404, "{\"error\":\"not found\"}"); return; }
-        List<String> lines = Files.readAllLines(target, StandardCharsets.UTF_8);
-        List<String> newLines = new ArrayList<>();
+        boolean dbOk = true;
         boolean found = false;
-        for (String ln : lines) {
-            if (ln.trim().isEmpty()) continue;
-            String[] p = ln.split(",", 9);
-            if (p.length < 1) continue;
-            try {
-                long qid = Long.parseLong(p[0]);
-                if (qid == id) { found = true; continue; }
-            } catch (Exception ignored) { }
-            newLines.add(ln);
+        try {
+            com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
+            int deleted = questionService.deleteQuestion(id);
+            if (deleted > 0) {
+                found = true;
+            }
+        } catch (Exception e) {
+            dbOk = false;
         }
-        if (!found) { Utils.send(exchange, 404, "{\"error\":\"not found\"}"); return; }
-        Files.write(target, newLines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        if (!dbOk) {
+            if (!Files.exists(target)) { Utils.send(exchange, 404, "{\"error\":\"not found\"}"); return; }
+            List<String> lines = Files.readAllLines(target, StandardCharsets.UTF_8);
+            List<String> newLines = new ArrayList<>();
+            for (String ln : lines) {
+                if (ln.trim().isEmpty()) continue;
+                String[] p = ln.split(",", 9);
+                if (p.length < 1) continue;
+                try {
+                    long qid = Long.parseLong(p[0]);
+                    if (qid == id) { found = true; continue; }
+                } catch (Exception ignored) { }
+                newLines.add(ln);
+            }
+            if (!found) { Utils.send(exchange, 404, "{\"error\":\"not found\"}"); return; }
+            Files.write(target, newLines, StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.CREATE);
+        }
         Utils.send(exchange, 200, "{\"success\":true}");
     }
 

@@ -43,6 +43,9 @@ public final class HandlerRegistry {
 
         // 通知中心（由公告映射而来，支持已读/隐藏状态）
         HANDLERS.put("notifications", new NotificationsHandler());
+
+        // 通知状态表（notifications_state）数据库操作接口
+        HANDLERS.put("notifications_state", new NotificationsStateHandler());
     }
 
     private HandlerRegistry() { /* no instantiation */ }

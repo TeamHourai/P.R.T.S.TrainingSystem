@@ -6,6 +6,17 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class UserService {
+        // 检查用户名是否存在
+        public boolean usernameExists(String username) throws SQLException {
+            List<User> users = userDao.selectAll();
+            return users.stream().anyMatch(u -> u.getUsername() != null && u.getUsername().equals(username));
+        }
+
+        // 获取下一个用户id（最大id+1）
+        public long getNextUserId() throws SQLException {
+            List<User> users = userDao.selectAll();
+            return users.stream().mapToLong(u -> u.getId() == null ? 0 : u.getId()).max().orElse(0L) + 1;
+        }
     private final UserDao userDao = new UserDao();
 
     public int register(User user) throws SQLException {

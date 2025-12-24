@@ -70,13 +70,26 @@ public class ExamSubmitHandler implements HttpHandler {
 
                 UserAnswer ua = new UserAnswer(uaNext++, userId, qid, "normal", correct, sel, Utils.now());
                 DataStore.appendUserAnswer(ua);
+                // 同步写入MySQL
+                try {
+                    com.hourai.prts.service.UserAnswerService userAnswerService = new com.hourai.prts.service.UserAnswerService();
+                    userAnswerService.addUserAnswer(ua);
+                } catch (Exception ex1) {
+                    ex1.printStackTrace();
+                }
             }
 
             List<ExamRecord> ers = DataStore.loadExamRecords();
             long erId = DataStore.nextId(ers);
             ExamRecord rec = new ExamRecord(erId, userId, score, Utils.now());
             DataStore.appendExamRecord(rec);
-
+            // 同步写入MySQL
+            try {
+                com.hourai.prts.service.ExamRecordService examRecordService = new com.hourai.prts.service.ExamRecordService();
+                examRecordService.addExamRecord(rec);
+            } catch (Exception ex2) {
+                ex2.printStackTrace();
+            }
             Utils.send(exchange, 200, "{\"examId\":" + erId + ",\"score\":" + score + "}");
         } catch (Exception ex) {
             ex.printStackTrace();

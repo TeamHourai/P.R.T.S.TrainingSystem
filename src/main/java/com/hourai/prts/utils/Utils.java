@@ -1,26 +1,90 @@
 package com.hourai.prts.utils;
 
-import com.sun.net.httpserver.HttpExchange;
-import com.hourai.prts.entity.Question;
-
-import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.IOException;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import com.sun.net.httpserver.HttpExchange;
+import com.hourai.prts.entity.Question;
 
-/*
-  通用工具：解析参数、生成 JSON（非常简陋）、CSV 辅助、发送响应
-*/
 public class Utils {
-    static final DateTimeFormatter DT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        private static final DateTimeFormatter DT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-    public static String now() {
-        return LocalDateTime.now().format(DT);
+        public static String now() {
+            return LocalDateTime.now().format(DT);
+        }
+    // ...existing code...
+    // 简单 List<T> 转 JSON 数组（仅支持基础类型字段，适合本项目）
+    public static <T> String toJson(List<T> list) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("[");
+        for (int i = 0; i < list.size(); i++) {
+            sb.append(toJsonObj(list.get(i)));
+            if (i < list.size() - 1) sb.append(",");
+        }
+        sb.append("]");
+        return sb.toString();
     }
+
+    // 简单对象转 JSON（仅支持基础类型字段，适合本项目）
+    private static String toJsonObj(Object obj) {
+        if (obj == null) return "null";
+        StringBuilder sb = new StringBuilder();
+        sb.append("{");
+        var fields = obj.getClass().getDeclaredFields();
+        for (int i = 0; i < fields.length; i++) {
+            fields[i].setAccessible(true);
+            try {
+                sb.append("\"").append(fields[i].getName()).append("\":");
+                Object v = fields[i].get(obj);
+                if (v == null) sb.append("null");
+                else if (v instanceof Number || v instanceof Boolean) sb.append(v.toString());
+                else sb.append("\"").append(escapeJson(v.toString())).append("\"");
+            } catch (Exception e) { sb.append("null"); }
+            if (i < fields.length - 1) sb.append(",");
+        }
+        sb.append("}");
+        return sb.toString();
+    }
+
+    // 解析 JSON 为对象（仅支持简单结构，适合本项目）
+    public static <T> T parseJson(HttpExchange ex, Class<T> clazz) throws IOException {
+        String body = new String(ex.getRequestBody().readAllBytes(), StandardCharsets.UTF_8);
+        // 这里只支持最简单的 key:value 结构，建议前端传所有字段
+        try {
+            T obj = clazz.getDeclaredConstructor().newInstance();
+            body = body.trim();
+            if (body.startsWith("{")) body = body.substring(1);
+            if (body.endsWith("}")) body = body.substring(0, body.length() - 1);
+            String[] pairs = body.split(",");
+            for (String pair : pairs) {
+                String[] kv = pair.split(":", 2);
+                if (kv.length != 2) continue;
+                String key = kv[0].replaceAll("[\"{} ]", "").trim();
+                String val = kv[1].replaceAll("[\"{} ]", "").trim();
+                for (var f : clazz.getDeclaredFields()) {
+                    if (f.getName().equals(key)) {
+                        f.setAccessible(true);
+                        if (f.getType() == Long.class || f.getType() == long.class) f.set(obj, Long.parseLong(val));
+                        else if (f.getType() == Integer.class || f.getType() == int.class) f.set(obj, Integer.parseInt(val));
+                        else if (f.getType() == Boolean.class || f.getType() == boolean.class) f.set(obj, Boolean.parseBoolean(val));
+                        else f.set(obj, val);
+                    }
+                }
+            }
+            return obj;
+        } catch (Exception e) {
+            throw new IOException("parseJson error: " + e.getMessage());
+        }
+    }
+
 
     /* 方法parseQuery:
      * 解析查询字符串为键值对映射

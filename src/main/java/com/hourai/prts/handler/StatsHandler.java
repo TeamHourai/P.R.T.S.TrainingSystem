@@ -75,11 +75,20 @@ public class StatsHandler implements HttpHandler {
             return;
         }
 
-        List<UserAnswer> answers = DataStore.loadUserAnswers();
+        List<UserAnswer> answers = null;
+        boolean dbOk = true;
+        try {
+            com.hourai.prts.service.UserAnswerService userAnswerService = new com.hourai.prts.service.UserAnswerService();
+            answers = userAnswerService.getAllUserAnswers();
+        } catch (Exception e) {
+            dbOk = false;
+        }
+        if (!dbOk) {
+            answers = DataStore.loadUserAnswers();
+        }
         int total = 0;
         int correct = 0;
         int[] wrongCounts = new int[10];
-
         for (UserAnswer ua : answers) {
             if (ua.getQuestionId() == null || ua.getQuestionId() != qid) continue;
             total++;
@@ -95,7 +104,6 @@ public class StatsHandler implements HttpHandler {
                 if (opt >= 0 && opt < wrongCounts.length) wrongCounts[opt]++;
             }
         }
-
         int mostWrongOpt = 0;
         int maxCount = 0;
         for (int i = 0; i < wrongCounts.length; i++) {
@@ -104,15 +112,12 @@ public class StatsHandler implements HttpHandler {
                 mostWrongOpt = i;
             }
         }
-
         double correctRate = total == 0 ? 0.0 : (double) correct / (double) total;
-
-        String json = "{"
-                + "\"totalUsers\":" + total + ","
-                + "\"correctRate\":" + String.format(Locale.US, "%.4f", correctRate) + ","
-                + "\"mostCommonWrongOption\":" + mostWrongOpt
+        String json = "{" +
+                "\"totalUsers\":" + total + "," +
+                "\"correctRate\":" + String.format(Locale.US, "%.4f", correctRate) + "," +
+                "\"mostCommonWrongOption\":" + mostWrongOpt
                 + "}";
-
         Utils.send(exchange, 200, json);
     }
 }

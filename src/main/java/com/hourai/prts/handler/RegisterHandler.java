@@ -41,7 +41,6 @@ public class RegisterHandler implements HttpHandler {
         username = username == null ? null : username.trim();
         password = password == null ? null : password.trim();
 
-        // capture for lambdas
         final String uname = username;
 
         if (uname == null || uname.isEmpty() || password == null || password.isEmpty()) {
@@ -49,16 +48,42 @@ public class RegisterHandler implements HttpHandler {
             return;
         }
 
-        List<User> users = DataStore.loadUsers();
-        boolean exists = users.stream().anyMatch(u -> u.getUsername() != null && u.getUsername().equals(uname));
-        if (exists) {
-            Utils.send(exchange, 400, "{\"success\":false,\"message\":\"username exists\"}");
-            return;
+        boolean exists = false;
+        boolean dbOk = true;
+        long id = -1;
+        User u = null;
+        try {
+            com.hourai.prts.service.UserService userService = new com.hourai.prts.service.UserService();
+            exists = userService.usernameExists(uname);
+            if (exists) {
+                Utils.send(exchange, 400, "{\"success\":false,\"message\":\"username exists\"}");
+                return;
+            }
+            // 数据库查最大id
+            id = userService.getNextUserId();
+            u = new User(id, uname, password, false, Utils.now());
+            userService.register(u);
+        } catch (Exception e) {
+            dbOk = false;
         }
 
-        long id = DataStore.nextId(users);
-        User u = new User(id, uname, password, false, Utils.now());
-        DataStore.appendUser(u);
+        if (!dbOk) {
+            // 数据库不可用时，回退到CSV查重和写入
+            try {
+                List<User> users = DataStore.loadUsers();
+                exists = users.stream().anyMatch(user -> user.getUsername() != null && user.getUsername().equals(uname));
+                if (exists) {
+                    Utils.send(exchange, 400, "{\"success\":false,\"message\":\"username exists\"}");
+                    return;
+                }
+                id = DataStore.nextId(users);
+                u = new User(id, uname, password, false, Utils.now());
+                DataStore.appendUser(u);
+            } catch (Exception ex) {
+                Utils.send(exchange, 500, "{\"success\":false,\"message\":\"internal error\"}");
+                return;
+            }
+        }
 
         Utils.send(exchange, 200,
                 "{\"success\":true,\"id\":" + id + ",\"userId\":" + id + ",\"username\":\"" + Utils.escapeJson(uname) + "\"}");

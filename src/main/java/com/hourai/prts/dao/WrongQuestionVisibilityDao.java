@@ -62,15 +62,24 @@ public class WrongQuestionVisibilityDao {
         List<WrongQuestionVisibility> all = selectAll();
         Optional<WrongQuestionVisibility> existing = all.stream().filter(r -> r.getUserId() == userId && r.getQuestionId() == questionId).findFirst();
         String now = Utils.now();
+        WrongQuestionVisibility target;
         if (existing.isPresent()) {
             WrongQuestionVisibility r = existing.get();
             r.setHidden(hidden);
             r.setUpdatedAt(now);
+            target = r;
         } else {
             long id = DataStore.nextId(all);
-            all.add(new WrongQuestionVisibility(id, userId, questionId, hidden, now));
+            target = new WrongQuestionVisibility(id, userId, questionId, hidden, now);
+            all.add(target);
         }
         rewriteAll(all);
+        // 同步写入MySQL
+        try {
+            new com.hourai.prts.service.WrongQuestionVisibilityDbService().upsert(target);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         return findByUserAndQuestion(userId, questionId).orElseThrow();
     }
 

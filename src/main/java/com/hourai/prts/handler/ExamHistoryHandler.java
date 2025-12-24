@@ -35,7 +35,13 @@ public class ExamHistoryHandler implements HttpHandler {
         if (size < 1) size = 10;
         if (size > 1000) size = 1000;
 
-        List<ExamRecord> all = DataStore.loadExamRecords();
+        List<ExamRecord> all;
+        try {
+            com.hourai.prts.service.ExamRecordService examRecordService = new com.hourai.prts.service.ExamRecordService();
+            all = examRecordService.getAllExamRecords();
+        } catch (Exception dbEx) {
+            all = DataStore.loadExamRecords();
+        }
         // 按 createdAt 倒序（null 视为最早）
         List<ExamRecord> sorted = all.stream()
                 .sorted(Comparator.comparing(ExamRecord::getCreatedAt, Comparator.nullsLast(Comparator.naturalOrder())).reversed())

@@ -1,32 +1,3 @@
-    public List<Question> selectAllByType(int type) throws SQLException {
-        String sql = "SELECT * FROM questions WHERE type = ?";
-        List<Question> list = new ArrayList<>();
-        try (Connection conn = DriverManager.getConnection(url, user, password);
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, type);
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                Question q = new Question();
-                q.setId(rs.getLong("id"));
-                q.setType(rs.getInt("type"));
-                q.setDifficulty(rs.getInt("difficulty"));
-                q.setCategory(rs.getString("category"));
-                q.setResource(rs.getString("resource"));
-                q.setQuestion(rs.getString("question"));
-                q.setOptions(rs.getString("options"));
-                q.setAnswer(rs.getString("answer"));
-                q.setAnalysis(rs.getString("analysis"));
-                q.setHasPicture(rs.getBoolean("has_picture"));
-                q.setPictureUrl(rs.getString("picture_url"));
-                q.setViewCount(rs.getInt("view_count"));
-                q.setErrorCount(rs.getInt("error_count"));
-                q.setCreatedAt(rs.getTimestamp("created_at"));
-                q.setUpdatedAt(rs.getTimestamp("updated_at"));
-                list.add(q);
-            }
-        }
-        return list;
-    }
 package com.hourai.prts.dao;
 
 import com.hourai.prts.entity.Question;
@@ -57,6 +28,36 @@ public class QuestionDao {
             ps.setInt(12, q.getErrorCount());
             return ps.executeUpdate();
         }
+    }
+
+    public List<Question> selectAllByType(int type) throws SQLException {
+        String sql = "SELECT * FROM questions WHERE type = ?";
+        List<Question> list = new ArrayList<>();
+        try (Connection conn = DriverManager.getConnection(url, user, password);
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, type);
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Question q = new Question();
+                q.setId(rs.getLong("id"));
+                q.setType(rs.getInt("type"));
+                q.setDifficulty(rs.getInt("difficulty"));
+                q.setCategory(rs.getString("category"));
+                q.setResource(rs.getString("resource"));
+                q.setQuestion(rs.getString("question"));
+                q.setOptions(rs.getString("options"));
+                q.setAnswer(rs.getString("answer"));
+                q.setAnalysis(rs.getString("analysis"));
+                q.setHasPicture(rs.getBoolean("has_picture"));
+                q.setPictureUrl(rs.getString("picture_url"));
+                q.setViewCount(rs.getInt("view_count"));
+                q.setErrorCount(rs.getInt("error_count"));
+                q.setCreatedAt(rs.getTimestamp("created_at"));
+                q.setUpdatedAt(rs.getTimestamp("updated_at"));
+                list.add(q);
+            }
+        }
+        return list;
     }
 
     public Question selectById(Long id) throws SQLException {

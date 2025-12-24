@@ -60,7 +60,8 @@ public class WrongQuestionService {
             questions = DataStore.loadQuestions();
         }
         wrongIds.removeAll(hiddenIds);
-        return questions.stream().filter(q -> wrongIds.contains(q.getId())).collect(Collectors.toList());
+        Set<Long> finalWrongIds = wrongIds;
+        return questions.stream().filter(q -> finalWrongIds.contains(q.getId())).collect(Collectors.toList());
     }
 
     /**

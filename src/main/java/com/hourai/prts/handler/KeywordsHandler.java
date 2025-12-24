@@ -28,19 +28,22 @@ public class KeywordsHandler implements HttpHandler {
         String fullPath = exchange.getRequestURI().getPath() == null ? "" : exchange.getRequestURI().getPath();
         boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
         java.util.List<com.hourai.prts.entity.Question> all;
+        Path target;
         if (useOnboarding) {
+            target = DataStore.getQuestionsFile().resolveSibling("questions_onboarding.csv");
             try {
                 com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
                 all = questionService.getAllQuestionsByType(2);
             } catch (Exception dbEx) {
-                all = com.hourai.prts.data.DataStore.loadQuestions(DataStore.getQuestionsFile().resolveSibling("questions_onboarding.csv"));
+                all = com.hourai.prts.data.DataStore.loadQuestions(target);
             }
         } else {
+            target = DataStore.getQuestionsFile();
             try {
                 com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
                 all = questionService.getAllQuestions();
             } catch (Exception dbEx) {
-                all = com.hourai.prts.data.DataStore.loadQuestions(DataStore.getQuestionsFile());
+                all = com.hourai.prts.data.DataStore.loadQuestions(target);
             }
         }
 

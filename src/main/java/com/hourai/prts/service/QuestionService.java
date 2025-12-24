@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import java.util.List;
 
 public class QuestionService {
+        public List<Question> getAllQuestionsByType(int type) throws SQLException {
+            return questionDao.selectAllByType(type);
+        }
     private final QuestionDao questionDao = new QuestionDao();
 
     public int addQuestion(Question q) throws SQLException {

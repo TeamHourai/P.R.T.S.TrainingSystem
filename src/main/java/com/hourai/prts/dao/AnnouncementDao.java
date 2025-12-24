@@ -2,6 +2,8 @@ package com.hourai.prts.dao;
 
 import com.hourai.prts.entity.Announcement;
 import java.sql.*;
+import java.util.List;
+import java.util.ArrayList;
 
 public class AnnouncementDao {
     private final String url = "jdbc:mysql://localhost:3306/p.r.t.s?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true";

@@ -54,7 +54,7 @@
 ### 技术栈 / Tech Stack
 
 **后端 / Backend:**
-- **语言 / Language**: Java 21
+- **语言 / Language**: Java 17+ (recommended 21)
 - **框架 / Framework**: JDK HttpServer (lightweight, no external dependencies)
 - **数据存储 / Data Storage**: CSV files (local filesystem)
 - **端口 / Port**: 8080
@@ -82,9 +82,10 @@
 
 ### 前置要求 / Prerequisites
 
-1. **Java Development Kit (JDK) 21 or higher**
+1. **Java Development Kit (JDK) 17 or higher**
    - 下载 / Download: [Oracle JDK](https://www.oracle.com/java/technologies/downloads/) or [OpenJDK](https://openjdk.org/)
    - 验证安装 / Verify: `java -version`
+   - 注意 / Note: Maven 构建需要 JDK 21（如 pom.xml 中指定），但手动编译可使用 JDK 17+ / Maven build requires JDK 21 (as specified in pom.xml), but manual compilation works with JDK 17+
 
 2. **Node.js 14+ and npm 6+**
    - 下载 / Download: [Node.js Official Site](https://nodejs.org/)

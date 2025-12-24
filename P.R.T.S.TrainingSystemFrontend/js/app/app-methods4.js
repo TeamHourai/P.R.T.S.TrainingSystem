@@ -1,4 +1,30 @@
 window._appMethods4 = {
+    // ============ 分类折叠/展开（修复 toggleCategory 未定义报错）===========
+    toggleCategory(key) {
+        if (!this.categories) return;
+        const category = this.categories[key];
+        if (!category) return;
+
+        // 确保 isOpen 是响应式属性
+        if (!Object.prototype.hasOwnProperty.call(category, 'isOpen')) {
+            this.$set(category, 'isOpen', true);
+        } else {
+            category.isOpen = !category.isOpen;
+        }
+    },
+
+    toggleWrongCategory(key) {
+        if (!this.wrongCategories) return;
+        const category = this.wrongCategories[key];
+        if (!category) return;
+
+        if (!Object.prototype.hasOwnProperty.call(category, 'isOpen')) {
+            this.$set(category, 'isOpen', true);
+        } else {
+            category.isOpen = !category.isOpen;
+        }
+    },
+
     // ============ 题目导航、搜索、工具、通知等方法 ============
     prevQuestion() {
         // ...existing code...

@@ -11,9 +11,13 @@ public class WrongQuestionVisibilityDbDao {
     private final String password = "p.r.t.s.data115";
 
     public int upsert(WrongQuestionVisibility wqv) throws SQLException {
-        String table = DbCompat.tableExists("wrong_question_visibility") ? "wrong_question_visibility"
-                : (DbCompat.tableExists("wrong_visibility") ? "wrong_visibility" : "wrong_question_visibility");
-        String sql = "REPLACE INTO " + table + " (id, user_id, question_id, hidden, updated_at) VALUES (?, ?, ?, ?, ?)";
+        String table = DbCompat.tableExists("wrong_visibility") ? "wrong_visibility"
+            : (DbCompat.tableExists("wrong_question_visibility") ? "wrong_question_visibility" : "wrong_visibility");
+        String hiddenCol = DbCompat.columnExists(table, "hidden") ? "hidden"
+            : (DbCompat.columnExists(table, "visible") ? "visible" : "hidden");
+        String updatedAtCol = DbCompat.columnExists(table, "updated_at") ? "updated_at"
+            : (DbCompat.columnExists(table, "update_time") ? "update_time" : "updated_at");
+        String sql = "REPLACE INTO " + table + " (id, user_id, question_id, " + hiddenCol + ", " + updatedAtCol + ") VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, wqv.getId());
@@ -27,9 +31,13 @@ public class WrongQuestionVisibilityDbDao {
 
     public List<WrongQuestionVisibility> selectAll() throws SQLException {
         List<WrongQuestionVisibility> out = new ArrayList<>();
-        String table = DbCompat.tableExists("wrong_question_visibility") ? "wrong_question_visibility"
-            : (DbCompat.tableExists("wrong_visibility") ? "wrong_visibility" : "wrong_question_visibility");
-        String sql = "SELECT id, user_id, question_id, hidden, updated_at FROM " + table + " ORDER BY id";
+        String table = DbCompat.tableExists("wrong_visibility") ? "wrong_visibility"
+            : (DbCompat.tableExists("wrong_question_visibility") ? "wrong_question_visibility" : "wrong_visibility");
+        String hiddenCol = DbCompat.columnExists(table, "hidden") ? "hidden"
+                : (DbCompat.columnExists(table, "visible") ? "visible" : "hidden");
+        String updatedAtCol = DbCompat.columnExists(table, "updated_at") ? "updated_at"
+                : (DbCompat.columnExists(table, "update_time") ? "update_time" : "updated_at");
+        String sql = "SELECT id, user_id, question_id, " + hiddenCol + ", " + updatedAtCol + " FROM " + table + " ORDER BY id";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -37,8 +45,8 @@ public class WrongQuestionVisibilityDbDao {
                 long id = rs.getLong("id");
                 long userId = rs.getLong("user_id");
                 long questionId = rs.getLong("question_id");
-                boolean hidden = rs.getBoolean("hidden");
-                String updatedAt = rs.getString("updated_at");
+                boolean hidden = rs.getBoolean(hiddenCol);
+                String updatedAt = rs.getString(updatedAtCol);
                 out.add(new WrongQuestionVisibility(id, userId, questionId, hidden, updatedAt));
             }
         }
@@ -46,9 +54,13 @@ public class WrongQuestionVisibilityDbDao {
     }
 
     public WrongQuestionVisibility findByUserAndQuestion(long userId, long questionId) throws SQLException {
-        String table = DbCompat.tableExists("wrong_question_visibility") ? "wrong_question_visibility"
-            : (DbCompat.tableExists("wrong_visibility") ? "wrong_visibility" : "wrong_question_visibility");
-        String sql = "SELECT id, user_id, question_id, hidden, updated_at FROM " + table + " WHERE user_id = ? AND question_id = ? LIMIT 1";
+        String table = DbCompat.tableExists("wrong_visibility") ? "wrong_visibility"
+            : (DbCompat.tableExists("wrong_question_visibility") ? "wrong_question_visibility" : "wrong_visibility");
+        String hiddenCol = DbCompat.columnExists(table, "hidden") ? "hidden"
+                : (DbCompat.columnExists(table, "visible") ? "visible" : "hidden");
+        String updatedAtCol = DbCompat.columnExists(table, "updated_at") ? "updated_at"
+                : (DbCompat.columnExists(table, "update_time") ? "update_time" : "updated_at");
+        String sql = "SELECT id, user_id, question_id, " + hiddenCol + ", " + updatedAtCol + " FROM " + table + " WHERE user_id = ? AND question_id = ? LIMIT 1";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, userId);
@@ -56,8 +68,8 @@ public class WrongQuestionVisibilityDbDao {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     long id = rs.getLong("id");
-                    boolean hidden = rs.getBoolean("hidden");
-                    String updatedAt = rs.getString("updated_at");
+                    boolean hidden = rs.getBoolean(hiddenCol);
+                    String updatedAt = rs.getString(updatedAtCol);
                     return new WrongQuestionVisibility(id, userId, questionId, hidden, updatedAt);
                 }
             }
@@ -66,7 +78,9 @@ public class WrongQuestionVisibilityDbDao {
     }
 
     public long nextId() throws SQLException {
-        String sql = "SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM wrong_question_visibility";
+        String table = DbCompat.tableExists("wrong_visibility") ? "wrong_visibility"
+            : (DbCompat.tableExists("wrong_question_visibility") ? "wrong_question_visibility" : "wrong_visibility");
+        String sql = "SELECT COALESCE(MAX(id), 0) + 1 AS next_id FROM " + table;
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {

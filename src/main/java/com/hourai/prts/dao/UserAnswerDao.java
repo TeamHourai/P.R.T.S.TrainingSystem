@@ -115,10 +115,10 @@ public class UserAnswerDao {
                 ua.setId(rs.getLong("id"));
                 ua.setUserId(rs.getLong("user_id"));
                 ua.setQuestionId(rs.getLong("question_id"));
-                ua.setSelectedAnswer(readSelectedAnswer(rs));
-                ua.setCorrect(rs.getBoolean("is_correct"));
-                ua.setAnswerTime(rs.getInt("answer_time"));
-                ua.setCreatedAt(rs.getTimestamp("created_at"));
+                    ua.setSelectedAnswer(readSelectedAnswer(rs));
+                    ua.setCorrect(readCorrect(rs));
+                ua.setAnswerTime(readAnswerTime(rs));
+                ua.setCreatedAt(readCreatedAt(rs));
                 return ua;
             }
         }
@@ -136,15 +136,62 @@ public class UserAnswerDao {
                 ua.setId(rs.getLong("id"));
                 ua.setUserId(rs.getLong("user_id"));
                 ua.setQuestionId(rs.getLong("question_id"));
-                ua.setSelectedAnswer(readSelectedAnswer(rs));
-                ua.setCorrect(rs.getBoolean("is_correct"));
-                ua.setAnswerTime(rs.getInt("answer_time"));
-                ua.setCreatedAt(rs.getTimestamp("created_at"));
+                    ua.setSelectedAnswer(readSelectedAnswer(rs));
+                    ua.setCorrect(readCorrect(rs));
+                ua.setAnswerTime(readAnswerTime(rs));
+                ua.setCreatedAt(readCreatedAt(rs));
                 list.add(ua);
             }
         }
         return list;
     }
+        // Helper: read correctness flag from ResultSet trying multiple candidate column names.
+        private boolean readCorrect(ResultSet rs) {
+            try {
+                if (hasColumn(rs, "is_correct")) return rs.getBoolean("is_correct");
+                if (hasColumn(rs, "correct")) return rs.getBoolean("correct");
+                if (hasColumn(rs, "isCorrect")) return rs.getBoolean("isCorrect");
+            } catch (SQLException ignored) { }
+            return false;
+        }
+
+        // Helper: read answer time (may be stored as INT or as DATETIME/submit_time)
+        private Integer readAnswerTime(ResultSet rs) {
+            try {
+                if (hasColumn(rs, "answer_time")) {
+                    try {
+                        int v = rs.getInt("answer_time");
+                        if (rs.wasNull()) return null;
+                        return v;
+                    } catch (SQLException ex) {
+                        Object o = rs.getObject("answer_time");
+                        if (o instanceof Number) return ((Number) o).intValue();
+                        if (o instanceof String) {
+                            try { return Integer.parseInt((String)o); } catch (Exception ignored) { }
+                        }
+                        return null;
+                    }
+                }
+                if (hasColumn(rs, "submit_time")) {
+                    try {
+                        int v = rs.getInt("submit_time");
+                        if (!rs.wasNull()) return v;
+                    } catch (SQLException ex) {
+                        // submit_time may be DATETIME - not convertible to int
+                    }
+                }
+            } catch (SQLException ignored) { }
+            return null;
+        }
+
+        // Helper: read created timestamp from ResultSet using possible column names
+        private Timestamp readCreatedAt(ResultSet rs) {
+            try {
+                if (hasColumn(rs, "created_at")) return rs.getTimestamp("created_at");
+                if (hasColumn(rs, "submit_time")) return rs.getTimestamp("submit_time");
+            } catch (SQLException ignored) { }
+            return null;
+        }
 
     // Helper: try multiple candidate column names for selected answer to tolerate schema variations.
     private String readSelectedAnswer(ResultSet rs) {

@@ -84,8 +84,12 @@ public class QuestionsHandler implements HttpHandler {
         try {
             com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
             if (useOnboarding) {
-                // 约定type=2为onboarding题库
-                all = questionService.getAllQuestionsByType(2);
+                // fetch from onboarding table and map to Question for frontend compatibility
+                List<com.hourai.prts.entity.OnboardingQuestion> ons = questionService.getAllOnboardingQuestions();
+                all = new ArrayList<>();
+                for (com.hourai.prts.entity.OnboardingQuestion o : ons) {
+                    all.add(mapOnboardingToQuestion(o));
+                }
             } else {
                 all = questionService.getAllQuestions();
             }
@@ -131,10 +135,18 @@ public class QuestionsHandler implements HttpHandler {
         boolean useOnboarding = "onboarding".equalsIgnoreCase(mode) || fullPath.toLowerCase().contains("/training/");
         try {
             com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
-            Question qz = questionService.getQuestionById(id);
-            if (qz != null) {
-                Utils.send(exchange, 200, oneQuestionToJson(qz));
-                return;
+            if (useOnboarding) {
+                com.hourai.prts.entity.OnboardingQuestion oq = questionService.getOnboardingById((int) id);
+                if (oq != null) {
+                    Utils.send(exchange, 200, oneQuestionToJson(mapOnboardingToQuestion(oq)));
+                    return;
+                }
+            } else {
+                Question qz = questionService.getQuestionById(id);
+                if (qz != null) {
+                    Utils.send(exchange, 200, oneQuestionToJson(qz));
+                    return;
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -156,20 +168,30 @@ public class QuestionsHandler implements HttpHandler {
         // DB-only: no target file
 
         long newId = -1;
-        Question q = null;
         try {
             com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
-            // 获取最大id+1
-            List<Question> all = questionService.getAllQuestions();
-            newId = all.stream().mapToLong(qq -> qq.getId() == null ? 0 : qq.getId()).max().orElse(0L) + 1;
-            q = buildQuestionFromBody(newId, body);
-            questionService.addQuestion(q);
+            if (useOnboarding) {
+                // compute new id from onboarding table
+                List<com.hourai.prts.entity.OnboardingQuestion> allOn = questionService.getAllOnboardingQuestions();
+                int nid = allOn.stream().mapToInt(oo -> oo.getId() == null ? 0 : oo.getId()).max().orElse(0) + 1;
+                com.hourai.prts.entity.OnboardingQuestion oq = buildOnboardingFromBody(nid, body);
+                questionService.addOnboardingQuestion(oq);
+                Utils.send(exchange, 200, "{\"id\":" + nid + "}");
+                return;
+            } else {
+                // 获取最大id+1 from main questions
+                List<Question> all = questionService.getAllQuestions();
+                newId = all.stream().mapToLong(qq -> qq.getId() == null ? 0 : qq.getId()).max().orElse(0L) + 1;
+                Question q = buildQuestionFromBody(newId, body);
+                questionService.addQuestion(q);
+                Utils.send(exchange, 200, "{\"id\":" + newId + "}");
+                return;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             Utils.send(exchange, 500, "{\"error\":\"db error\"}");
             return;
         }
-        Utils.send(exchange, 200, "{\"id\":" + newId + "}");
     }
 
     private void handleUpdate(HttpExchange exchange, long id) throws IOException {
@@ -186,9 +208,15 @@ public class QuestionsHandler implements HttpHandler {
         boolean found = false;
         try {
             com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
-            Question q = buildQuestionFromBody(id, body);
-            int updated = questionService.updateQuestion(q);
-            if (updated > 0) found = true;
+            if (useOnboarding) {
+                com.hourai.prts.entity.OnboardingQuestion oq = buildOnboardingFromBody((int) id, body);
+                int updated = questionService.updateOnboardingQuestion(oq);
+                if (updated > 0) found = true;
+            } else {
+                Question q = buildQuestionFromBody(id, body);
+                int updated = questionService.updateQuestion(q);
+                if (updated > 0) found = true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             Utils.send(exchange, 500, "{\"error\":\"db error\"}");
@@ -209,8 +237,13 @@ public class QuestionsHandler implements HttpHandler {
         boolean foundDel = false;
         try {
             com.hourai.prts.service.QuestionService questionService = new com.hourai.prts.service.QuestionService();
-            int deleted = questionService.deleteQuestion(id);
-            if (deleted > 0) foundDel = true;
+            if (useOnboarding) {
+                int deleted = questionService.deleteOnboardingQuestion((int) id);
+                if (deleted > 0) foundDel = true;
+            } else {
+                int deleted = questionService.deleteQuestion(id);
+                if (deleted > 0) foundDel = true;
+            }
         } catch (Exception e) {
             e.printStackTrace();
             Utils.send(exchange, 500, "{\"error\":\"db error\"}");
@@ -405,6 +438,67 @@ public class QuestionsHandler implements HttpHandler {
         }
         q.setKeywords(kwRaw);
         return q;
+    }
+
+    // Map onboarding entity to Question for frontend compatibility
+    private static Question mapOnboardingToQuestion(com.hourai.prts.entity.OnboardingQuestion o) {
+        Question q = new Question();
+        q.setId(o.getId() == null ? null : (long) o.getId());
+        q.setType(o.getTypeId() == null ? 2 : o.getTypeId());
+        q.setDifficulty(1);
+        q.setCategory(null);
+        q.setResource(null);
+        q.setQuestion(o.getQuestion());
+        // onboarding.options may be stored as JSON array or pipe-separated; keep raw
+        String opts = o.getOptions() == null ? "" : o.getOptions();
+        q.setOptions(opts);
+        q.setAnswer(o.getAnswer());
+        q.setAnalysis(o.getAnalysis());
+        q.setHasPicture(o.getImageUrl() != null && !o.getImageUrl().isEmpty());
+        q.setPictureUrl(o.getImageUrl());
+        q.setViewCount(0);
+        q.setErrorCount(0);
+        return q;
+    }
+
+    private static com.hourai.prts.entity.OnboardingQuestion buildOnboardingFromBody(int id, Map<String, Object> body) {
+        com.hourai.prts.entity.OnboardingQuestion o = new com.hourai.prts.entity.OnboardingQuestion();
+        o.setId(id);
+        // group id
+        Object gv = body.get("group_id"); if (gv == null) gv = body.get("groupId"); if (gv == null) gv = body.get("group");
+        try { if (gv != null) o.setGroupId(Integer.parseInt(String.valueOf(gv))); } catch (Exception ignored) {}
+        // type id
+        Object tv = body.get("type_id"); if (tv == null) tv = body.get("typeId"); if (tv == null) tv = body.get("type");
+        try { if (tv != null) o.setTypeId(Integer.parseInt(String.valueOf(tv))); } catch (Exception ignored) {}
+        // image url
+        Object iv = body.get("image_url"); if (iv == null) iv = body.get("picture"); if (iv == null) iv = body.get("picture_url"); if (iv == null) iv = body.get("imageUrl");
+        if (iv != null) o.setImageUrl(String.valueOf(iv));
+        // question text
+        Object qv = body.get("question"); if (qv != null) o.setQuestion(String.valueOf(qv));
+        // is_multi
+        Object mv = body.get("is_multi"); if (mv == null) mv = body.get("isMulti"); if (mv == null) mv = body.get("multi");
+        if (mv != null) {
+            String s = String.valueOf(mv);
+            o.setIsMulti("1".equals(s) || "true".equalsIgnoreCase(s));
+        } else { o.setIsMulti(false); }
+        // options: array or individual fields
+        Object opts = body.get("options");
+        String optRaw = "";
+        if (opts instanceof List) {
+            //noinspection unchecked
+            optRaw = String.join("|", ((List<Object>) opts).stream().map(Object::toString).toArray(String[]::new));
+        } else {
+            String a = toStr(body.get("optA"));
+            String b = toStr(body.get("optB"));
+            String c = toStr(body.get("optC"));
+            String d = toStr(body.get("optD"));
+            if (!a.isEmpty() || !b.isEmpty() || !c.isEmpty() || !d.isEmpty()) optRaw = String.join("|", a, b, c, d);
+            else if (opts != null) optRaw = String.valueOf(opts);
+        }
+        o.setOptions(optRaw);
+        Object av = body.get("answer"); if (av != null) o.setAnswer(String.valueOf(av));
+        Object an = body.get("analysis"); if (an != null) o.setAnalysis(String.valueOf(an));
+        return o;
     }
 
     private static boolean toBool(Object v) {

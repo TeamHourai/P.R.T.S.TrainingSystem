@@ -54,18 +54,63 @@ public class ExamRecordDao {
     private final String password = "p.r.t.s.data115";
 
     public int insert(ExamRecord er) throws SQLException {
-        String sql = "INSERT INTO exam_records (user_id, exam_name, total_questions, correct_count, score, duration) VALUES (?, ?, ?, ?, ?, ?)";
+        // Build insert dynamically to tolerate schema differences (exam_name vs exam_id etc.)
+        java.util.List<String> cols = new java.util.ArrayList<>();
+        java.util.List<Object> vals = new java.util.ArrayList<>();
+        // Handle id column: if id exists but is not auto-increment and not nullable, generate id when missing
+        boolean idExists = DbCompat.columnExists("exam_records", "id");
+        boolean includeId = er.getId() != null;
+        if (!includeId && idExists && !DbCompat.isAutoIncrement("exam_records", "id") && !DbCompat.isNullable("exam_records", "id")) {
+            try (Connection conn = DriverManager.getConnection(url, user, password);
+                 Statement st = conn.createStatement();
+                 ResultSet rs = st.executeQuery("SELECT COALESCE(MAX(id),0)+1 AS nid FROM exam_records")) {
+                if (rs.next()) {
+                    long nid = rs.getLong("nid");
+                    er.setId(nid);
+                    includeId = true;
+                }
+            }
+        }
+        if (includeId && idExists) { cols.add("id"); vals.add(er.getId()); }
+        if (DbCompat.columnExists("exam_records", "user_id")) { cols.add("user_id"); vals.add(er.getUserId()); }
+        if (DbCompat.columnExists("exam_records", "exam_name")) { cols.add("exam_name"); vals.add(er.getExamName()); }
+        else if (DbCompat.columnExists("exam_records", "exam_id")) {
+            Long examIdVal = null;
+            if (er.getExamName() != null) {
+                try {
+                    examIdVal = Long.parseLong(er.getExamName());
+                } catch (Exception ignored) {
+                    examIdVal = null; // tolerate non-numeric examName
+                }
+            }
+            cols.add("exam_id"); vals.add(examIdVal);
+        }
+        if (DbCompat.columnExists("exam_records", "total_questions")) { cols.add("total_questions"); vals.add(er.getTotalQuestions()); }
+        if (DbCompat.columnExists("exam_records", "correct_count")) { cols.add("correct_count"); vals.add(er.getCorrectCount()); }
+        if (DbCompat.columnExists("exam_records", "score")) { cols.add("score"); vals.add(er.getScore()); }
+        if (DbCompat.columnExists("exam_records", "duration")) { cols.add("duration"); vals.add(er.getDuration()); }
+
+        if (cols.isEmpty()) {
+            throw new SQLException("No writable columns detected in exam_records");
+        }
+
+        StringBuilder colSb = new StringBuilder();
+        StringBuilder phSb = new StringBuilder();
+        for (int i = 0; i < cols.size(); i++) {
+            if (i > 0) { colSb.append(", "); phSb.append(", "); }
+            colSb.append(cols.get(i)); phSb.append("?");
+        }
+        String sql = "INSERT INTO exam_records (" + colSb.toString() + ") VALUES (" + phSb.toString() + ")";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setLong(1, er.getUserId());
-            ps.setString(2, er.getExamName());
-            ps.setInt(3, er.getTotalQuestions());
-            ps.setInt(4, er.getCorrectCount());
-            ps.setBigDecimal(5, er.getScore());
-            if (er.getDuration() != null) {
-                ps.setInt(6, er.getDuration());
-            } else {
-                ps.setNull(6, Types.INTEGER);
+            for (int i = 0; i < vals.size(); i++) {
+                Object v = vals.get(i);
+                int idx = i + 1;
+                if (v == null) { ps.setNull(idx, Types.NULL); continue; }
+                if (v instanceof Long) ps.setLong(idx, (Long) v);
+                else if (v instanceof Integer) ps.setInt(idx, (Integer) v);
+                else if (v instanceof java.math.BigDecimal) ps.setBigDecimal(idx, (java.math.BigDecimal) v);
+                else ps.setString(idx, String.valueOf(v));
             }
             int rows = ps.executeUpdate();
             try (ResultSet gk = ps.getGeneratedKeys()) {

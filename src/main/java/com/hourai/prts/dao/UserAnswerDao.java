@@ -53,52 +53,85 @@ public class UserAnswerDao {
     private final String password = "p.r.t.s.data115";
 
     public int insert(UserAnswer ua) throws SQLException {
-        // Determine column names to use based on DB schema
-        String selCol = DbCompat.columnExists("user_answers", "selected_answer") ? "selected_answer"
-                : (DbCompat.columnExists("user_answers", "answer") ? "answer" : "selected_answer");
-        String correctCol = DbCompat.columnExists("user_answers", "is_correct") ? "is_correct"
-                : (DbCompat.columnExists("user_answers", "correct") ? "correct" : "is_correct");
-        String answerTimeCol = DbCompat.columnExists("user_answers", "answer_time") ? "answer_time"
-                : (DbCompat.columnExists("user_answers", "submit_time") ? "submit_time" : "answer_time");
-        String createdAtCol = DbCompat.columnExists("user_answers", "created_at") ? "created_at"
-                : (DbCompat.columnExists("user_answers", "submit_time") ? "submit_time" : "created_at");
+        // Build insert dynamically based on which columns actually exist to tolerate schema differences
+        java.util.List<String> cols = new java.util.ArrayList<>();
+        java.util.List<Object> vals = new java.util.ArrayList<>();
+        boolean includeId = ua.getId() != null;
 
-        // If explicit id provided
-        if (ua.getId() != null) {
-            String sqlWithId = String.format("INSERT INTO user_answers (id, user_id, question_id, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?, ?)",
-                    selCol, correctCol, answerTimeCol, createdAtCol);
+        // If id column exists but is not auto-increment and not nullable, we must generate an id when not provided.
+        boolean idExists = DbCompat.columnExists("user_answers", "id");
+        if (!includeId && idExists && !DbCompat.isAutoIncrement("user_answers", "id") && !DbCompat.isNullable("user_answers", "id")) {
             try (Connection conn = DriverManager.getConnection(url, user, password);
-                 PreparedStatement ps = conn.prepareStatement(sqlWithId)) {
-                ps.setLong(1, ua.getId());
-                ps.setLong(2, ua.getUserId());
-                ps.setLong(3, ua.getQuestionId());
-                ps.setString(4, ua.getSelectedAnswer());
-                ps.setBoolean(5, ua.isCorrect());
-                if (ua.getAnswerTime() != null) ps.setInt(6, ua.getAnswerTime());
-                else ps.setNull(6, Types.INTEGER);
-                if (ua.getCreatedAt() != null) ps.setTimestamp(7, ua.getCreatedAt());
-                else ps.setNull(7, Types.TIMESTAMP);
-                return ps.executeUpdate();
+                 Statement st = conn.createStatement();
+                 ResultSet rs = st.executeQuery("SELECT COALESCE(MAX(id),0)+1 AS nid FROM user_answers")) {
+                if (rs.next()) {
+                    long nid = rs.getLong("nid");
+                    ua.setId(nid);
+                    includeId = true;
+                }
             }
         }
 
-        String sql = String.format("INSERT INTO user_answers (user_id, question_id, %s, %s, %s, %s) VALUES (?, ?, ?, ?, ?, ?)",
-                selCol, correctCol, answerTimeCol, createdAtCol);
+        if (includeId) { cols.add("id"); vals.add(ua.getId()); }
+        cols.add("user_id"); vals.add(ua.getUserId());
+        cols.add("question_id"); vals.add(ua.getQuestionId());
+
+        // selected answer
+        String selCol = DbCompat.columnExists("user_answers", "selected_answer") ? "selected_answer"
+                : (DbCompat.columnExists("user_answers", "selected_option") ? "selected_option"
+                : (DbCompat.columnExists("user_answers", "selected") ? "selected" : null));
+        if (selCol != null) { cols.add(selCol); vals.add(ua.getSelectedAnswer()); }
+
+        // correctness
+        String correctCol = DbCompat.columnExists("user_answers", "is_correct") ? "is_correct"
+                : (DbCompat.columnExists("user_answers", "correct") ? "correct" : null);
+        if (correctCol != null) { cols.add(correctCol); vals.add(ua.isCorrect()); }
+
+        // answer time
+        String answerTimeCol = DbCompat.columnExists("user_answers", "answer_time") ? "answer_time"
+                : (DbCompat.columnExists("user_answers", "submit_time") ? "submit_time" : null);
+        if (answerTimeCol != null) { cols.add(answerTimeCol); vals.add(ua.getAnswerTime()); }
+
+        // created / submit timestamp
+        String createdAtCol = DbCompat.columnExists("user_answers", "created_at") ? "created_at"
+                : (DbCompat.columnExists("user_answers", "submit_time") ? "submit_time" : null);
+        if (createdAtCol != null) { cols.add(createdAtCol); vals.add(ua.getCreatedAt()); }
+
+        if (cols.size() < 3) {
+            // unexpected schema: fallback to simple insert with minimal columns
+            String sql = "INSERT INTO user_answers (user_id, question_id) VALUES (?, ?)";
+            try (Connection conn = DriverManager.getConnection(url, user, password);
+                 PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+                ps.setLong(1, ua.getUserId());
+                ps.setLong(2, ua.getQuestionId());
+                int rows = ps.executeUpdate();
+                try (ResultSet gk = ps.getGeneratedKeys()) { if (gk != null && gk.next()) ua.setId(gk.getLong(1)); }
+                return rows;
+            }
+        }
+
+        StringBuilder colSb = new StringBuilder();
+        StringBuilder phSb = new StringBuilder();
+        for (int i = 0; i < cols.size(); i++) {
+            if (i > 0) { colSb.append(", "); phSb.append(", "); }
+            colSb.append(cols.get(i)); phSb.append("?");
+        }
+        String sql = "INSERT INTO user_answers (" + colSb.toString() + ") VALUES (" + phSb.toString() + ")";
         try (Connection conn = DriverManager.getConnection(url, user, password);
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setLong(1, ua.getUserId());
-            ps.setLong(2, ua.getQuestionId());
-            ps.setString(3, ua.getSelectedAnswer());
-            ps.setBoolean(4, ua.isCorrect());
-            if (ua.getAnswerTime() != null) ps.setInt(5, ua.getAnswerTime());
-            else ps.setNull(5, Types.INTEGER);
-            if (ua.getCreatedAt() != null) ps.setTimestamp(6, ua.getCreatedAt());
-            else ps.setNull(6, Types.TIMESTAMP);
+            for (int i = 0; i < vals.size(); i++) {
+                Object v = vals.get(i);
+                int idx = i + 1;
+                if (v == null) { ps.setNull(idx, Types.NULL); continue; }
+                if (v instanceof Long) ps.setLong(idx, (Long) v);
+                else if (v instanceof Integer) ps.setInt(idx, (Integer) v);
+                else if (v instanceof Boolean) ps.setBoolean(idx, (Boolean) v);
+                else if (v instanceof Timestamp) ps.setTimestamp(idx, (Timestamp) v);
+                else ps.setString(idx, String.valueOf(v));
+            }
             int rows = ps.executeUpdate();
             try (ResultSet gk = ps.getGeneratedKeys()) {
-                if (gk != null && gk.next()) {
-                    ua.setId(gk.getLong(1));
-                }
+                if (gk != null && gk.next()) ua.setId(gk.getLong(1));
             }
             return rows;
         }

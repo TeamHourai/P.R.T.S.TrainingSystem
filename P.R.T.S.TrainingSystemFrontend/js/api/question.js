@@ -51,12 +51,12 @@
         q.analysis = (q.analysis === undefined || q.analysis === null) ? '' : String(q.analysis);
         q.resource = (q.resource === undefined || q.resource === null) ? '' : String(q.resource);
 
-        // options 可能为字符串（"A|B|C|D"）或数组；统一为数组
+        // options 可能为字符串（"A|B|C|D" 或 "A¦B¦C¦D"）或数组；统一为数组
         if (Array.isArray(q.options)) {
             q.options = q.options.map(o => o === null || o === undefined ? '' : String(o));
         } else if (typeof q.options === 'string') {
-            if (q.options.indexOf('|') !== -1) {
-                q.options = q.options.split('|').map(s => s.trim());
+            if (q.options.indexOf('|') !== -1 || q.options.indexOf('¦') !== -1) {
+                q.options = q.options.split(/[|¦]/).map(s => s.trim());
             } else {
                 try {
                     const parsed = JSON.parse(q.options);

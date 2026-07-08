@@ -7,7 +7,7 @@
         // 系统信息
         SYSTEM: {
             NAME: '博士业务能力考核系统',
-            VERSION: '2.0.0',
+            VERSION: '2.1.0',
             DESCRIPTION: '明日方舟博士业务能力考核平台',
             AUTHOR: '罗德岛制药',
             COPYRIGHT: '© 2025 罗德岛制药',
@@ -19,10 +19,10 @@
             // 后端API地址
             BASE_URL: getApiBaseUrl(),
 
-            // API版本：针对当前后端设为空（后端已同时支持 /api 与无前缀）
-            VERSION: '',
+            // API版本：v1 (匹配后端 /api/v1 前缀)
+            VERSION: 'v1',
 
-            // API前缀：可为 'api' 或 ''，但实际请求中会使用 FULL_BASE_URL + endpoint
+            // API前缀
             PREFIX: 'api',
 
             // 完整API路径（改为更稳健的拼接方式）

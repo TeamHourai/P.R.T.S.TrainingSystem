@@ -1,48 +1,47 @@
 package com.hourai.prts.entity;
 
-import java.sql.Timestamp;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "user_answers")
 public class UserAnswer {
-    public UserAnswer(Long id, Long userId, Long questionId, String questionType, boolean isCorrect, int selected, String answeredAt) {
-      this.id = id;
-      this.userId = userId;
-      this.questionId = questionId;
-      this.selectedAnswer = String.valueOf(selected);
-      this.isCorrect = isCorrect;
-      try {
-        this.createdAt = java.sql.Timestamp.valueOf(answeredAt);
-      } catch (Exception e) {
-        this.createdAt = null;
-      }
-    }
-  private Long id;
-  private Long userId;
-  private Long questionId;
-  private String selectedAnswer;
-  private boolean isCorrect;
-  private Integer answerTime;
-  private Timestamp createdAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  public UserAnswer() {}
+    @Column(name = "user_id", nullable = false)
+    private Long userId;
 
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+    @Column(name = "question_id", nullable = false)
+    private Long questionId;
 
-  public Long getUserId() { return userId; }
-  public void setUserId(Long userId) { this.userId = userId; }
+    @Column(name = "selected_answer", length = 255)
+    private String selectedAnswer;
 
-  public Long getQuestionId() { return questionId; }
-  public void setQuestionId(Long questionId) { this.questionId = questionId; }
+    @Column(name = "is_correct", nullable = false)
+    private Boolean isCorrect = false;
 
-  public String getSelectedAnswer() { return selectedAnswer; }
-  public void setSelectedAnswer(String selectedAnswer) { this.selectedAnswer = selectedAnswer; }
+    @Column(name = "answer_time")
+    private Integer answerTime;
 
-  public boolean isCorrect() { return isCorrect; }
-  public void setCorrect(boolean correct) { isCorrect = correct; }
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-  public Integer getAnswerTime() { return answerTime; }
-  public void setAnswerTime(Integer answerTime) { this.answerTime = answerTime; }
+    public UserAnswer() {}
 
-  public Timestamp getCreatedAt() { return createdAt; }
-  public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getUserId() { return userId; }
+    public void setUserId(Long userId) { this.userId = userId; }
+    public Long getQuestionId() { return questionId; }
+    public void setQuestionId(Long questionId) { this.questionId = questionId; }
+    public String getSelectedAnswer() { return selectedAnswer; }
+    public void setSelectedAnswer(String selectedAnswer) { this.selectedAnswer = selectedAnswer; }
+    public Boolean getIsCorrect() { return isCorrect; }
+    public void setIsCorrect(Boolean isCorrect) { this.isCorrect = isCorrect; }
+    public Integer getAnswerTime() { return answerTime; }
+    public void setAnswerTime(Integer answerTime) { this.answerTime = answerTime; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
 }

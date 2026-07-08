@@ -13,7 +13,7 @@
         }
         // basic normalization similar to question.js
         q = q || {};
-        q.options = Array.isArray(q.options) ? q.options : (typeof q.options === 'string' ? q.options.split('|') : []);
+        q.options = Array.isArray(q.options) ? q.options : (typeof q.options === 'string' ? q.options.split(/[|¦]/) : []);
         while (q.options.length < 4) q.options.push('');
         q.answer = q.answer ? parseInt(q.answer) : 0;
         q.type = q.type ? Number(q.type) : 0;

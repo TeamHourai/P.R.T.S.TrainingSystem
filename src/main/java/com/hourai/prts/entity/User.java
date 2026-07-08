@@ -1,61 +1,78 @@
 package com.hourai.prts.entity;
 
-import java.sql.Timestamp;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "users")
 public class User {
-    public User(Long id, String username, String password, boolean isAdmin, String createdAt) {
-      this.id = id;
-      this.username = username;
-      this.password = password;
-      this.isAdmin = isAdmin;
-      // createdAt 字段类型为 Timestamp，需转换
-      try {
-        this.createdAt = java.sql.Timestamp.valueOf(createdAt);
-      } catch (Exception e) {
-        this.createdAt = null;
-      }
-    }
-  private Long id;
-  private String username;
-  private String password;
-  private String nickname;
-  private String avatar;
-  private String email;
-  private boolean isAdmin;
-  private boolean status;
-  private Timestamp createdAt;
-  private Timestamp updatedAt;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  public User() {}
+    @Column(nullable = false, unique = true, length = 50)
+    private String username;
 
-  // getter/setter
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+    @Column(nullable = false, length = 255)
+    private String password;
 
-  public String getUsername() { return username; }
-  public void setUsername(String username) { this.username = username; }
+    @Column(length = 50)
+    private String nickname;
 
-  public String getPassword() { return password; }
-  public void setPassword(String password) { this.password = password; }
+    @Column(length = 255)
+    private String avatar;
 
-  public String getNickname() { return nickname; }
-  public void setNickname(String nickname) { this.nickname = nickname; }
+    @Column(length = 100)
+    private String email;
 
-  public String getAvatar() { return avatar; }
-  public void setAvatar(String avatar) { this.avatar = avatar; }
+    @Column(name = "is_admin", nullable = false)
+    private Boolean isAdmin = false;
 
-  public String getEmail() { return email; }
-  public void setEmail(String email) { this.email = email; }
+    @Column(nullable = false)
+    private Boolean status = true;
 
-  public boolean isAdmin() { return isAdmin; }
-  public void setAdmin(boolean admin) { isAdmin = admin; }
+    @Column(name = "register_time")
+    private LocalDateTime registerTime;
 
-  public boolean isStatus() { return status; }
-  public void setStatus(boolean status) { this.status = status; }
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-  public Timestamp getCreatedAt() { return createdAt; }
-  public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-  public Timestamp getUpdatedAt() { return updatedAt; }
-  public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
+    public User() {}
+
+    // Getters and Setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+
+    public String getUsername() { return username; }
+    public void setUsername(String username) { this.username = username; }
+
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
+
+    public String getNickname() { return nickname; }
+    public void setNickname(String nickname) { this.nickname = nickname; }
+
+    public String getAvatar() { return avatar; }
+    public void setAvatar(String avatar) { this.avatar = avatar; }
+
+    public String getEmail() { return email; }
+    public void setEmail(String email) { this.email = email; }
+
+    public Boolean getIsAdmin() { return isAdmin; }
+    public void setIsAdmin(Boolean isAdmin) { this.isAdmin = isAdmin; }
+
+    public Boolean getStatus() { return status; }
+    public void setStatus(Boolean status) { this.status = status; }
+
+    public LocalDateTime getRegisterTime() { return registerTime; }
+    public void setRegisterTime(LocalDateTime registerTime) { this.registerTime = registerTime; }
+
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

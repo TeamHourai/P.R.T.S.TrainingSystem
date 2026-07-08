@@ -1,83 +1,92 @@
 package com.hourai.prts.entity;
 
-import java.sql.Timestamp;
+import jakarta.persistence.*;
+import java.time.LocalDateTime;
 
+@Entity
+@Table(name = "questions")
 public class Question {
-    public Question(Long id, int type, int difficulty, String resource, String question, boolean hasPicture, java.util.List<String> options, int answer, String analysis) {
-      this.id = id;
-      this.type = type;
-      this.difficulty = difficulty;
-      this.resource = resource;
-      this.question = question;
-      this.hasPicture = hasPicture;
-      this.options = String.join("|", options);
-      this.answer = String.valueOf(answer);
-      this.analysis = analysis;
-    }
-  private Long id;
-  private int type;
-  private int difficulty;
-  private String category;
-  private String resource;
-  private String question;
-  private String options; // JSON 字符串
-  private String answer;
-  private String analysis;
-  private boolean hasPicture;
-  private String pictureUrl;
-  private int viewCount;
-  private int errorCount;
-  private Timestamp createdAt;
-  private Timestamp updatedAt;
-  private String keywords; // stored as pipe-separated string (e.g., "kw1|kw2")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-  public Question() {}
+    @Column(nullable = false)
+    private Integer type = 1;
 
-  public Long getId() { return id; }
-  public void setId(Long id) { this.id = id; }
+    @Column(nullable = false)
+    private Integer difficulty = 1;
 
-  public int getType() { return type; }
-  public void setType(int type) { this.type = type; }
+    @Column(length = 50)
+    private String category;
 
-  public int getDifficulty() { return difficulty; }
-  public void setDifficulty(int difficulty) { this.difficulty = difficulty; }
+    @Column(length = 255)
+    private String resource;
 
-  public String getCategory() { return category; }
-  public void setCategory(String category) { this.category = category; }
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String question;
 
-  public String getResource() { return resource; }
-  public void setResource(String resource) { this.resource = resource; }
+    @Column(nullable = false, columnDefinition = "TEXT")
+    private String options;
 
-  public String getQuestion() { return question; }
-  public void setQuestion(String question) { this.question = question; }
+    @Column(nullable = false, length = 255)
+    private String answer;
 
-  public String getOptions() { return options; }
-  public void setOptions(String options) { this.options = options; }
+    @Column(columnDefinition = "TEXT")
+    private String analysis;
 
-  public String getAnswer() { return answer; }
-  public void setAnswer(String answer) { this.answer = answer; }
+    @Column(name = "has_picture")
+    private Boolean hasPicture = false;
 
-  public String getAnalysis() { return analysis; }
-  public void setAnalysis(String analysis) { this.analysis = analysis; }
+    @Column(name = "picture_url", length = 255)
+    private String pictureUrl;
 
-  public boolean isHasPicture() { return hasPicture; }
-  public void setHasPicture(boolean hasPicture) { this.hasPicture = hasPicture; }
+    @Column(name = "view_count")
+    private Integer viewCount = 0;
 
-  public String getPictureUrl() { return pictureUrl; }
-  public void setPictureUrl(String pictureUrl) { this.pictureUrl = pictureUrl; }
+    @Column(name = "error_count")
+    private Integer errorCount = 0;
 
-  public int getViewCount() { return viewCount; }
-  public void setViewCount(int viewCount) { this.viewCount = viewCount; }
+    @Column(length = 500)
+    private String keywords;
 
-  public int getErrorCount() { return errorCount; }
-  public void setErrorCount(int errorCount) { this.errorCount = errorCount; }
+    @Column(name = "created_at")
+    private LocalDateTime createdAt;
 
-  public Timestamp getCreatedAt() { return createdAt; }
-  public void setCreatedAt(Timestamp createdAt) { this.createdAt = createdAt; }
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
 
-  public Timestamp getUpdatedAt() { return updatedAt; }
-  public void setUpdatedAt(Timestamp updatedAt) { this.updatedAt = updatedAt; }
+    public Question() {}
 
-  public String getKeywords() { return keywords; }
-  public void setKeywords(String keywords) { this.keywords = keywords; }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Integer getType() { return type; }
+    public void setType(Integer type) { this.type = type; }
+    public Integer getDifficulty() { return difficulty; }
+    public void setDifficulty(Integer difficulty) { this.difficulty = difficulty; }
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+    public String getResource() { return resource; }
+    public void setResource(String resource) { this.resource = resource; }
+    public String getQuestion() { return question; }
+    public void setQuestion(String question) { this.question = question; }
+    public String getOptions() { return options; }
+    public void setOptions(String options) { this.options = options; }
+    public String getAnswer() { return answer; }
+    public void setAnswer(String answer) { this.answer = answer; }
+    public String getAnalysis() { return analysis; }
+    public void setAnalysis(String analysis) { this.analysis = analysis; }
+    public Boolean getHasPicture() { return hasPicture; }
+    public void setHasPicture(Boolean hasPicture) { this.hasPicture = hasPicture; }
+    public String getPictureUrl() { return pictureUrl; }
+    public void setPictureUrl(String pictureUrl) { this.pictureUrl = pictureUrl; }
+    public Integer getViewCount() { return viewCount; }
+    public void setViewCount(Integer viewCount) { this.viewCount = viewCount; }
+    public Integer getErrorCount() { return errorCount; }
+    public void setErrorCount(Integer errorCount) { this.errorCount = errorCount; }
+    public String getKeywords() { return keywords; }
+    public void setKeywords(String keywords) { this.keywords = keywords; }
+    public LocalDateTime getCreatedAt() { return createdAt; }
+    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public LocalDateTime getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(LocalDateTime updatedAt) { this.updatedAt = updatedAt; }
 }

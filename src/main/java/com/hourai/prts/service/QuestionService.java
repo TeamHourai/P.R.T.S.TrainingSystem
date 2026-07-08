@@ -1,62 +1,156 @@
 package com.hourai.prts.service;
 
-import com.hourai.prts.dao.OnboardingQuestionDao;
-import com.hourai.prts.dao.QuestionDao;
+import com.hourai.prts.dto.QuestionDTO;
 import com.hourai.prts.entity.OnboardingQuestion;
 import com.hourai.prts.entity.Question;
-import java.sql.SQLException;
-import java.util.List;
+import com.hourai.prts.repository.OnboardingQuestionRepository;
+import com.hourai.prts.repository.QuestionRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
+
+@Service
 public class QuestionService {
-    private final QuestionDao questionDao = new QuestionDao();
-    private final OnboardingQuestionDao onboardingDao = new OnboardingQuestionDao();
+    private final QuestionRepository questionRepository;
+    private final OnboardingQuestionRepository onboardingRepository;
 
-    public List<Question> getAllQuestionsByType(int type) throws SQLException {
-        return questionDao.selectAllByType(type);
+    public QuestionService(QuestionRepository questionRepository, OnboardingQuestionRepository onboardingRepository) {
+        this.questionRepository = questionRepository;
+        this.onboardingRepository = onboardingRepository;
     }
 
-    public int addQuestion(Question q) throws SQLException {
-        return questionDao.insert(q);
+    // ===== Questions =====
+    public List<Question> getAllQuestions() {
+        return questionRepository.findAll();
     }
 
-    public Question getQuestionById(Long id) throws SQLException {
-        return questionDao.selectById(id);
+    public Optional<Question> getQuestionById(Long id) {
+        return questionRepository.findById(id);
     }
 
-    public List<Question> getAllQuestions() throws SQLException {
-        return questionDao.selectAll();
+    public List<Question> getFilteredQuestions(Integer type, Integer difficulty, String keyword) {
+        List<Question> all = questionRepository.findAll();
+        return all.stream()
+            .filter(q -> type == null || q.getType().equals(type))
+            .filter(q -> difficulty == null || q.getDifficulty().equals(difficulty))
+            .filter(q -> {
+                if (keyword == null || keyword.isEmpty()) return true;
+                String kl = keyword.toLowerCase();
+                if (q.getKeywords() != null && q.getKeywords().toLowerCase().contains(kl)) return true;
+                return q.getQuestion() != null && q.getQuestion().toLowerCase().contains(kl);
+            })
+            .collect(Collectors.toList());
     }
 
-    public int updateQuestion(Question q) throws SQLException {
-        return questionDao.update(q);
+    @Transactional
+    public Question addQuestion(Question q) {
+        q.setCreatedAt(LocalDateTime.now());
+        return questionRepository.save(q);
     }
 
-    public int deleteQuestion(Long id) throws SQLException {
-        return questionDao.delete(id);
+    @Transactional
+    public Question updateQuestion(Long id, Question updated) {
+        Question q = questionRepository.findById(id).orElseThrow();
+        q.setType(updated.getType());
+        q.setDifficulty(updated.getDifficulty());
+        q.setCategory(updated.getCategory());
+        q.setResource(updated.getResource());
+        q.setQuestion(updated.getQuestion());
+        q.setOptions(updated.getOptions());
+        q.setAnswer(updated.getAnswer());
+        q.setAnalysis(updated.getAnalysis());
+        q.setHasPicture(updated.getHasPicture());
+        q.setPictureUrl(updated.getPictureUrl());
+        q.setKeywords(updated.getKeywords());
+        q.setUpdatedAt(LocalDateTime.now());
+        return questionRepository.save(q);
     }
 
-    // --- Onboarding-specific APIs (separate handling) ---
-    public List<OnboardingQuestion> getAllOnboardingQuestions() throws SQLException {
-        return onboardingDao.selectAll();
+    @Transactional
+    public void deleteQuestion(Long id) {
+        questionRepository.deleteById(id);
     }
 
-    public List<OnboardingQuestion> getOnboardingByGroup(int groupId) throws SQLException {
-        return onboardingDao.selectByGroupId(groupId);
+    @Transactional
+    public void batchDelete(List<Long> ids) {
+        questionRepository.deleteAllById(ids);
     }
 
-    public OnboardingQuestion getOnboardingById(int id) throws SQLException {
-        return onboardingDao.selectById(id);
+    // ===== Onboarding Questions =====
+    public List<OnboardingQuestion> getAllOnboardingQuestions() {
+        return onboardingRepository.findAll();
     }
 
-    public int addOnboardingQuestion(OnboardingQuestion q) throws SQLException {
-        return onboardingDao.insert(q);
+    public Optional<OnboardingQuestion> getOnboardingById(Integer id) {
+        return onboardingRepository.findById(id);
     }
 
-    public int updateOnboardingQuestion(OnboardingQuestion q) throws SQLException {
-        return onboardingDao.update(q);
+    @Transactional
+    public OnboardingQuestion addOnboardingQuestion(OnboardingQuestion q) {
+        return onboardingRepository.save(q);
     }
 
-    public int deleteOnboardingQuestion(int id) throws SQLException {
-        return onboardingDao.delete(id);
+    @Transactional
+    public OnboardingQuestion updateOnboardingQuestion(Integer id, OnboardingQuestion updated) {
+        OnboardingQuestion q = onboardingRepository.findById(id).orElseThrow();
+        q.setGroupId(updated.getGroupId());
+        q.setTypeId(updated.getTypeId());
+        q.setImageUrl(updated.getImageUrl());
+        q.setQuestion(updated.getQuestion());
+        q.setIsMulti(updated.getIsMulti());
+        q.setOptions(updated.getOptions());
+        q.setAnswer(updated.getAnswer());
+        q.setAnalysis(updated.getAnalysis());
+        return onboardingRepository.save(q);
+    }
+
+    @Transactional
+    public void deleteOnboardingQuestion(Integer id) {
+        onboardingRepository.deleteById(id);
+    }
+
+    // ===== DTO Conversion =====
+    public static QuestionDTO toDTO(Question q) {
+        QuestionDTO dto = new QuestionDTO();
+        dto.setId(q.getId());
+        dto.setType(q.getType());
+        dto.setDifficulty(q.getDifficulty());
+        dto.setCategory(q.getCategory());
+        dto.setResource(q.getResource());
+        dto.setQuestion(q.getQuestion());
+        dto.setPicture(q.getHasPicture());
+        dto.setPictureUrl(q.getHasPicture() != null && q.getHasPicture()
+                ? "/images/" + q.getId() + ".png" : q.getPictureUrl());
+        dto.setOptions(q.getOptions() != null ? Arrays.asList(q.getOptions().split("\\|")) : List.of());
+        dto.setAnswer(q.getAnswer() != null ? Integer.parseInt(q.getAnswer()) : 0);
+        dto.setAnalysis(q.getAnalysis());
+        dto.setKeywords(q.getKeywords() != null ? Arrays.asList(q.getKeywords().split("\\|")) : List.of());
+        dto.setViewCount(q.getViewCount());
+        dto.setErrorCount(q.getErrorCount());
+        dto.setCreatedAt(q.getCreatedAt());
+        dto.setUpdatedAt(q.getUpdatedAt());
+        return dto;
+    }
+
+    public static QuestionDTO toDTOFromOnboarding(OnboardingQuestion o) {
+        QuestionDTO dto = new QuestionDTO();
+        dto.setId(o.getId() != null ? o.getId().longValue() : null);
+        dto.setType(o.getTypeId());
+        dto.setDifficulty(1);
+        dto.setQuestion(o.getQuestion());
+        boolean hasPic = o.getImageUrl() != null && !o.getImageUrl().isEmpty();
+        dto.setPicture(hasPic);
+        dto.setPictureUrl(hasPic ? "/images/" + o.getId() + ".png" : o.getImageUrl());
+        dto.setOptions(o.getOptions() != null ? Arrays.asList(o.getOptions().split("\\|")) : List.of());
+        dto.setAnswer(o.getAnswer() != null ? Integer.parseInt(o.getAnswer()) : 0);
+        dto.setAnalysis(o.getAnalysis());
+        dto.setKeywords(List.of());
+        dto.setViewCount(0);
+        dto.setErrorCount(0);
+        return dto;
     }
 }

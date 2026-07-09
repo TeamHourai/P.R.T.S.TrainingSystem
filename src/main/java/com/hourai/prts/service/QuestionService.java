@@ -40,6 +40,10 @@ public class QuestionService {
             .filter(q -> {
                 if (keyword == null || keyword.isEmpty()) return true;
                 String kl = keyword.toLowerCase();
+                // Search by ID
+                try {
+                    if (q.getId().equals(Long.parseLong(keyword))) return true;
+                } catch (NumberFormatException ignored) {}
                 if (q.getKeywords() != null && q.getKeywords().toLowerCase().contains(kl)) return true;
                 return q.getQuestion() != null && q.getQuestion().toLowerCase().contains(kl);
             })

@@ -11,4 +11,5 @@ import java.util.Optional;
 public interface WrongQuestionVisibilityRepository extends JpaRepository<WrongQuestionVisibility, Long> {
     Optional<WrongQuestionVisibility> findByUserIdAndQuestionId(Long userId, Long questionId);
     List<WrongQuestionVisibility> findByUserIdAndHiddenFalse(Long userId);
+    List<WrongQuestionVisibility> findByUserIdAndHiddenTrue(Long userId);
 }

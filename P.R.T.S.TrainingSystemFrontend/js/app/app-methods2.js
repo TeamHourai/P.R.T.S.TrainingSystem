@@ -43,21 +43,27 @@ window._appMethods2 = {
         this.updateWrongCategories();
     },
     async loadQuestionStats(questionId, questionType) {
-        // ...existing code...
         if (!questionId) return;
-        if (window.statsApi) {
-            try {
-                this.questionStats = await statsApi.getQuestionStats(questionId);
-                return;
-            } catch (e) {
-                console.warn('获取题目统计失败，使用本地统计兜底', e);
+        // Prevent infinite re-fetch loops
+        if (this._statsLoading === questionId) return;
+        this._statsLoading = questionId;
+        try {
+            if (window.statsApi) {
+                try {
+                    this.questionStats = await statsApi.getQuestionStats(questionId);
+                    return;
+                } catch (e) {
+                    console.warn('获取题目统计失败', e);
+                }
             }
+            this.questionStats = {
+                totalAttempts: Math.floor(Math.random() * 500) + 100,
+                correctRate: Math.random() * 0.3 + 0.6,
+                mostCommonWrongOption: Math.floor(Math.random() * 4) + 1
+            };
+        } finally {
+            this._statsLoading = null;
         }
-        this.questionStats = {
-            totalAttempts: Math.floor(Math.random() * 500) + 100,
-            correctRate: Math.random() * 0.3 + 0.6,
-            mostCommonWrongOption: Math.floor(Math.random() * 4) + 1
-        };
     },
     async loadExamStats() {
         // ...existing code...

@@ -210,33 +210,27 @@ window._appMethods4 = {
     },
     getPrevTrainingQuestion() {
         if (!this.currentQuestion) return null;
-        const currentId = this.currentQuestion.id;
-        const prevQuestions = this.trainingQuestions
-            .filter(q => q.id < currentId)
-            .sort((a, b) => b.id - a.id);
-        return prevQuestions.length > 0 ? prevQuestions[0].id : null;
+        const ids = this.trainingQuestions.map(q => q.id);
+        const idx = ids.indexOf(this.currentQuestion.id);
+        return idx > 0 ? ids[idx - 1] : null;
     },
     getNextTrainingQuestion() {
         if (!this.currentQuestion) return null;
-        const currentId = this.currentQuestion.id;
-        const nextQuestions = this.trainingQuestions
-            .filter(q => q.id > currentId)
-            .sort((a, b) => a.id - b.id);
-        return nextQuestions.length > 0 ? nextQuestions[0].id : null;
+        const ids = this.trainingQuestions.map(q => q.id);
+        const idx = ids.indexOf(this.currentQuestion.id);
+        return idx >= 0 && idx < ids.length - 1 ? ids[idx + 1] : null;
     },
     getPrevWrongQuestion() {
         if (!this.currentQuestion) return null;
-        const currentId = this.currentQuestion.id;
-        const wrongIds = this.wrongQuestions.sort((a, b) => a - b);
-        const currentIndex = wrongIds.indexOf(currentId);
-        return currentIndex > 0 ? wrongIds[currentIndex - 1] : null;
+        const ids = this.wrongQuestions; // preserve natural order
+        const idx = ids.indexOf(this.currentQuestion.id);
+        return idx > 0 ? ids[idx - 1] : null;
     },
     getNextWrongQuestion() {
         if (!this.currentQuestion) return null;
-        const currentId = this.currentQuestion.id;
-        const wrongIds = this.wrongQuestions.sort((a, b) => a - b);
-        const currentIndex = wrongIds.indexOf(currentId);
-        return currentIndex < wrongIds.length - 1 ? wrongIds[currentIndex + 1] : null;
+        const ids = this.wrongQuestions; // preserve natural order
+        const idx = ids.indexOf(this.currentQuestion.id);
+        return idx >= 0 && idx < ids.length - 1 ? ids[idx + 1] : null;
     },
     startRandom() {
         if (this.rawQuestions.length === 0) {
@@ -403,13 +397,9 @@ window._appMethods4 = {
     openSystemNotice() {
         if (!this.isLoggedIn) {
             this.showError('请先登录后查看系统公告');
-            this.showAuthModal = true;
-            this.authMode = 'login';
             return;
         }
         this.showSystemNotice = true;
-        // 默认切到未读页
-        if (!this.systemNoticeTab) this.systemNoticeTab = 'unread';
         this.noticePage = 1;
         this.loadNotifications();
     },
@@ -462,15 +452,11 @@ window._appMethods4 = {
     },
     // ============ 通知中心相关方法 ============
     async loadNotifications() {
-        // 必须登录才能查看公告
         if (!this.isLoggedIn) {
             this.notifications = [];
             this.unreadCount = 0;
             this.hasMoreNotifications = false;
             this.loadingNotifications = false;
-            this.showError('请先登录后查看系统公告');
-            this.showAuthModal = true;
-            this.authMode = 'login';
             return;
         }
 

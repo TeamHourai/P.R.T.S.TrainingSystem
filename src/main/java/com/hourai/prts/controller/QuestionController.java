@@ -33,19 +33,27 @@ public class QuestionController {
         // Support mode=onboarding (called by trainingQuestionApi.js)
         if ("onboarding".equals(mode)) {
             List<OnboardingQuestion> all = questionService.getAllOnboardingQuestions();
-            int from = Math.min((page - 1) * size, all.size());
-            int to = Math.min(from + size, all.size());
+            int total = all.size();
+            int totalPages = size > 0 ? (int) Math.ceil((double) total / size) : 1;
+            int from = Math.min((page - 1) * size, total);
+            int to = Math.min(from + size, total);
             List<OnboardingQuestion> pageList = all.subList(from, to);
             List<QuestionDTO> dtos = pageList.stream().map(QuestionService::toDTOFromOnboarding).collect(Collectors.toList());
-            return ResponseEntity.ok(dtos);
+            return ResponseEntity.ok(Map.of(
+                "questions", dtos, "total", total, "page", page, "size", size, "pages", totalPages
+            ));
         }
 
         List<Question> filtered = questionService.getFilteredQuestions(type, difficulty, keyword);
-        int from = Math.min((page - 1) * size, filtered.size());
-        int to = Math.min(from + size, filtered.size());
+        int total = filtered.size();
+        int totalPages = size > 0 ? (int) Math.ceil((double) total / size) : 1;
+        int from = Math.min((page - 1) * size, total);
+        int to = Math.min(from + size, total);
         List<Question> pageList = filtered.subList(from, to);
         List<QuestionDTO> dtos = pageList.stream().map(QuestionService::toDTO).collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(Map.of(
+            "questions", dtos, "total", total, "page", page, "size", size, "pages", totalPages
+        ));
     }
 
     @GetMapping("/questions/{id}")

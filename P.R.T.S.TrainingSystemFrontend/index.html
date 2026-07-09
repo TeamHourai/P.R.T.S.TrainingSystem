@@ -509,7 +509,7 @@
                                          correct: showAnswer && index + 1 === currentQuestion.answer,
                                          wrong: showAnswer && selectedOption === index + 1 && selectedOption !== currentQuestion.answer }]" @click="selectOption(index + 1)">
                                 <span class="option-label">{{ String.fromCharCode(65 + index) }}</span>
-                                <span class="option-text" v-html="option"></span>
+                                <span class="option-text">{{ option }}</span>
                             </div>
                         </div>
                         <div class="navigation-buttons">
@@ -732,29 +732,11 @@
 
     </div>
 
-    <!-- 先加载基础API模块：Axios + 请求封装 + api 总入口（必须放在 #app 外面） -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="js/api/request.js"></script>
-    <script src="js/apiapp.js"></script>
+    <!-- Unified API client (replaces all old js/api/*.js + apiapp.js + request.js + user.js) -->
+    <script src="js/api.js"></script>
 
-    <!-- 再加载各个 api 模块（路径修正为 js/api/...） -->
-    <script src="js/api/user.js"></script> <!-- 定义 userApi -->
-    <script src="js/api/question.js"></script> <!-- 定义 questionApi -->
-    <script src="js/api/answer.js"></script> <!-- 如果存在，请放到 js/api/answer.js -->
-    <script src="js/api/answerSettings.js"></script> <!-- 用户答题设置 -->
-    <script src="js/api/trainingRecords.js"></script> <!-- 入职培训答题记录 -->
-    <script src="js/api/exam.js"></script> <!-- 如果存在，请放到 js/api/exam.js -->
-    <script src="js/api/stats.js"></script> <!-- 定义 statsApi -->
-    <script src="js/api/notifications.js"></script> <!-- 定义 notificationApi -->
-    <script src="js/api/system.js"></script> <!-- 定义 systemApi -->
-    <!-- 如果有 trainingQuestionApi，请放到 js/api/trainingQuestionApi.js -->
-    <script src="js/api/trainingQuestionApi.js"></script> <!-- 可选：若不存在浏览器会报404，可删除 -->
-
-    <!-- UI helpers (replace alert with centered modal) -->
+    <!-- UI helpers -->
     <script src="js/ui/modal.js"></script>
-
-    <!-- 再加载依赖这些API的模块 -->
-    <script src="js/auth-manager.js"></script> <!-- 使用 userApi -->
     <script src="js/app/app-data.js"></script>
     <script src="js/app/app-computed.js"></script>
     <script src="js/app/app-watch.js"></script>

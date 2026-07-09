@@ -221,47 +221,59 @@ window._appMethods3 = {
         }
     },
     goToTrainingQuestion(id) {
-        // ...existing code...
         this.questionMode = 'training';
         const question = this.trainingQuestions.find(q => q.id === id);
         if (question) {
             this.loadQuestionForDisplay(question, 'training');
             this.currentPage = 'question';
-            this.selectedOption = null;
-            this.showAnswer = false;
+            this.$nextTick(() => {
+                this.selectedOption = null;
+                this.showAnswer = false;
+            });
         } else {
             this.showError('培训题目不存在');
         }
     },
     goToWrongQuestion(id) {
-        // ...existing code...
         this.questionMode = 'wrong';
         const question = this.wrongQuestionsDetail.find(q => q.id === id);
         if (question) {
             this.loadQuestionForDisplay(question, 'wrong');
             this.currentPage = 'question';
-            this.selectedOption = null;
-            this.showAnswer = false;
+            // Batch reactive changes in nextTick to avoid cascading re-renders
+            this.$nextTick(() => {
+                this.selectedOption = null;
+                this.showAnswer = false;
+            });
         } else {
             this.showError('错题不存在');
         }
     },
     loadQuestionForDisplay(question, mode) {
-        // ...existing code...
         const fmtText = (str) => (str || '')
-            // 支持真实换行与转义换行(\n / \r\n)
             .replace(/\\r\\n/g, '\n')
             .replace(/\\n/g, '\n')
             .replace(/\r\n/g, '\n')
             .replace(/\n/g, '<br>');
+        // Normalize options: ensure array of plain strings (no HTML, no fmtText)
+        let opts = question.options;
+        if (!Array.isArray(opts)) {
+            if (typeof opts === 'string') opts = opts.split(/[|¦]/);
+            else opts = ['', '', '', ''];
+        }
+        while (opts.length < 4) opts.push('');
+        // Normalize answer to number
+        let answer = question.answer;
+        if (typeof answer === 'string') answer = parseInt(answer) || 0;
         this.currentQuestion = {
             ...question,
             typeText: mode === 'training' ? '入职培训' : this.getTypeText(question.type),
             difficultyText: mode === 'training' ? '入门' : this.getDifficultyText(question.difficulty),
             resource: question.resource || '',
             question: fmtText(question.question),
-            options: question.options ? question.options.map(opt => fmtText(opt || '')) : ['', '', '', ''],
+            options: opts.map(o => String(o || '')),
             analysis: fmtText(question.analysis) || '暂无解析',
+            answer: answer,
             picture: question.picture || false
         };
     },
@@ -280,7 +292,9 @@ window._appMethods3 = {
         }
     },
     async checkAnswer() {
-        // ...existing code...
+        if (this._checkingAnswer) return;
+        this._checkingAnswer = true;
+        try {
         if (!this.selectedOption) {
             this.showError('请先选择一个答案');
             return;
@@ -351,6 +365,11 @@ window._appMethods3 = {
                     // ignore
                 }
             }, 1000);
+        }
+        } catch (e) {
+            console.error('checkAnswer failed', e);
+        } finally {
+            this._checkingAnswer = false;
         }
     },
     async addToWrongBook(questionId) {

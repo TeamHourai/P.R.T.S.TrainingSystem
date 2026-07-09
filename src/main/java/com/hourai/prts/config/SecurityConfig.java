@@ -24,49 +24,19 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
             .csrf(csrf -> csrf.disable())
-            .cors(cors -> {})
+            .cors(cors -> {})  // uses corsConfigurationSource bean from CorsConfig
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Public read endpoints (matching old app behavior)
-                .requestMatchers(HttpMethod.GET,
-                    "/api/v1/questions",
-                    "/api/v1/questions/**",
-                    "/api/v1/training/questions",
-                    "/api/v1/training/questions/**",
-                    "/api/v1/keywords",
-                    "/api/v1/announcements",
-                    "/api/v1/notifications",
-                    "/api/v1/notifications/**",
-                    "/notifications",
-                    "/notifications/**",
-                    "/api/v1/exam/paper",
-                    "/api/v1/stats/**",
-                    "/api/v1/user/*/wrong",
-                    "/api/v1/ping",
-                    "/ping"
-                ).permitAll()
-                // Auth endpoints (public)
-                .requestMatchers(
-                    "/api/v1/auth/register",
-                    "/api/v1/auth/login",
-                    "/api/v1/auth/logout",
-                    "/h2-console/**"
-                ).permitAll()
-                // OPTIONS preflight
+                // Admin-only endpoints
+                .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // All other requests (GET/POST/PUT/DELETE) are public
+                // Auth is handled via JwtAuthenticationFilter (optional for most endpoints)
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                // Admin endpoints
-                .requestMatchers("/api/v1/admin/**", "/admin/**").hasRole("ADMIN")
-                // Write operations require authentication
-                .requestMatchers(HttpMethod.POST, "/api/v1/**").authenticated()
-                .requestMatchers(HttpMethod.PUT, "/api/v1/**").authenticated()
-                .requestMatchers(HttpMethod.DELETE, "/api/v1/**").authenticated()
-                // Everything else is public (static files)
                 .anyRequest().permitAll()
             )
-            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-            .headers(headers -> headers.frameOptions(frame -> frame.sameOrigin()));
+            .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 }

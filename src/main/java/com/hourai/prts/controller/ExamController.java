@@ -1,13 +1,16 @@
 package com.hourai.prts.controller;
 
-import com.hourai.prts.entity.ExamRecord;
-import com.hourai.prts.entity.Question;
+import com.hourai.prts.entity.*;
+import com.hourai.prts.repository.*;
 import com.hourai.prts.service.ExamService;
 import com.hourai.prts.service.QuestionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -16,10 +19,19 @@ import java.util.stream.Collectors;
 public class ExamController {
     private final ExamService examService;
     private final QuestionService questionService;
+    private final UserAnswerRepository userAnswerRepository;
+    private final WrongQuestionVisibilityRepository wrongVisibilityRepository;
+    private final QuestionRepository questionRepository;
 
-    public ExamController(ExamService examService, QuestionService questionService) {
+    public ExamController(ExamService examService, QuestionService questionService,
+                          UserAnswerRepository userAnswerRepository,
+                          WrongQuestionVisibilityRepository wrongVisibilityRepository,
+                          QuestionRepository questionRepository) {
         this.examService = examService;
         this.questionService = questionService;
+        this.userAnswerRepository = userAnswerRepository;
+        this.wrongVisibilityRepository = wrongVisibilityRepository;
+        this.questionRepository = questionRepository;
     }
 
     @GetMapping("/exam/paper")
@@ -64,34 +76,78 @@ public class ExamController {
     }
 
     // ===== Wrong answers =====
+
     @GetMapping("/answers/wrong")
-    public ResponseEntity<?> getWrongQuestions(Authentication auth,
-                                                @RequestParam(defaultValue = "1") int page,
-                                                @RequestParam(defaultValue = "1000") int size) {
+    public ResponseEntity<?> getWrongQuestions(Authentication auth) {
         if (auth == null) {
             return ResponseEntity.status(401).body(Map.of("success", false, "message", "missing token"));
         }
         Long userId = (Long) auth.getPrincipal();
-        // Find wrong questions by checking user_answers where is_correct=false
-        // and not hidden in wrong_visibility
-        // For now, return all questions marked wrong
-        return ResponseEntity.ok(List.of()); // Implement with proper service
+
+        // Get all wrong answers for this user
+        List<UserAnswer> wrongAnswers = userAnswerRepository.findByUserIdAndIsCorrectFalse(userId);
+
+        // Get hidden question IDs
+        List<WrongQuestionVisibility> hidden = wrongVisibilityRepository.findByUserIdAndHiddenTrue(userId);
+        Set<Long> hiddenIds = hidden.stream().map(WrongQuestionVisibility::getQuestionId).collect(Collectors.toSet());
+
+        // Build result: unique question IDs that are wrong and not hidden
+        Set<Long> seenIds = new HashSet<>();
+        List<Question> wrongQuestions = new ArrayList<>();
+        for (UserAnswer ua : wrongAnswers) {
+            if (hiddenIds.contains(ua.getQuestionId())) continue;
+            if (!seenIds.add(ua.getQuestionId())) continue;
+            questionRepository.findById(ua.getQuestionId()).ifPresent(wrongQuestions::add);
+        }
+
+        List<Map<String, Object>> result = wrongQuestions.stream().map(q -> {
+            Map<String, Object> m = new HashMap<>();
+            m.put("id", q.getId());
+            m.put("question", q.getQuestion());
+            m.put("type", q.getType());
+            m.put("difficulty", q.getDifficulty());
+            m.put("options", q.getOptions() != null ? Arrays.asList(q.getOptions().split("\\|")) : List.of());
+            m.put("answer", q.getAnswer());
+            m.put("analysis", q.getAnalysis());
+            return m;
+        }).collect(Collectors.toList());
+
+        return ResponseEntity.ok(result);
     }
 
     @DeleteMapping("/answers/wrong/{questionId}")
+    @Transactional
     public ResponseEntity<?> hideWrongQuestion(@PathVariable Long questionId, Authentication auth) {
         if (auth == null) {
             return ResponseEntity.status(401).body(Map.of("success", false, "message", "missing token"));
         }
         Long userId = (Long) auth.getPrincipal();
-        // Hide the wrong question
+
+        WrongQuestionVisibility wv = wrongVisibilityRepository
+                .findByUserIdAndQuestionId(userId, questionId)
+                .orElseGet(() -> {
+                    WrongQuestionVisibility n = new WrongQuestionVisibility();
+                    n.setUserId(userId);
+                    n.setQuestionId(questionId);
+                    return n;
+                });
+        wv.setHidden(true);
+        wv.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        wrongVisibilityRepository.save(wv);
+
         return ResponseEntity.ok(Map.of("success", true, "message", "hidden", "userId", userId, "questionId", questionId));
     }
 
     @GetMapping("/user/{id}/wrong")
     public ResponseEntity<?> getUserWrongQuestions(@PathVariable Long id) {
-        // Legacy endpoint
-        return ResponseEntity.ok(List.of());
+        List<UserAnswer> wrongAnswers = userAnswerRepository.findByUserIdAndIsCorrectFalse(id);
+        Set<Long> seenIds = new HashSet<>();
+        List<Question> wrongQuestions = new ArrayList<>();
+        for (UserAnswer ua : wrongAnswers) {
+            if (!seenIds.add(ua.getQuestionId())) continue;
+            questionRepository.findById(ua.getQuestionId()).ifPresent(wrongQuestions::add);
+        }
+        return ResponseEntity.ok(wrongQuestions.stream().map(QuestionService::toDTO).collect(Collectors.toList()));
     }
 
     private Map<Long, Integer> parseAnswers(String s) {

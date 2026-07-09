@@ -4,187 +4,55 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="修复入职培训问题">
-      <change afterPath="$PROJECT_DIR$/.idea/claudeCodeTabState.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.delete_list.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
+    <list default="true" id="d098536a-9e2b-4cbc-a3af-1d608640ca9f" name="更改" comment="全面重构与优化项目">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystem.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/question.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/question.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/trainingQuestionApi.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/trainingQuestionApi.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/config.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/config.js" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/PROJECT_EXPANSION_PLAN_.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/PRTS.TRAININGSYSTEM.iml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/build_jpackage.ps1" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/data/DataStore.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/entity/ExamRecord.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/entity/Question.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/entity/User.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/entity/UserAnswer.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/handler/ExamPaperHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/handler/ExamSubmitHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/handler/LoginHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/handler/PingHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/handler/QuestionsHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/handler/RegisterHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/handler/UserHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/classes/com/hourai/prts/utils/Utils.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/homeworkapp.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package_input/data/exam_records.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package_input/data/questions.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package_input/data/user_answers.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package_input/data/users.csv" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/package_input/homeworkapp.jar" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/CorsFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/Main.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/AnnouncementDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/AnswerSettingsDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/DbCompat.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/ExamDetailDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/ExamRecordDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/NotificationStateDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/NotificationsStateDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/OnboardingQuestionDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/QuestionDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/TrainingRecordDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/UserAnswerDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/UserDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/WrongQuestionVisibilityDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/dao/WrongQuestionVisibilityDbDao.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataImportMain.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataImporter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataImporterTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/data/DataStore.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/Announcement.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/Announcement.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/AnswerSettings.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/AnswerSettings.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/ExamDetail.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/ExamDetail.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/ExamRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/ExamRecord.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/NotificationState.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/NotificationState.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/NotificationsState.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/OnboardingQuestion.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/OnboardingQuestion.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/Question.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/Question.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/TrainingRecord.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/TrainingRecord.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/User.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/User.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/UserAnswer.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/UserAnswer.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/WrongQuestionVisibility.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/entity/WrongQuestionVisibility.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminQuestionsHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminSetPermissionsHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AdminUserListHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AnnouncementsHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AnswerSettingsHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/ApiHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/AuthProfileHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/ExamHistoryHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/ExamPaperHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/ExamSubmitHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/HandlerRegistry.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/KeywordsHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LoginHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/LogoutHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/NotificationsHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/NotificationsStateHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/PingHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/QuestionsHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/RegisterHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/StatsHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/TrainingRecordsHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/UserHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/handler/WrongAnswersHandler.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/AnnouncementService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/AnswerSettingsService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/ExamDetailService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/ExamRecordService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/NotificationStateService.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/announcement-editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/announcement-editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/exam.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/exam.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/index.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/API规范.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/admin.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/announcements.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/answer.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/answerSettings.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/exam.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/export.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/keyword.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/notification.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/notifications.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/question.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/request.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/stats.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/system.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/trainingQuestionApi.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/trainingRecords.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/upload.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/api/user.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/apiapp.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods2.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods2.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods3.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/app/app-methods4.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/auth-manager.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/question-editor.js" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/question-editor.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/js/vendor/axios.min.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/training-editor.html" beforeDir="false" afterPath="$PROJECT_DIR$/P.R.T.S.TrainingSystemFrontend/training-editor.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data/announcements.csv" beforeDir="false" afterPath="$PROJECT_DIR$/data/announcements.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/config/CorsConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/config/CorsConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/controller/ExamController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/controller/ExamController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/controller/QuestionController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/controller/QuestionController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/controller/UserSettingsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/controller/UserSettingsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/repository/WrongQuestionVisibilityRepository.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/repository/WrongQuestionVisibilityRepository.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/QuestionService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/QuestionService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/TrainingRecordService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/UserAnswerService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/UserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/UserService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/WrongQuestionService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/service/WrongQuestionVisibilityDbService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/tool/CsvBatchImporter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/tool/DataImportTool.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/tool/QuestionsImportTool.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/tools/CsvImporter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/hourai/prts/utils/Utils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/hourai/prts/dao/QuestionDaoTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/com/hourai/prts/service/UserServiceTest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/CorsFilter.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/Main.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/AnnouncementDao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/ExamDetailDao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/ExamRecordDao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/NotificationsStateDao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/QuestionDao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/UserAnswerDao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/UserDao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/WrongQuestionVisibilityDao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/dao/WrongQuestionVisibilityDbDao.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataImportMain.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataImporter.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataImporterTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/data/DataStore.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/Announcement.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/Announcement.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/ExamDetail.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/ExamDetail.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/ExamRecord.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/ExamRecord.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/NotificationsState.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/Question.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/Question.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/User.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/User.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/UserAnswer.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/UserAnswer.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/WrongQuestionVisibility.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/entity/WrongQuestionVisibility.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/AdminQuestionsHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/AnnouncementsHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ApiHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/AuthProfileHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamHistoryHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamPaperHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/ExamSubmitHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry$1.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/HandlerRegistry.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/KeywordsHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LoginHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/LogoutHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/NotificationsHandler$State.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/NotificationsHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/NotificationsStateHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/PingHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/QuestionsHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/RegisterHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/StatsHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/UserHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/handler/WrongAnswersHandler.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/AnnouncementService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/ExamDetailService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/ExamRecordService.class" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/PRTS.TRAININGSYSTEM-2.0.0.jar" beforeDir="false" afterPath="$PROJECT_DIR$/target/PRTS.TRAININGSYSTEM-2.0.0.jar" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/PRTS.TRAININGSYSTEM-2.0.0.jar.original" beforeDir="false" afterPath="$PROJECT_DIR$/target/PRTS.TRAININGSYSTEM-2.0.0.jar.original" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/config/CorsConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/config/CorsConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/config/SecurityConfig.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/config/SecurityConfig.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/controller/ExamController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/controller/ExamController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/controller/QuestionController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/controller/QuestionController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/controller/UserSettingsController.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/controller/UserSettingsController.class" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/repository/WrongQuestionVisibilityRepository.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/repository/WrongQuestionVisibilityRepository.class" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/QuestionService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/QuestionService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/UserAnswerService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/UserService.class" beforeDir="false" afterPath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/UserService.class" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/WrongQuestionService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/service/WrongQuestionVisibilityDbService.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/tool/CsvBatchImporter.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/tool/DataImportTool.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/classes/com/hourai/prts/utils/Utils.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/createdFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" beforeDir="false" afterPath="$PROJECT_DIR$/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/2025-12-07T18-29-10_427.dumpstream" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/2025-12-07T18-34-19_777.dumpstream" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/2025-12-07T18-41-17_609.dumpstream" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/2025-12-07T18-43-51_980.dumpstream" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/TEST-com.hourai.prts.dao.QuestionDaoTest.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/TEST-com.hourai.prts.service.UserServiceTest.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/com.hourai.prts.dao.QuestionDaoTest.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/surefire-reports/com.hourai.prts.service.UserServiceTest.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/hourai/prts/dao/QuestionDaoTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/target/test-classes/com/hourai/prts/service/UserServiceTest.class" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/testfrontend/app.js" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/testfrontend/index.html" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -570,7 +438,15 @@
       <option name="project" value="LOCAL" />
       <updated>1766598289522</updated>
     </task>
-    <option name="localTasksCounter" value="35" />
+    <task id="LOCAL-00035" summary="全面重构与优化项目">
+      <option name="closed" value="true" />
+      <created>1783543090312</created>
+      <option name="number" value="00035" />
+      <option name="presentableId" value="LOCAL-00035" />
+      <option name="project" value="LOCAL" />
+      <updated>1783543090312</updated>
+    </task>
+    <option name="localTasksCounter" value="36" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -640,7 +516,6 @@
     </option>
   </component>
   <component name="VcsManagerConfiguration">
-    <MESSAGE value="合并注释更改和数据库更新" />
     <MESSAGE value="上传了正式前端，现在在不加数据库的情况下实现了前后端的连接，用户注册和登陆的功能，无法成功答题，答案显示为乱码，无法保存错题" />
     <MESSAGE value="在未接入数据库分支中，把端口更改为8080，同时数据文件中前面的userid会随着注册用户而递增" />
     <MESSAGE value="完善了系统公告界面" />
@@ -665,7 +540,8 @@
     <MESSAGE value="已将answer_settings迁移至数据库" />
     <MESSAGE value="已全部迁移至数据库，但未进行测试" />
     <MESSAGE value="仅登录时存在问题" />
-    <option name="LAST_COMMIT_MESSAGE" value="仅登录时存在问题" />
+    <MESSAGE value="全面重构与优化项目" />
+    <option name="LAST_COMMIT_MESSAGE" value="全面重构与优化项目" />
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

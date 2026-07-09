@@ -20,6 +20,8 @@
         pageinfo: document.getElementById('qe-pageinfo'),
         hint: document.getElementById('qe-hint'),
 
+        rightPanel: document.getElementById('qe-right-panel'),
+        closePanelBtn: document.getElementById('qe-close-panel-btn'),
         form: document.getElementById('qe-form'),
         formTitle: document.getElementById('qe-form-title'),
         formSub: document.getElementById('qe-form-sub'),
@@ -286,6 +288,8 @@
         if (el.formTitle) el.formTitle.textContent = '新建题目';
         if (el.formSub) el.formSub.textContent = '填写题目内容并保存';
         setHint(el.formHint, '', null);
+        // Show the editor panel
+        if (el.rightPanel) el.rightPanel.style.display = '';
     }
 
     function fillForm(q) {
@@ -463,6 +467,7 @@
             setHint(el.formHint, '加载题目详情中...', null);
             const q = await apiGetDetail(id);
             fillForm(q);
+            if (el.rightPanel) el.rightPanel.style.display = '';
             setHint(el.formHint, '已载入，可修改后保存', 'success');
         } catch (e) {
             console.error(e);
@@ -595,6 +600,12 @@
 
         if (el.newBtn) {
             el.newBtn.addEventListener('click', () => clearForm());
+        }
+
+        if (el.closePanelBtn) {
+            el.closePanelBtn.addEventListener('click', () => {
+                if (el.rightPanel) el.rightPanel.style.display = 'none';
+            });
         }
 
         if (el.clearBtn) {

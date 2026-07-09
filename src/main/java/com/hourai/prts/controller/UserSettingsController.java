@@ -82,8 +82,7 @@ public class UserSettingsController {
         return ResponseEntity.ok(Map.of("success", true, "records", result));
     }
 
-    @PostMapping("/training-records")
-    @PutMapping("/training-records")
+    @RequestMapping(value = "/training-records", method = {RequestMethod.POST, RequestMethod.PUT})
     @Transactional
     public ResponseEntity<?> saveTrainingRecord(@RequestBody Map<String, Object> body, Authentication auth) {
         if (auth == null) return ResponseEntity.status(401).body(Map.of("success", false, "message", "missing token"));

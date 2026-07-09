@@ -139,7 +139,9 @@
                     <div class="qe-hint" id="qe-hint"></div>
                 </section>
 
-                <section class="qe-card qe-right">
+                <section class="qe-card qe-right" id="qe-right-panel" style="display:none;">
+                    <button class="nav-btn secondary" id="qe-close-panel-btn" style="float:right;margin:5px;"
+                        type="button"><i class="fas fa-times"></i> 关闭</button>
                     <div class="qe-form-header">
                         <h2 class="qe-form-title" id="qe-form-title">新建题目</h2>
                         <div class="qe-form-sub" id="qe-form-sub">填写题目内容并保存</div>
@@ -249,14 +251,8 @@
         </div>
     </div>
 
-    <!-- API依赖：axios + request + apiapp + 各模块 -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <script src="js/api/request.js"></script>
-    <script src="js/apiapp.js"></script>
-    <script src="js/api/user.js"></script>
-    <script src="js/api/question.js"></script>
-    <script src="js/api/admin.js"></script>
-    <script src="js/api/keyword.js"></script>
+    <!-- API client -->
+    <script src="js/api.js"></script>
     <script>
         window.EDITOR_MODE = 'questions';
     </script>

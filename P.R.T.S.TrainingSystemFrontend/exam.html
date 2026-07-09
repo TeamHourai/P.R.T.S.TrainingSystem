@@ -260,15 +260,10 @@
         </div>
     </div>
 
-    <!-- 依赖顺序：axios -> request -> api -> page logic -->
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
-    <!-- 请求层/HTTP 封装（必须在 api 模块之前加载） -->
-    <script src="js/api/request.js"></script>
-    <!-- 题目 API（提供 window.questionApi，用于点击题号拉取详情） -->
-    <script src="js/api/question.js"></script>
-    <!-- 考试相关 API（提供 window.examApi） -->
-    <script src="js/api/exam.js"></script>
-    <!-- 考试页面前端逻辑，依赖 window.examApi / window.questionApi -->
+    <!-- API client (config.js + api.js provides window.api + all legacy aliases) -->
+    <script src="js/config.js"></script>
+    <script src="js/api.js"></script>
+    <!-- Exam page logic -->
     <script src="js/exam-frontend.js"></script>
 </body>
 

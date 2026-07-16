@@ -6,11 +6,15 @@ spring:
   application:
     name: prts-training-system
 
+  # 从项目根目录的 .env 文件加载敏感配置（该文件已被 .gitignore 忽略，不会入库）
+  config:
+    import: optional:file:.env[.properties]
+
   datasource:
     url: jdbc:mysql://localhost:3306/prts_db?useSSL=false&serverTimezone=Asia/Shanghai&characterEncoding=UTF-8&allowPublicKeyRetrieval=true
     driver-class-name: com.mysql.cj.jdbc.Driver
-    username: root
-    password: lin41008
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD}
 
   jpa:
     hibernate:
@@ -33,7 +37,7 @@ spring:
 
 app:
   jwt:
-    secret: cHJ0cy10cmFpbmluZy1zeXN0ZW0tc2VjcmV0LWtleS0yMDI2LTA3LTA4LWZvci1kcmlsbGVyLWJ1c2luZXNzLWNhcGFiaWxpdHktYXNzZXNzbWVudA==
+    secret: ${JWT_SECRET}
     expiration-ms: 86400000
   data:
     import-on-startup: true

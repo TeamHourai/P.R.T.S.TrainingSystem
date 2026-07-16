@@ -1,0 +1,14 @@
+# 本地环境变量（含敏感信息）——切勿提交
+.env
+.env.local
+.env.*.local
+# 注意：.env.example 是模板，刻意保留并提交
+
+# 依赖与构建产物
+node_modules/
+dist/
+
+# IDE / 编辑器
+.idea/
+.vscode/
+*.iml

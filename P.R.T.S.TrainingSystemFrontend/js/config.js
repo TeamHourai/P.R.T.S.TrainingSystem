@@ -7,7 +7,7 @@
         // 系统信息
         SYSTEM: {
             NAME: '博士业务能力考核系统',
-            VERSION: '2.1.0',
+            VERSION: '2.0.0',
             DESCRIPTION: '明日方舟博士业务能力考核平台',
             AUTHOR: '罗德岛制药',
             COPYRIGHT: '© 2025 罗德岛制药',
@@ -33,13 +33,13 @@
                 return `${base}${prefix}${version}`;
             },
 
-            // API端点（尽量与后端 Main 注册的路径保持一致）
+            // 与服务端 /api/v1 路由保持一致（路径相对于 /api/v1）
             ENDPOINTS: {
                 AUTH: {
-                    REGISTER: '/register',
-                    LOGIN: '/login',
-                    LOGOUT: '/logout',
-                    PROFILE: '/profile'
+                    REGISTER: '/auth/register',
+                    LOGIN: '/auth/login',
+                    LOGOUT: '/auth/logout',
+                    PROFILE: '/auth/profile'
                 },
                 QUESTIONS: {
                     LIST: '/questions',
@@ -47,7 +47,7 @@
                     CREATE: '/questions',
                     UPDATE: '/questions/{id}',
                     DELETE: '/questions/{id}',
-                    SEARCH: '/questions/search'
+                    BATCH_DELETE: '/admin/questions/batch-delete'
                 },
                 TRAINING_QUESTIONS: {
                     LIST: '/training/questions',
@@ -57,45 +57,54 @@
                     DELETE: '/training/questions/{id}'
                 },
                 ANSWERS: {
-                    SUBMIT: '/exam/submit',
-                    HISTORY: '/answers/history',
-                    WRONG: '/user/{userId}/wrong',
-                    DELETE_WRONG: '/answers/wrong/{questionId}'
+                    WRONG: '/answers/wrong',
+                    DELETE_WRONG: '/answers/wrong/{questionId}',
+                    USER_WRONG: '/user/{userId}/wrong',
+                    SUBMIT: '/exam/submit'
                 },
                 EXAMS: {
-                    GENERATE: '/exam/paper',
+                    PAPER: '/exam/paper',
                     SUBMIT: '/exam/submit',
-                    HISTORY: '/exam/history',
-                    DETAIL: '/exam/{examId}',
-                    LEADERBOARD: '/exams/leaderboard'
+                    HISTORY: '/exam/history'
                 },
                 STATS: {
                     USER: '/stats/user',
                     QUESTION: '/stats/question/{questionId}',
-                    SYSTEM: '/stats/system',
-                    EXAM: '/stats/exam'
+                    SYSTEM: '/stats/system'
                 },
-                UPLOAD: {
-                    QUESTION_IMAGE: '/upload/question-image',
-                    AVATAR: '/upload/avatar'
+                KEYWORDS: '/keywords',
+                NOTIFICATIONS: {
+                    LIST: '/notifications',
+                    UNREAD_COUNT: '/notifications/unread-count',
+                    READ: '/notifications/{id}/read',
+                    READ_ALL: '/notifications/read-all'
                 },
-                SYSTEM: {
-                    PING: '/ping',
-                    INFO: '/system/info',
-                    TIME: '/system/time',
-                    FEEDBACK: '/system/feedback'
+                ANNOUNCEMENTS: {
+                    LIST: '/announcements',
+                    CREATE: '/admin/announcements'
                 },
-                EXPORT: {
-                    ANSWERS: '/export/answers',
-                    EXAM_REPORT: '/export/exam-report/{examId}',
-                    USER_STATS: '/export/user-stats'
+                USER: {
+                    ANSWER_SETTINGS: '/user/answer-settings',
+                    TRAINING_RECORDS: '/user/training-records'
                 },
                 ADMIN: {
                     USERS: '/admin/users',
-                    USER_PERMISSION: '/admin/user/permission',
-                    USER: '/admin/users/{userId}',
-                    CONFIG: '/admin/config'
+                    USER_PERMISSION: '/admin/user/permission'
+                },
+                SYSTEM: {
+                    PING: '/ping'
                 }
+            },
+
+            // 统一响应状态码（与服务端 ResultCode 对齐）
+            RESPONSE_CODES: {
+                SUCCESS: 200,
+                BAD_REQUEST: 400,
+                UNAUTHORIZED: 401,
+                FORBIDDEN: 403,
+                NOT_FOUND: 404,
+                CONFLICT: 409,
+                INTERNAL_ERROR: 500
             },
 
             // 超时设置（毫秒）
@@ -260,8 +269,9 @@
 
             // 存储键名
             KEYS: {
-                TOKEN: 'auth_token',
-                USER_INFO: 'user_info',
+                // 与 js/utils/common.js (window.PRTS.STORAGE) 保持一致的规范键名
+                TOKEN: 'token',
+                USER_INFO: 'userInfo',
                 REMEMBER_ME: 'remember_me',
                 LAST_LOGIN: 'last_login_time',
                 SESSION_EXPIRE: 'session_expire_time',

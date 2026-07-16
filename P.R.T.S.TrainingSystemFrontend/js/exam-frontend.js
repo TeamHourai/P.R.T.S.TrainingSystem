@@ -160,11 +160,12 @@ document.addEventListener('DOMContentLoaded', function () {
                             Object.assign(q, full);
                         }
                     } else if (needsFetch) {
-                        // fallback：直接 fetch
+                        // fallback：直接 fetch（兼容统一响应体 {code,message,data,success}）
                         const base = (window.API_BASE_URL || 'http://localhost:8080').replace(/\/+$/, '');
                         const resp = await fetch(base + '/api/v1/questions/' + encodeURIComponent(q.id));
                         if (resp.ok) {
-                            const full = await resp.json();
+                            const payload = await resp.json();
+                            const full = (payload && payload.data !== undefined) ? payload.data : payload;
                             if (full) Object.assign(q, full);
                         }
                     }

@@ -1,9 +1,13 @@
 package com.hourai.prts.controller;
 
+import com.hourai.prts.common.Result;
+import com.hourai.prts.common.ResultCode;
+import com.hourai.prts.dto.QuestionDTO;
 import com.hourai.prts.entity.*;
 import com.hourai.prts.repository.*;
 import com.hourai.prts.service.ExamService;
 import com.hourai.prts.service.QuestionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,11 +16,13 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
 public class ExamController {
+
     private final ExamService examService;
     private final QuestionService questionService;
     private final UserAnswerRepository userAnswerRepository;
@@ -35,25 +41,28 @@ public class ExamController {
     }
 
     @GetMapping("/exam/paper")
-    public ResponseEntity<?> generatePaper() {
+    public ResponseEntity<Result<List<QuestionDTO>>> generatePaper() {
         List<Question> paper = examService.generatePaper();
-        return ResponseEntity.ok(paper.stream().map(QuestionService::toDTO).collect(Collectors.toList()));
+        List<QuestionDTO> dtos = paper.stream().map(QuestionService::toDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Result.success(dtos));
     }
 
     @PostMapping("/exam/submit")
-    public ResponseEntity<?> submitExam(@RequestParam Long userId,
-                                        @RequestParam String answers,
-                                        @RequestParam(required = false) Integer duration) {
+    public ResponseEntity<Result<Map<String, Object>>> submitExam(@RequestParam Long userId,
+                                                                  @RequestParam String answers,
+                                                                  @RequestParam(required = false) Integer duration) {
         if (userId == null || answers == null || answers.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "missing required fields"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Result.fail(ResultCode.BAD_REQUEST, "缺少必填字段"));
         }
         Map<Long, Integer> answerMap = parseAnswers(answers);
         ExamRecord record = examService.submitExam(userId, answerMap, duration);
-        return ResponseEntity.ok(Map.of("examId", record.getId(), "score", record.getScore().intValue()));
+        Map<String, Object> data = Map.of("examId", record.getId(), "score", record.getScore().intValue());
+        return ResponseEntity.ok(Result.success(data));
     }
 
     @GetMapping("/exam/history")
-    public ResponseEntity<?> getHistory(
+    public ResponseEntity<Result<List<Map<String, Object>>>> getHistory(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size,
             Authentication auth) {
@@ -72,26 +81,23 @@ public class ExamController {
             m.put("createdAt", r.getCreatedAt() != null ? r.getCreatedAt().toString() : null);
             return m;
         }).collect(Collectors.toList());
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(Result.success(result));
     }
 
-    // ===== Wrong answers =====
+    // ===== 错题 =====
 
     @GetMapping("/answers/wrong")
-    public ResponseEntity<?> getWrongQuestions(Authentication auth) {
+    public ResponseEntity<Result<List<Map<String, Object>>>> getWrongQuestions(Authentication auth) {
         if (auth == null) {
-            return ResponseEntity.status(401).body(Map.of("success", false, "message", "missing token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Result.fail(ResultCode.UNAUTHORIZED, "未登录或登录已过期"));
         }
         Long userId = (Long) auth.getPrincipal();
 
-        // Get all wrong answers for this user
         List<UserAnswer> wrongAnswers = userAnswerRepository.findByUserIdAndIsCorrectFalse(userId);
-
-        // Get hidden question IDs
         List<WrongQuestionVisibility> hidden = wrongVisibilityRepository.findByUserIdAndHiddenTrue(userId);
         Set<Long> hiddenIds = hidden.stream().map(WrongQuestionVisibility::getQuestionId).collect(Collectors.toSet());
 
-        // Build result: unique question IDs that are wrong and not hidden
         Set<Long> seenIds = new HashSet<>();
         List<Question> wrongQuestions = new ArrayList<>();
         for (UserAnswer ua : wrongAnswers) {
@@ -112,14 +118,15 @@ public class ExamController {
             return m;
         }).collect(Collectors.toList());
 
-        return ResponseEntity.ok(result);
+        return ResponseEntity.ok(Result.success(result));
     }
 
     @DeleteMapping("/answers/wrong/{questionId}")
     @Transactional
-    public ResponseEntity<?> hideWrongQuestion(@PathVariable Long questionId, Authentication auth) {
+    public ResponseEntity<Result<Map<String, Object>>> hideWrongQuestion(@PathVariable Long questionId, Authentication auth) {
         if (auth == null) {
-            return ResponseEntity.status(401).body(Map.of("success", false, "message", "missing token"));
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Result.fail(ResultCode.UNAUTHORIZED, "未登录或登录已过期"));
         }
         Long userId = (Long) auth.getPrincipal();
 
@@ -135,11 +142,11 @@ public class ExamController {
         wv.setUpdatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
         wrongVisibilityRepository.save(wv);
 
-        return ResponseEntity.ok(Map.of("success", true, "message", "hidden", "userId", userId, "questionId", questionId));
+        return ResponseEntity.ok(Result.success(Map.of("questionId", questionId)));
     }
 
     @GetMapping("/user/{id}/wrong")
-    public ResponseEntity<?> getUserWrongQuestions(@PathVariable Long id) {
+    public ResponseEntity<Result<List<QuestionDTO>>> getUserWrongQuestions(@PathVariable Long id) {
         List<UserAnswer> wrongAnswers = userAnswerRepository.findByUserIdAndIsCorrectFalse(id);
         Set<Long> seenIds = new HashSet<>();
         List<Question> wrongQuestions = new ArrayList<>();
@@ -147,7 +154,8 @@ public class ExamController {
             if (!seenIds.add(ua.getQuestionId())) continue;
             questionRepository.findById(ua.getQuestionId()).ifPresent(wrongQuestions::add);
         }
-        return ResponseEntity.ok(wrongQuestions.stream().map(QuestionService::toDTO).collect(Collectors.toList()));
+        List<QuestionDTO> dtos = wrongQuestions.stream().map(QuestionService::toDTO).collect(Collectors.toList());
+        return ResponseEntity.ok(Result.success(dtos));
     }
 
     private Map<Long, Integer> parseAnswers(String s) {

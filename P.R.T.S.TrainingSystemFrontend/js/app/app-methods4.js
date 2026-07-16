@@ -472,7 +472,7 @@ window._appMethods4 = {
             const params = {
                 page: this.noticePage,
                 size: 10,
-                unread: this.systemNoticeTab === 'unread' ? true : undefined
+                unreadOnly: this.systemNoticeTab === 'unread' ? true : undefined
             };
             const res = await notificationApi.getNotifications(params);
             const raw = res.notifications || [];

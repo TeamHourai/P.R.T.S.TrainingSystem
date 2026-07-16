@@ -1,19 +1,23 @@
 package com.hourai.prts.controller;
 
-import com.hourai.prts.dto.ApiResponse;
+import com.hourai.prts.common.Result;
+import com.hourai.prts.common.ResultCode;
 import com.hourai.prts.dto.QuestionDTO;
 import com.hourai.prts.entity.OnboardingQuestion;
 import com.hourai.prts.entity.Question;
 import com.hourai.prts.service.QuestionService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+
 import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1")
 public class QuestionController {
+
     private final QuestionService questionService;
 
     public QuestionController(QuestionService questionService) {
@@ -22,7 +26,7 @@ public class QuestionController {
 
     // ===== 正式题库 =====
     @GetMapping("/questions")
-    public ResponseEntity<?> listQuestions(
+    public ResponseEntity<Result<Map<String, Object>>> listQuestions(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "50") int size,
             @RequestParam(required = false) Integer type,
@@ -30,7 +34,7 @@ public class QuestionController {
             @RequestParam(defaultValue = "") String keyword,
             @RequestParam(defaultValue = "") String mode) {
 
-        // Support mode=onboarding (called by trainingQuestionApi.js)
+        // mode=onboarding 由培训题库模块复用（保持向后兼容）
         if ("onboarding".equals(mode)) {
             List<OnboardingQuestion> all = questionService.getAllOnboardingQuestions();
             int total = all.size();
@@ -39,9 +43,10 @@ public class QuestionController {
             int to = Math.min(from + size, total);
             List<OnboardingQuestion> pageList = all.subList(from, to);
             List<QuestionDTO> dtos = pageList.stream().map(QuestionService::toDTOFromOnboarding).collect(Collectors.toList());
-            return ResponseEntity.ok(Map.of(
-                "questions", dtos, "total", total, "page", page, "size", size, "pages", totalPages
-            ));
+            Map<String, Object> data = Map.of(
+                    "questions", dtos, "total", total, "page", page, "size", size, "pages", totalPages
+            );
+            return ResponseEntity.ok(Result.success(data));
         }
 
         List<Question> filtered = questionService.getFilteredQuestions(type, difficulty, keyword);
@@ -51,86 +56,83 @@ public class QuestionController {
         int to = Math.min(from + size, total);
         List<Question> pageList = filtered.subList(from, to);
         List<QuestionDTO> dtos = pageList.stream().map(QuestionService::toDTO).collect(Collectors.toList());
-        return ResponseEntity.ok(Map.of(
-            "questions", dtos, "total", total, "page", page, "size", size, "pages", totalPages
-        ));
+        Map<String, Object> data = Map.of(
+                "questions", dtos, "total", total, "page", page, "size", size, "pages", totalPages
+        );
+        return ResponseEntity.ok(Result.success(data));
     }
 
     @GetMapping("/questions/{id}")
-    public ResponseEntity<?> getQuestion(@PathVariable Long id) {
+    public ResponseEntity<Result<QuestionDTO>> getQuestion(@PathVariable Long id) {
         Optional<Question> q = questionService.getQuestionById(id);
-        return q.map(value -> ResponseEntity.ok(QuestionService.toDTO(value)))
-                .orElse(ResponseEntity.notFound().build());
+        return q.map(value -> ResponseEntity.ok(Result.success(QuestionService.toDTO(value))))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Result.fail(ResultCode.NOT_FOUND, "题目不存在")));
     }
 
     @PostMapping("/questions")
-    public ResponseEntity<?> createQuestion(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<Result<Map<String, Object>>> createQuestion(@RequestBody Map<String, Object> body) {
         Question q = mapToQuestion(body);
         q = questionService.addQuestion(q);
-        return ResponseEntity.ok(Map.of("id", q.getId()));
+        return ResponseEntity.ok(Result.success(Map.of("id", q.getId())));
     }
 
     @PutMapping("/questions/{id}")
-    public ResponseEntity<?> updateQuestion(@PathVariable Long id, @RequestBody Map<String, Object> body) {
-        try {
-            Question updated = mapToQuestion(body);
-            questionService.updateQuestion(id, updated);
-            return ResponseEntity.ok(Map.of("success", true));
-        } catch (NoSuchElementException e) {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<Result<Map<String, Object>>> updateQuestion(@PathVariable Long id, @RequestBody Map<String, Object> body) {
+        Question updated = mapToQuestion(body);
+        questionService.updateQuestion(id, updated);
+        return ResponseEntity.ok(Result.success(Map.of("id", id)));
     }
 
     @DeleteMapping("/questions/{id}")
-    public ResponseEntity<?> deleteQuestion(@PathVariable Long id) {
+    public ResponseEntity<Result<Void>> deleteQuestion(@PathVariable Long id) {
         questionService.deleteQuestion(id);
-        return ResponseEntity.ok(Map.of("success", true));
+        return ResponseEntity.ok(Result.success("删除成功", null));
     }
 
     // ===== 入职培训题库 =====
     @GetMapping("/training/questions")
-    public ResponseEntity<?> listTrainingQuestions() {
+    public ResponseEntity<Result<List<QuestionDTO>>> listTrainingQuestions() {
         List<OnboardingQuestion> all = questionService.getAllOnboardingQuestions();
         List<QuestionDTO> dtos = all.stream().map(QuestionService::toDTOFromOnboarding).collect(Collectors.toList());
-        return ResponseEntity.ok(dtos);
+        return ResponseEntity.ok(Result.success(dtos));
     }
 
     @GetMapping("/training/questions/{id}")
-    public ResponseEntity<?> getTrainingQuestion(@PathVariable Integer id) {
+    public ResponseEntity<Result<QuestionDTO>> getTrainingQuestion(@PathVariable Integer id) {
         Optional<OnboardingQuestion> q = questionService.getOnboardingById(id);
-        return q.map(value -> ResponseEntity.ok(QuestionService.toDTOFromOnboarding(value)))
-                .orElse(ResponseEntity.notFound().build());
+        return q.map(value -> ResponseEntity.ok(Result.success(QuestionService.toDTOFromOnboarding(value))))
+                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body(Result.fail(ResultCode.NOT_FOUND, "培训题目不存在")));
     }
 
     @PostMapping("/training/questions")
-    public ResponseEntity<?> createTrainingQuestion(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<Result<Map<String, Object>>> createTrainingQuestion(@RequestBody Map<String, Object> body) {
         OnboardingQuestion q = mapToOnboarding(body);
         q = questionService.addOnboardingQuestion(q);
-        return ResponseEntity.ok(Map.of("id", q.getId()));
+        return ResponseEntity.ok(Result.success(Map.of("id", q.getId())));
     }
 
     @PutMapping("/training/questions/{id}")
-    public ResponseEntity<?> updateTrainingQuestion(@PathVariable Integer id, @RequestBody Map<String, Object> body) {
+    public ResponseEntity<Result<Map<String, Object>>> updateTrainingQuestion(@PathVariable Integer id, @RequestBody Map<String, Object> body) {
         OnboardingQuestion q = mapToOnboarding(body);
         q.setId(id);
         questionService.updateOnboardingQuestion(id, q);
-        return ResponseEntity.ok(Map.of("success", true));
+        return ResponseEntity.ok(Result.success(Map.of("id", id)));
     }
 
     @DeleteMapping("/training/questions/{id}")
-    public ResponseEntity<?> deleteTrainingQuestion(@PathVariable Integer id) {
+    public ResponseEntity<Result<Void>> deleteTrainingQuestion(@PathVariable Integer id) {
         questionService.deleteOnboardingQuestion(id);
-        return ResponseEntity.ok(Map.of("success", true));
+        return ResponseEntity.ok(Result.success("删除成功", null));
     }
 
     // ===== Keywords =====
     @GetMapping("/keywords")
-    public ResponseEntity<?> getKeywords(@RequestParam(defaultValue = "") String mode) {
+    public ResponseEntity<Result<List<String>>> getKeywords(@RequestParam(defaultValue = "") String mode) {
         Set<String> keywords = new LinkedHashSet<>();
         if ("onboarding".equals(mode)) {
-            questionService.getAllOnboardingQuestions().forEach(o -> {
-                // onboarding doesn't have keywords field; skip
-            });
+            // 培训题库无关键词字段，跳过
         } else {
             questionService.getAllQuestions().forEach(q -> {
                 if (q.getKeywords() != null && !q.getKeywords().isEmpty()) {
@@ -140,12 +142,12 @@ public class QuestionController {
                 }
             });
         }
-        return ResponseEntity.ok(new ArrayList<>(keywords));
+        return ResponseEntity.ok(Result.success(new ArrayList<>(keywords)));
     }
 
-    // ===== Admin batch delete =====
+    // ===== Admin 批量删除（统一在 /api/v1 前缀下） =====
     @PostMapping("/admin/questions/batch-delete")
-    public ResponseEntity<?> batchDelete(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<Result<Void>> batchDelete(@RequestBody Map<String, Object> body) {
         Object idsObj = body.get("ids");
         List<Long> ids = new ArrayList<>();
         if (idsObj instanceof List) {
@@ -158,10 +160,11 @@ public class QuestionController {
             }
         }
         if (ids.isEmpty()) {
-            return ResponseEntity.badRequest().body(Map.of("error", "no ids provided"));
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Result.fail(ResultCode.BAD_REQUEST, "未提供题目ID"));
         }
         questionService.batchDelete(ids);
-        return ResponseEntity.ok(Map.of("success", true));
+        return ResponseEntity.ok(Result.success("删除成功", null));
     }
 
     // ===== Helper methods =====

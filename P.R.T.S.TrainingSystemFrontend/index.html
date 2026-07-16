@@ -733,10 +733,13 @@
     </div>
 
     <!-- Unified API client (replaces all old js/api/*.js + apiapp.js + request.js + user.js) -->
+    <script src="js/utils/common.js"></script>
     <script src="js/api.js"></script>
 
     <!-- UI helpers -->
-    <script src="js/ui/modal.js"></script>
+    <script src="js/components/modal.js"></script>
+    <!-- 通知/公告数据格式化（生成 formattedContent/formattedTime/typeInfo） -->
+    <script src="js/utils/notification-helper.js"></script>
     <script src="js/app/app-data.js"></script>
     <script src="js/app/app-computed.js"></script>
     <script src="js/app/app-watch.js"></script>

@@ -16,7 +16,7 @@
     <!-- 引入全局配置 -->
     <script src="js/config.js"></script>
     <!-- 引入 UI Modal -->
-    <script src="js/ui/modal.js"></script>
+    <script src="js/components/modal.js"></script>
 
     <style>
         /* 针对本页面的特定样式补充 */
@@ -279,11 +279,12 @@
             const url = `${baseUrl}/api/v1/admin/users?q=${encodeURIComponent(keyword)}`;
 
             fetch(url)
-                .then(response => {
-                    if (!response.ok) throw new Error('网络响应异常');
-                    return response.json();
-                })
-                .then(users => {
+                .then(response => response.json())
+                .then(payload => {
+                    // 兼容标准信封 { code, message, data } 与历史原始数组两种格式
+                    const users = (payload && payload.data)
+                        ? payload.data
+                        : (Array.isArray(payload) ? payload : []);
                     renderTable(users);
                 })
                 .catch(error => {
@@ -374,7 +375,8 @@
             })
             .then(res => res.json())
             .then(data => {
-                if (data.success) {
+                // 兼容标准信封（data.success / data.code）与历史格式
+                if (data && (data.success === true || data.code === 200)) {
                     if (typeof uiModal !== 'undefined') {
                         uiModal.success('操作成功');
                     } else {

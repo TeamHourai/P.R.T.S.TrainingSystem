@@ -17,6 +17,9 @@
     <script src="js/config.js"></script>
     <!-- 引入 UI Modal -->
     <script src="js/components/modal.js"></script>
+    <!-- 统一请求层（带 JWT）+ API 客户端 -->
+    <script src="js/utils/common.js"></script>
+    <script src="js/api.js"></script>
 
     <style>
         /* 针对本页面的特定样式补充 */
@@ -217,6 +220,45 @@
                     </table>
                 </div>
             </div>
+
+            <!-- 管理员操作记录（审计日志，仅超级管理员可查） -->
+            <div class="admin-container" style="margin-top: 24px;">
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+                    <h2 style="margin:0; font-size:1.3rem;"><i class="fas fa-history"></i> 管理员操作记录</h2>
+                    <div style="display:flex; gap:10px; align-items:center;">
+                        <label style="font-size:0.9em; color:var(--text-secondary);">每页</label>
+                        <select id="auditSize" style="padding:6px 10px; border:1px solid var(--border-color); border-radius:4px; background:var(--bg-card); color:var(--text-main);">
+                            <option value="20" selected>20</option>
+                            <option value="50">50</option>
+                            <option value="100">100</option>
+                        </select>
+                        <button class="nav-btn primary" onclick="loadAuditLogs(1)">
+                            <i class="fas fa-search"></i> 查询
+                        </button>
+                    </div>
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="user-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>操作者</th>
+                                <th>动作</th>
+                                <th>目标</th>
+                                <th>方法</th>
+                                <th>路径</th>
+                                <th>IP</th>
+                                <th>状态</th>
+                                <th>时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="auditLogBody">
+                            <tr><td colspan="9" style="text-align:center; padding:20px; color:var(--text-muted);">点击「查询」加载操作记录</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div id="auditPagination" style="display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top:12px;"></div>
+            </div>
         </div>
     </div>
 
@@ -255,42 +297,24 @@
             searchUsers();
         });
 
-        function searchUsers() {
+        async function searchUsers() {
             const keyword = document.getElementById('searchInput').value;
             const tbody = document.getElementById('userTableBody');
 
             tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 30px;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>';
 
-            // 使用 config.js 中的 getApiBaseUrl() 获取基础路径
-            // 如果 getApiBaseUrl() 返回空字符串（相对路径），则直接使用 /api/...
-            // 如果是绝对路径（如 http://localhost:8080），则拼接
-            let baseUrl = '';
-            if (typeof getApiBaseUrl === 'function') {
-                baseUrl = getApiBaseUrl();
-            } else if (typeof CONFIG !== 'undefined' && CONFIG.API && CONFIG.API.BASE_URL) {
-                baseUrl = CONFIG.API.BASE_URL;
-            } else if (window.API_BASE_URL) {
-                baseUrl = window.API_BASE_URL;
+            // 走统一 API 客户端（自动携带 JWT）；/admin/** 需要 ROLE_ADMIN
+            if (!window.adminApi || typeof adminApi.getUsers !== 'function') {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--warning-color);">API 客户端未加载，请刷新页面重试</td></tr>';
+                return;
             }
-
-            // 移除 baseUrl 末尾的斜杠（如果有）
-            if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
-
-            const url = `${baseUrl}/api/v1/admin/users?q=${encodeURIComponent(keyword)}`;
-
-            fetch(url)
-                .then(response => response.json())
-                .then(payload => {
-                    // 兼容标准信封 { code, message, data } 与历史原始数组两种格式
-                    const users = (payload && payload.data)
-                        ? payload.data
-                        : (Array.isArray(payload) ? payload : []);
-                    renderTable(users);
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--warning-color);">加载失败: ${error.message}</td></tr>`;
-                });
+            try {
+                const users = await adminApi.getUsers(keyword);
+                renderTable(Array.isArray(users) ? users : []);
+            } catch (error) {
+                console.error('Error:', error);
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--warning-color);">加载失败: ${error.message || error}</td></tr>`;
+            }
         }
 
         function renderTable(users) {
@@ -355,49 +379,97 @@
             }
         }
 
-        function performChangePermission(actorId, targetId, makeAdmin) {
-            const body = `actor_id=${encodeURIComponent(actorId)}&target_id=${encodeURIComponent(targetId)}&make_admin=${makeAdmin}`;
-
-            let baseUrl = '';
-            if (typeof getApiBaseUrl === 'function') {
-                baseUrl = getApiBaseUrl();
-            } else if (typeof CONFIG !== 'undefined' && CONFIG.API && CONFIG.API.BASE_URL) {
-                baseUrl = CONFIG.API.BASE_URL;
-            } else if (window.API_BASE_URL) {
-                baseUrl = window.API_BASE_URL;
+        async function performChangePermission(actorId, targetId, makeAdmin) {
+            if (!window.adminApi || typeof adminApi.setPermission !== 'function') {
+                if (typeof uiModal !== 'undefined') uiModal.error('API 客户端未加载，请刷新页面重试');
+                else alert('API 客户端未加载，请刷新页面重试');
+                return;
             }
-            if (baseUrl.endsWith('/')) baseUrl = baseUrl.slice(0, -1);
+            try {
+                // adminApi.setPermission 走统一请求层，自动携带 JWT 并解包信封；
+                // 非 200 会抛错，进入 catch。
+                await adminApi.setPermission(actorId, targetId, makeAdmin);
+                if (typeof uiModal !== 'undefined') uiModal.success('操作成功');
+                else alert('操作成功');
+                searchUsers(); // 刷新列表
+            } catch (err) {
+                const msg = (err && err.message) ? err.message : String(err);
+                if (typeof uiModal !== 'undefined') uiModal.error('操作失败: ' + msg);
+                else alert('操作失败: ' + msg);
+            }
+        }
 
-            fetch(`${baseUrl}/api/v1/admin/user/permission`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/x-www-form-urlencoded'},
-                body: body
-            })
-            .then(res => res.json())
-            .then(data => {
-                // 兼容标准信封（data.success / data.code）与历史格式
-                if (data && (data.success === true || data.code === 200)) {
-                    if (typeof uiModal !== 'undefined') {
-                        uiModal.success('操作成功');
-                    } else {
-                        alert('操作成功');
-                    }
-                    searchUsers(); // 刷新列表
-                } else {
-                    if (typeof uiModal !== 'undefined') {
-                        uiModal.error('操作失败: ' + data.message);
-                    } else {
-                        alert('操作失败: ' + data.message);
-                    }
-                }
-            })
-            .catch(err => {
-                if (typeof uiModal !== 'undefined') {
-                    uiModal.error('请求出错: ' + err);
-                } else {
-                    alert('请求出错: ' + err);
-                }
-            });
+        // ============ 管理员操作记录（审计日志） ============
+        let auditPage = 1;
+        function getAuditSize() {
+            const sel = document.getElementById('auditSize');
+            return sel ? Number(sel.value || 20) : 20;
+        }
+
+        async function loadAuditLogs(page) {
+            auditPage = page || 1;
+            const size = getAuditSize();
+            const tbody = document.getElementById('auditLogBody');
+            if (!tbody) return;
+            tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;"><i class="fas fa-spinner fa-spin"></i> 加载中...</td></tr>';
+
+            if (!window.adminApi || typeof adminApi.getAuditLogs !== 'function') {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--warning-color);">API 客户端未加载</td></tr>';
+                return;
+            }
+            try {
+                const res = await adminApi.getAuditLogs(auditPage, size);
+                const logs = (res && Array.isArray(res.logs)) ? res.logs : [];
+                const total = (res && typeof res.total === 'number') ? res.total : 0;
+                const pages = (res && typeof res.pages === 'number') ? res.pages : 1;
+                renderAuditLogs(logs);
+                renderAuditPagination(auditPage, pages, total);
+            } catch (err) {
+                const msg = (err && err.message) ? err.message : String(err);
+                tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;color:var(--warning-color);">加载失败: ${escapeHtml(msg)}</td></tr>`;
+                const pg = document.getElementById('auditPagination');
+                if (pg) pg.innerHTML = '';
+            }
+        }
+
+        function renderAuditLogs(logs) {
+            const tbody = document.getElementById('auditLogBody');
+            if (!logs || logs.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;padding:20px;color:var(--text-muted);">暂无操作记录</td></tr>';
+                return;
+            }
+            const statusBadge = (s) => {
+                if (s === 'SUCCESS') return '<span class="role-badge role-user">成功</span>';
+                if (s === 'FAIL') return '<span class="role-badge role-admin">失败</span>';
+                return escapeHtml(s || '-');
+            };
+            tbody.innerHTML = logs.map(l => `
+                <tr>
+                    <td>${l.id != null ? l.id : '-'}</td>
+                    <td>${escapeHtml(l.actorName || ('user#' + (l.actorId || '?')))}</td>
+                    <td>${escapeHtml(l.action || '-')}</td>
+                    <td>${escapeHtml(l.target || '-')}</td>
+                    <td>${escapeHtml(l.method || '-')}</td>
+                    <td>${escapeHtml(l.path || '-')}</td>
+                    <td>${escapeHtml(l.ip || '-')}</td>
+                    <td>${statusBadge(l.status)}</td>
+                    <td>${escapeHtml(l.createdAt || '-')}</td>
+                </tr>
+            `).join('');
+        }
+
+        function renderAuditPagination(page, pages, total) {
+            const pg = document.getElementById('auditPagination');
+            if (!pg) return;
+            const prevDisabled = page <= 1;
+            const nextDisabled = page >= pages;
+            pg.innerHTML = `
+                <span style="color:var(--text-secondary);font-size:0.9em;">第 ${page} / ${pages} 页（共 ${total} 条）</span>
+                <span style="display:flex;gap:8px;">
+                    <button class="nav-btn secondary" ${prevDisabled ? 'disabled' : ''} onclick="loadAuditLogs(${page - 1})">上一页</button>
+                    <button class="nav-btn secondary" ${nextDisabled ? 'disabled' : ''} onclick="loadAuditLogs(${page + 1})">下一页</button>
+                </span>
+            `;
         }
 
         function escapeHtml(text) {

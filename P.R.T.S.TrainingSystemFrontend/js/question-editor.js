@@ -21,6 +21,7 @@
         hint: document.getElementById('qe-hint'),
 
         rightPanel: document.getElementById('qe-right-panel'),
+        qeMain: document.querySelector('.qe-main'),
         closePanelBtn: document.getElementById('qe-close-panel-btn'),
         form: document.getElementById('qe-form'),
         formTitle: document.getElementById('qe-form-title'),
@@ -270,6 +271,18 @@
         return params;
     }
 
+    // 切换为左右分栏并显示右侧编辑面板
+    function openPanel() {
+        if (el.rightPanel) el.rightPanel.style.display = '';
+        if (el.qeMain) el.qeMain.classList.add('qe-split');
+    }
+
+    // 收起右侧编辑面板，恢复 qe-left 居中单列
+    function closePanel() {
+        if (el.rightPanel) el.rightPanel.style.display = 'none';
+        if (el.qeMain) el.qeMain.classList.remove('qe-split');
+    }
+
     function clearForm() {
         if (el.id) el.id.value = '';
         if (el.formType) el.formType.value = '';
@@ -288,8 +301,8 @@
         if (el.formTitle) el.formTitle.textContent = '新建题目';
         if (el.formSub) el.formSub.textContent = '填写题目内容并保存';
         setHint(el.formHint, '', null);
-        // Show the editor panel
-        if (el.rightPanel) el.rightPanel.style.display = '';
+        // 注意：不再在此处显示面板。面板显隐由 openPanel/closePanel 控制，
+        // 初始态保持 qe-left 居中、qe-right 隐藏；点击「新建题目」或「编辑」时才展开。
     }
 
     function fillForm(q) {
@@ -467,7 +480,7 @@
             setHint(el.formHint, '加载题目详情中...', null);
             const q = await apiGetDetail(id);
             fillForm(q);
-            if (el.rightPanel) el.rightPanel.style.display = '';
+            openPanel();
             setHint(el.formHint, '已载入，可修改后保存', 'success');
         } catch (e) {
             console.error(e);
@@ -599,13 +612,11 @@
         }
 
         if (el.newBtn) {
-            el.newBtn.addEventListener('click', () => clearForm());
+            el.newBtn.addEventListener('click', () => { clearForm(); openPanel(); });
         }
 
         if (el.closePanelBtn) {
-            el.closePanelBtn.addEventListener('click', () => {
-                if (el.rightPanel) el.rightPanel.style.display = 'none';
-            });
+            el.closePanelBtn.addEventListener('click', () => closePanel());
         }
 
         if (el.clearBtn) {
@@ -738,6 +749,7 @@
         await loadKeywords();
 
         bindEvents();
+        closePanel();   // 初始态：qe-left 居中、qe-right 隐藏
         clearForm();
         await loadList();
     }

@@ -29,8 +29,20 @@
 
 .qe-main {
     display: grid;
-    grid-template-columns: 1.2fr 0.8fr;
+    /* 默认单列：qe-left 居中显示，qe-right 隐藏 */
+    grid-template-columns: 1fr;
     gap: 18px;
+}
+
+/* 点击「新建题目」后切换为左右分栏 */
+.qe-main.qe-split {
+    grid-template-columns: 1.2fr 0.8fr;
+}
+
+/* 非分栏态：qe-left 居中（限宽），避免在宽屏下被拉满 */
+.qe-main:not(.qe-split) .qe-left {
+    width: min(100%, 1200px);
+    justify-self: center;
 }
 
 .qe-card {
@@ -288,8 +300,14 @@
 }
 
 @media (max-width: 1100px) {
-    .qe-main {
+    .qe-main,
+    .qe-main.qe-split {
         grid-template-columns: 1fr;
+    }
+
+    .qe-main.qe-split .qe-left {
+        justify-self: stretch;
+        width: auto;
     }
 
     .qe-table-wrap {

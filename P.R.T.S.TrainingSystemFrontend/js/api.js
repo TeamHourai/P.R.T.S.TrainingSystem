@@ -100,6 +100,9 @@
                 body.append('target_id', targetId);
                 body.append('make_admin', makeAdmin ? 'true' : 'false');
                 return PRTS.post('/admin/user/permission', null, { formBody: body.toString() });
+            },
+            auditLogs: function (page, size) {
+                return PRTS.get('/admin/audit-logs', { page: page || 1, size: size || 20 });
             }
         },
 
@@ -213,6 +216,7 @@
     };
     window.adminApi = {
         getUsers: a.admin.users,
-        setPermission: a.admin.setPermission
+        setPermission: a.admin.setPermission,
+        getAuditLogs: a.admin.auditLogs
     };
 })(window);

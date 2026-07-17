@@ -53,6 +53,7 @@
       .ui-icon-info{background:rgba(33,150,243,.18);color:#90CAF9}
       .ui-icon-success{background:rgba(67,160,71,.18);color:#A5D6A7}
       .ui-icon-error{background:rgba(244,67,54,.18);color:#FFCDD2}
+      .ui-icon-warning{background:rgba(255,152,0,.18);color:#FFCC80}
     `;
         document.head.appendChild(style);
     }
@@ -75,8 +76,11 @@
         body.className = 'ui-modal-body';
 
         const icon = document.createElement('span');
-        icon.className = 'ui-modal-icon ' + (type === 'success' ? 'ui-icon-success' : type === 'error' ? 'ui-icon-error' : 'ui-icon-info');
-        icon.textContent = type === 'success' ? '✓' : type === 'error' ? '!' : 'i';
+        icon.className = 'ui-modal-icon ' + (
+            type === 'success' ? 'ui-icon-success' :
+            type === 'error' ? 'ui-icon-error' :
+            type === 'warning' ? 'ui-icon-warning' : 'ui-icon-info');
+        icon.textContent = type === 'success' ? '✓' : (type === 'error' || type === 'warning') ? '!' : 'i';
 
         const text = document.createElement('span');
         text.textContent = message == null ? '' : String(message);
@@ -152,6 +156,7 @@
     const modalApi = {
         info: (msg, title) => showModal('info', title || '提示', msg, {}),
         success: (msg, title) => showModal('success', title || '成功', msg, {}),
+        warning: (msg, title) => showModal('warning', title || '提示', msg, {}),
         error: (msg, title) => showModal('error', title || '错误', msg, {}),
         confirm: confirmModal
     };

@@ -27,6 +27,10 @@ new Vue({
 
             console.log('博士考核系统初始化...');
             await this.checkLoginStatus();
+            // 登录后自动检测未读公告（有未读则弹窗，每会话一次）
+            if (this.isLoggedIn && typeof this.checkLoginAnnouncements === 'function') {
+                this.checkLoginAnnouncements();
+            }
             // 登录后拉取用户答题设置
             if (typeof this.loadAnswerSettings === 'function') {
                 await this.loadAnswerSettings();
@@ -73,6 +77,8 @@ new Vue({
             });
         } catch (error) {
             console.error('应用初始化失败:', error);
+            // 限流（429）已在请求层给出区分性提示，此处不再重复弹「初始化失败」
+            if (error && error.rateLimited) return;
             this.showError('系统初始化失败，请刷新页面重试');
         }
     }

@@ -23,6 +23,7 @@ public enum ResultCode {
     FORBIDDEN(403, "没有权限执行该操作"),
     NOT_FOUND(404, "请求的资源不存在"),
     CONFLICT(409, "资源状态冲突，请刷新后重试"),
+    TOO_MANY_REQUESTS(429, "请求过于频繁，请稍后再试"),
 
     INTERNAL_ERROR(500, "服务器内部错误，请稍后重试");
 

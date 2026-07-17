@@ -322,3 +322,49 @@ npm run dev:full          # 同时起 http-server(8888) + json-server mock(8889)
 | 终端 2 | `npx live-server . -p 8888 --watch=js,css,*.html` | 前端 8888，改文件自动刷新 |
 
 访问 `http://localhost:8888` 即可获得前后端热更新体验。
+
+---
+
+## 八、安全与审计
+
+### 8.1 登录未读公告弹窗
+
+用户登录后（页面加载确认登录态时），前端自动调用 `GET /api/v1/notifications/unread-count`：
+- 若 `unreadCount > 0`，自动弹出「系统公告」弹窗展示未读公告内容；
+- 同一浏览器会话内仅自动弹一次（`sessionStorage` 标记 `__login_announcement_shown__`），登出时清除；
+- 用户在弹窗内「标记已读 / 全部已读」后，未读数归零，**后续登录不再重复弹出**。
+
+相关前端逻辑：`js/app/app-methods4.js` 的 `checkLoginAnnouncements()`，由 `app-main.js` 的 `mounted()` 在登录确认后触发。
+
+### 8.2 请求频率限制（防高频/爆破）
+
+`config/RateLimitFilter` 按「客户端 IP + 端点分组」做 60 秒滑动窗口计数，超限返回 HTTP 429 与统一信封（`code=429`）：
+
+| 端点分组 | 限流阈值 | 说明 |
+|----------|----------|------|
+| `/auth/login`、`/auth/register` | 10 次/分钟 | 防登录爆破 |
+| `/admin/**` | 60 次/分钟 | 管理操作 |
+| 其余 | 120 次/分钟 | 通用 |
+
+CORS 预检（OPTIONS）放行。纯内存实现，适合单实例；多实例需替换为 Redis 共享计数。注册于 `SecurityConfig`，早于 JWT 过滤器执行。
+
+### 8.3 管理员操作审计日志
+
+- 新增 `audit_logs` 表（Flyway `V2__audit_logs.sql`）与 `AuditLog` 实体 / `AuditLogService`。
+- 关键写操作自动记录：`SET_PERMISSION`（`AdminController.setPermission`）、`CREATE_ANNOUNCEMENT`（`NotificationController.createAnnouncement`）等，含操作者、目标、HTTP 方法、路径、IP、成功/失败、时间。
+- 审计写入使用独立事务（`REQUIRES_NEW`），即使主业务回滚也不丢审计。
+- 查询接口（仅超级管理员，即 `users.id = 1`）：
+
+```
+GET /api/v1/admin/audit-logs?page=1&size=20
+→ data:{ logs:[{id,actorId,actorName,action,target,method,path,ip,status,detail,createdAt}], total,page,size,pages }
+```
+
+非超级管理员访问返回 403，并记录一条 `VIEW_AUDIT_LOGS / FAIL` 审计。
+
+### 8.4 输入校验与防注入
+
+- **参数校验**：`RegisterRequest` 约束用户名（3–20 位，仅字母数字下划线连字符中文）、密码长度、邮箱格式（`@Email`）；`LoginRequest` 非空校验。校验失败由 `GlobalExceptionHandler` 转为 400 标准响应。
+- **XSS 清洗**：`util/InputSanitizer` 剥离 `<script>`、危险标签（iframe/object/embed/svg/style 等）、`on*=` 事件处理器、`javascript:`/`vbscript:` 协议。应用于公告标题（去全部 HTML）/内容、题目文本（`QuestionController.toStr`）等持久化点。
+- **全局参数过滤**：`config/XssFilter` 包装请求，对所有 query/form 参数统一清洗。
+- **SQL 注入**：持久层全程 JPA 参数化查询，无字符串拼接 SQL。

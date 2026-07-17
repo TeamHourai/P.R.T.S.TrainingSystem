@@ -22,6 +22,10 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // 安全过滤器：XSS 清洗 -> 频率限制 -> JWT 认证
+        XssFilter xssFilter = new XssFilter();
+        RateLimitFilter rateLimitFilter = new RateLimitFilter();
+
         http
             .csrf(csrf -> csrf.disable())
             .cors(cors -> {})  // uses corsConfigurationSource bean from CorsConfig
@@ -35,6 +39,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
                 .anyRequest().permitAll()
             )
+            .addFilterBefore(xssFilter, UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(rateLimitFilter, XssFilter.class)
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

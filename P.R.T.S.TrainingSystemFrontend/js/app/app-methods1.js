@@ -110,6 +110,9 @@ window._appMethods1 = {
         this.wrongQuestionsDetail = [];
         this.trainingRecords = {};
 
+        // 清除登录公告弹窗标记，使下次登录重新检测未读公告
+        try { sessionStorage.removeItem('__login_announcement_shown__'); } catch (e) { /* ignore */ }
+
         // 退出登录成功不弹窗
 
         // 退出登录后自动刷新页面

@@ -6,6 +6,10 @@ import com.hourai.prts.entity.Announcement;
 import com.hourai.prts.entity.NotificationState;
 import com.hourai.prts.repository.AnnouncementRepository;
 import com.hourai.prts.repository.NotificationStateRepository;
+import com.hourai.prts.service.AuditLogService;
+import com.hourai.prts.util.InputSanitizer;
+import com.hourai.prts.util.IpUtils;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,11 +29,14 @@ public class NotificationController {
 
     private final AnnouncementRepository announcementRepository;
     private final NotificationStateRepository notificationStateRepository;
+    private final AuditLogService auditLogService;
 
     public NotificationController(AnnouncementRepository announcementRepository,
-                                   NotificationStateRepository notificationStateRepository) {
+                                   NotificationStateRepository notificationStateRepository,
+                                   AuditLogService auditLogService) {
         this.announcementRepository = announcementRepository;
         this.notificationStateRepository = notificationStateRepository;
+        this.auditLogService = auditLogService;
     }
 
     // ===== 公告 =====
@@ -52,26 +59,45 @@ public class NotificationController {
     }
 
     @PostMapping("/admin/announcements")
-    public ResponseEntity<Result<Map<String, Object>>> createAnnouncement(@RequestBody Map<String, String> body, Authentication auth) {
+    public ResponseEntity<Result<Map<String, Object>>> createAnnouncement(@RequestBody Map<String, String> body, Authentication auth, HttpServletRequest request) {
+        Long actorId = null;
+        String ip = IpUtils.getClientIp(request);
         if (auth == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Result.fail(ResultCode.UNAUTHORIZED, "未登录或登录已过期"));
         }
+        actorId = (Long) auth.getPrincipal();
+
         String title = body.get("title");
         String content = body.get("content");
-        if (title == null || content == null) {
+        if (title == null || title.trim().isEmpty() || content == null || content.trim().isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Result.fail(ResultCode.BAD_REQUEST, "标题和内容不能为空"));
         }
+        // 输入清洗与长度限制：标题去全部 HTML，内容剥离脚本/事件处理器
+        String safeTitle = InputSanitizer.stripAllHtml(title.trim());
+        String safeContent = InputSanitizer.sanitize(content, 8000);
+        if (safeTitle.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Result.fail(ResultCode.BAD_REQUEST, "标题不能为空"));
+        }
+        if (safeTitle.length() > 200) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Result.fail(ResultCode.BAD_REQUEST, "标题过长（最多 200 字）"));
+        }
+
         Announcement a = new Announcement();
         a.setType(body.getOrDefault("type", "system"));
-        a.setTitle(title);
-        a.setContent(content);
+        a.setTitle(safeTitle);
+        a.setContent(safeContent);
         a.setImportant("true".equals(body.get("important")) || "1".equals(body.get("important")));
         a.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-        a.setCreatedBy(((Long) auth.getPrincipal()).toString());
+        a.setCreatedBy(actorId.toString());
         a.setExpiresAt(body.get("expiresAt"));
         a = announcementRepository.save(a);
+
+        auditLogService.record(actorId, "CREATE_ANNOUNCEMENT", "announcement#" + a.getId(),
+                request.getMethod(), request.getRequestURI(), ip, "SUCCESS", safeTitle);
         return ResponseEntity.ok(Result.success(Map.of("id", a.getId())));
     }
 
@@ -136,7 +162,17 @@ public class NotificationController {
             return ResponseEntity.ok(Result.success(Map.of("unreadCount", 0)));
         }
         Long userId = (Long) auth.getPrincipal();
-        long count = notificationStateRepository.countByUserIdAndIsReadFalse(userId);
+        // 与 /notifications 列表一致：无状态记录（ns==null）视为未读，
+        // 而非仅统计已有 NotificationState 行（否则新公告会被漏算为 0）。
+        List<Announcement> announcements = announcementRepository.findAllByOrderByIdDesc();
+        Map<Long, NotificationState> stateMap = notificationStateRepository.findByUserId(userId).stream()
+                .collect(Collectors.toMap(NotificationState::getNotificationId, s -> s));
+        long count = announcements.stream()
+                .filter(a -> {
+                    NotificationState ns = stateMap.get(a.getId());
+                    return ns == null || !ns.getIsRead();
+                })
+                .count();
         return ResponseEntity.ok(Result.success(Map.of("unreadCount", count)));
     }
 

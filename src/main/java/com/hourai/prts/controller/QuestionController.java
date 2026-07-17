@@ -225,7 +225,7 @@ public class QuestionController {
 
     private String toStr(Object... values) {
         for (Object v : values) {
-            if (v != null) return v.toString();
+            if (v != null) return com.hourai.prts.util.InputSanitizer.sanitize(v.toString());
         }
         return "";
     }

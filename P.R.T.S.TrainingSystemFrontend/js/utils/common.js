@@ -113,6 +113,10 @@
     }
 
     /* ============ 核心请求 ============ */
+    // 限流提示去重：短时间内多个并发请求同时 429 时只弹一次
+    var lastRateLimitToastAt = 0;
+    var RATE_LIMIT_MSG = '操作过于频繁，已触发限流保护，请稍后再试';
+
     function request(method, path, data, opts) {
         opts = opts || {};
         var url = buildUrl(path);
@@ -133,6 +137,18 @@
         }
 
         return fetch(url, config).then(function (resp) {
+            // 限流（HTTP 429）：给区分性提示，与普通业务错误区分开
+            if (resp.status === 429) {
+                var now = Date.now();
+                if (now - lastRateLimitToastAt > 3000) {
+                    lastRateLimitToastAt = now;
+                    toast('warning', RATE_LIMIT_MSG);
+                }
+                var rlErr = new Error(RATE_LIMIT_MSG);
+                rlErr.code = 429;
+                rlErr.rateLimited = true;
+                throw rlErr;
+            }
             return resp.text().then(function (text) {
                 var payload = null;
                 try { payload = text ? JSON.parse(text) : null; } catch (e) { payload = null; }

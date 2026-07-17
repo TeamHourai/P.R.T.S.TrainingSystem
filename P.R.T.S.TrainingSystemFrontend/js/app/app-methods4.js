@@ -403,6 +403,29 @@ window._appMethods4 = {
         this.noticePage = 1;
         this.loadNotifications();
     },
+    // 登录后自动检测未读公告并弹窗（每个浏览器会话仅自动弹一次；
+    // 公告标记为已读后 unreadCount 归零，后续登录不再弹出）
+    async checkLoginAnnouncements() {
+        if (!this.isLoggedIn) return;
+        try {
+            if (sessionStorage.getItem('__login_announcement_shown__')) return;
+        } catch (e) { /* sessionStorage 不可用时忽略 */ }
+        if (!window.notificationApi || typeof window.notificationApi.getUnreadCount !== 'function') return;
+        try {
+            const res = await window.notificationApi.getUnreadCount();
+            const count = (res && typeof res.unreadCount === 'number') ? res.unreadCount : 0;
+            if (count > 0) {
+                try { sessionStorage.setItem('__login_announcement_shown__', '1'); } catch (e) { /* ignore */ }
+                // 复用系统公告弹窗，默认展示「未读」标签
+                this.systemNoticeTab = 'unread';
+                this.noticePage = 1;
+                this.showSystemNotice = true;
+                this.loadNotifications();
+            }
+        } catch (e) {
+            console.warn('登录未读公告检测失败', e);
+        }
+    },
     startExam() {
         if (!this.isLoggedIn) {
             this.showError('请先登录以参加考试');
@@ -469,11 +492,16 @@ window._appMethods4 = {
                 this.loadingNotifications = false;
                 return;
             }
+            // 仅在「未读」tab 传 unreadOnly=true；「全部公告」tab 不传该参数，
+            // 否则 URLSearchParams 会把 undefined 序列化为 "undefined"，
+            // 后端 boolean 解析失败返回 400 -> 列表为空。
             const params = {
                 page: this.noticePage,
-                size: 10,
-                unreadOnly: this.systemNoticeTab === 'unread' ? true : undefined
+                size: 10
             };
+            if (this.systemNoticeTab === 'unread') {
+                params.unreadOnly = true;
+            }
             const res = await notificationApi.getNotifications(params);
             const raw = res.notifications || [];
             if (window.notificationHelper && typeof window.notificationHelper.formatNotification === 'function') {

@@ -399,9 +399,18 @@ window._appMethods4 = {
             this.showError('请先登录后查看系统公告');
             return;
         }
-        this.showSystemNotice = true;
+        // 已打开：直接刷新当前 tab（避免重复触发 watcher 产生并发竞态）
+        if (this.showSystemNotice) {
+            this.noticePage = 1;
+            this.loadNotifications();
+            return;
+        }
+        // 未打开：先清空旧缓存并置加载态，再打开弹窗；
+        // 由 showSystemNotice watcher 触发唯一一次 loadNotifications，避免并发。
         this.noticePage = 1;
-        this.loadNotifications();
+        this.notifications = [];
+        this.loadingNotifications = true;
+        this.showSystemNotice = true;
     },
     // 登录后自动检测未读公告并弹窗（每个浏览器会话仅自动弹一次；
     // 公告标记为已读后 unreadCount 归零，后续登录不再弹出）
@@ -416,11 +425,14 @@ window._appMethods4 = {
             const count = (res && typeof res.unreadCount === 'number') ? res.unreadCount : 0;
             if (count > 0) {
                 try { sessionStorage.setItem('__login_announcement_shown__', '1'); } catch (e) { /* ignore */ }
-                // 复用系统公告弹窗，默认展示「未读」标签
+                // 先重置状态：清空旧缓存 + 置加载态，避免弹窗瞬间展示旧公告；
+                // 再打开弹窗，由 showSystemNotice watcher 触发唯一一次 loadNotifications，
+                // 不再显式调用，消除 watcher 与显式调用并发导致的竞态。
                 this.systemNoticeTab = 'unread';
                 this.noticePage = 1;
+                this.notifications = [];
+                this.loadingNotifications = true;
                 this.showSystemNotice = true;
-                this.loadNotifications();
             }
         } catch (e) {
             console.warn('登录未读公告检测失败', e);
@@ -482,16 +494,19 @@ window._appMethods4 = {
             this.loadingNotifications = false;
             return;
         }
-
+        if (!window.notificationApi) {
+            this.notifications = [];
+            this.unreadCount = 0;
+            this.hasMoreNotifications = false;
+            this.loadingNotifications = false;
+            return;
+        }
+        // 请求令牌：仅采纳最新一次调用的结果，丢弃过时响应。
+        // 修复竞态：showSystemNotice/systemNoticeTab 的 watcher 与显式调用可能并发触发，
+        // 后 resolve 的旧响应（或失败的 catch）会覆盖新数据，导致弹窗偶发显示为空/旧公告。
+        const reqId = (this.notifReqSeq = (this.notifReqSeq || 0) + 1);
         this.loadingNotifications = true;
         try {
-            if (!window.notificationApi) {
-                this.notifications = [];
-                this.unreadCount = 0;
-                this.hasMoreNotifications = false;
-                this.loadingNotifications = false;
-                return;
-            }
             // 仅在「未读」tab 传 unreadOnly=true；「全部公告」tab 不传该参数，
             // 否则 URLSearchParams 会把 undefined 序列化为 "undefined"，
             // 后端 boolean 解析失败返回 400 -> 列表为空。
@@ -503,6 +518,7 @@ window._appMethods4 = {
                 params.unreadOnly = true;
             }
             const res = await notificationApi.getNotifications(params);
+            if (reqId !== this.notifReqSeq) return; // 已被更新的请求取代，丢弃过时结果
             const raw = res.notifications || [];
             if (window.notificationHelper && typeof window.notificationHelper.formatNotification === 'function') {
                 this.notifications = raw.map(n => window.notificationHelper.formatNotification(n)).filter(Boolean);
@@ -512,11 +528,13 @@ window._appMethods4 = {
             this.unreadCount = res.unreadCount || 0;
             this.hasMoreNotifications = res.hasMore || false;
         } catch (e) {
+            if (reqId !== this.notifReqSeq) return; // 丢弃过时请求的错误，不影响最新调用
             this.notifications = [];
             this.unreadCount = 0;
             this.hasMoreNotifications = false;
         } finally {
-            this.loadingNotifications = false;
+            // 仅当本请求仍是最新时才复位 loading，避免提前关闭加载态
+            if (reqId === this.notifReqSeq) this.loadingNotifications = false;
         }
     },
     switchNoticeTab(tab) {

@@ -399,18 +399,13 @@ window._appMethods4 = {
             this.showError('请先登录后查看系统公告');
             return;
         }
-        // 已打开：直接刷新当前 tab（避免重复触发 watcher 产生并发竞态）
-        if (this.showSystemNotice) {
-            this.noticePage = 1;
-            this.loadNotifications();
-            return;
-        }
-        // 未打开：先清空旧缓存并置加载态，再打开弹窗；
-        // 由 showSystemNotice watcher 触发唯一一次 loadNotifications，避免并发。
+        // 显式控制加载（showSystemNotice watcher 已移除自动加载），
+        // 先清空旧缓存并置加载态，再打开弹窗并加载，确保单次加载、无并发竞态。
         this.noticePage = 1;
         this.notifications = [];
         this.loadingNotifications = true;
         this.showSystemNotice = true;
+        this.loadNotifications();
     },
     // 登录后自动检测未读公告并弹窗（每个浏览器会话仅自动弹一次；
     // 公告标记为已读后 unreadCount 归零，后续登录不再弹出）
@@ -419,19 +414,20 @@ window._appMethods4 = {
         try {
             if (sessionStorage.getItem('__login_announcement_shown__')) return;
         } catch (e) { /* sessionStorage 不可用时忽略 */ }
-        if (!window.notificationApi || typeof window.notificationApi.getUnreadCount !== 'function') return;
+        // 立即标记「本会话已检测过」（在加载之前）。否则用户在 loadNotifications
+        // 加载期间导航离开（如进编辑器），标记未设→返回首页时再次弹窗（概率性触发）。
+        // 前置后：每会话至多弹一次，与加载是否完成无关。
+        try { sessionStorage.setItem('__login_announcement_shown__', '1'); } catch (e) { /* ignore */ }
+        if (!window.notificationApi || typeof window.notificationApi.getNotifications !== 'function') return;
         try {
-            const res = await window.notificationApi.getUnreadCount();
-            const count = (res && typeof res.unreadCount === 'number') ? res.unreadCount : 0;
-            if (count > 0) {
-                try { sessionStorage.setItem('__login_announcement_shown__', '1'); } catch (e) { /* ignore */ }
-                // 先重置状态：清空旧缓存 + 置加载态，避免弹窗瞬间展示旧公告；
-                // 再打开弹窗，由 showSystemNotice watcher 触发唯一一次 loadNotifications，
-                // 不再显式调用，消除 watcher 与显式调用并发导致的竞态。
-                this.systemNoticeTab = 'unread';
-                this.noticePage = 1;
-                this.notifications = [];
-                this.loadingNotifications = true;
+            // 单次加载未读公告：unreadCount 与 notifications 来自同一请求，
+            // 避免「getUnreadCount 决定开窗 + loadNotifications 加载列表」两调用竞态
+            // 导致 count>0 但列表为空时弹窗开而内容为空。
+            this.systemNoticeTab = 'unread';
+            this.noticePage = 1;
+            await this.loadNotifications();   // 弹窗未显示，后台加载并设置 unreadCount/notifications
+            if (this.unreadCount > 0) {
+                // 数据已就绪，直接开窗展示（showSystemNotice watcher 已移除自动加载，不会重复请求）
                 this.showSystemNotice = true;
             }
         } catch (e) {
@@ -477,7 +473,9 @@ window._appMethods4 = {
             questions: 'editor.html',
             training: 'training-editor.html'
         };
-        window.open(map[type], '_blank');
+        // 在当前页面内打开（同标签页导航），不再新开标签页，
+        // 保证 sessionStorage（含登录公告标记）在同一次会话内连续，避免返回首页时状态丢失。
+        window.location.href = map[type];
     },
     goToAnnouncementEditor() {
         window.location.href = 'announcement-editor.html';

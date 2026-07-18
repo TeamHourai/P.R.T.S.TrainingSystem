@@ -44,10 +44,10 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/by-be-young/P.R.T.S.TrainingSystem.git"
+        "url": "https://github.com/TeamHourai/P.R.T.S.TrainingSystem.git"
     },
     "bugs": {
-        "url": "https://github.com/by-be-young/P.R.T.S.TrainingSystem/issues"
+        "url": "https://github.com/TeamHourai/P.R.T.S.TrainingSystem/issues"
     },
-    "homepage": "https://github.com/by-be-young/P.R.T.S.TrainingSystem#readme"
+    "homepage": "https://github.com/TeamHourai/P.R.T.S.TrainingSystem#readme"
 }

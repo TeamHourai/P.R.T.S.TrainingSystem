@@ -4,6 +4,7 @@
 .env.local
 .env.*.local
 # 注意：.env.example 是模板，刻意保留并提交
+data/
 
 # ===================== 依赖与构建产物 =====================
 node_modules/

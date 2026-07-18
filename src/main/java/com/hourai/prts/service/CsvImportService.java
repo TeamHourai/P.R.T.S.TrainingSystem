@@ -28,6 +28,12 @@ public class CsvImportService implements CommandLineRunner {
     @Value("${app.data.force-import:false}")
     private boolean forceImport;
 
+    @Value("${app.admin.username:admin}")
+    private String adminUsername;
+
+    @Value("${app.admin.password:}")
+    private String adminPassword;
+
     public CsvImportService(JdbcTemplate jdbc, PasswordEncoder passwordEncoder) {
         this.jdbc = jdbc;
         this.passwordEncoder = passwordEncoder;
@@ -70,6 +76,8 @@ public class CsvImportService implements CommandLineRunner {
             importNotificationStates(base.resolve("notifications_state.csv"));
             importAnswerSettings(base.resolve("answer_settings.csv"));
             importTrainingRecords(base.resolve("training_records.csv"));
+            // 引导超级管理员（仅当库中无管理员时创建，账号/密码来自环境变量）
+            bootstrapAdmin();
             log.info("CSV data import completed successfully");
         } catch (Exception e) {
             log.error("CSV import failed: {}", e.getMessage(), e);
@@ -306,5 +314,52 @@ public class CsvImportService implements CommandLineRunner {
             if (s.contains(".")) s = s.substring(0, s.indexOf('.'));
             return java.sql.Timestamp.valueOf(s);
         } catch (Exception e) { return null; }
+    }
+
+    /**
+     * 引导超级管理员（id=1）。仅当库中不存在任何管理员时执行：
+     * 用户名取 app.admin.username（环境变量 ADMIN_USERNAME，默认 admin），
+     * 密码取 app.admin.password（环境变量 ADMIN_PASSWORD）；为空则随机生成并在日志显著输出。
+     * 不再从 data/users.csv 硬编码任何账号密码。
+     */
+    private void bootstrapAdmin() {
+        Integer adminCount = jdbc.queryForObject("SELECT COUNT(*) FROM users WHERE is_admin = 1", Integer.class);
+        if (adminCount != null && adminCount > 0) {
+            log.info("已存在 {} 个管理员，跳过超级管理员引导。", adminCount);
+            return;
+        }
+        String username = adminUsername;
+        String password = adminPassword;
+        boolean randomGenerated = false;
+        if (password == null || password.isEmpty()) {
+            password = generateRandomPassword(16);
+            randomGenerated = true;
+        }
+        try {
+            jdbc.update("INSERT INTO users (id, username, password, is_admin, status, register_time, created_at) " +
+                            "VALUES (1, ?, ?, 1, 1, NOW(), NOW())",
+                    username, passwordEncoder.encode(password));
+            if (randomGenerated) {
+                log.warn("====== 超级管理员已创建（未设置 ADMIN_PASSWORD，随机生成密码）======");
+                log.warn("  用户名 : {}", username);
+                log.warn("  密码   : {}", password);
+                log.warn("  请妥善保存并尽快登录后修改；设置环境变量 ADMIN_PASSWORD 可自定义初始密码。");
+                log.warn("===================================================================");
+            } else {
+                log.info("超级管理员 '{}' 已按环境变量配置创建。", username);
+            }
+        } catch (Exception e) {
+            log.warn("创建超级管理员失败（可能 id=1 已被占用）: {}", e.getMessage());
+        }
+    }
+
+    private String generateRandomPassword(int length) {
+        String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        java.security.SecureRandom rnd = new java.security.SecureRandom();
+        StringBuilder sb = new StringBuilder(length);
+        for (int i = 0; i < length; i++) {
+            sb.append(chars.charAt(rnd.nextInt(chars.length())));
+        }
+        return sb.toString();
     }
 }

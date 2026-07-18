@@ -36,10 +36,17 @@ spring:
     default-property-inclusion: non_null
 
 app:
+  admin:
+    # 超级管理员（id=1）账号：首次启动且库中无管理员时按此创建。
+    # 密码留空则随机生成并在启动日志显著输出，便于首次登录；生产请用 ADMIN_PASSWORD 指定强密码。
+    username: ${ADMIN_USERNAME:admin}
+    password: ${ADMIN_PASSWORD:}
   jwt:
     secret: ${JWT_SECRET}
     expiration-ms: 86400000
   data:
+    # 仅当数据库为空（users 表无记录）时才导入 data/ 下的初始数据模板。
+    # force-import=true 会先 TRUNCATE 再重新导入（仅用于重置开发数据），开源默认 false 以保证用户数据持久化。
     import-on-startup: true
-    force-import: true
+    force-import: false
     csv-path: data/

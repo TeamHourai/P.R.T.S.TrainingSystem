@@ -3,7 +3,7 @@
     "version": "2.0.0",
     "description": "明日方舟博士考核系统前端 - 多页面应用",
     "author": "Java大作业小组——蓬莱人形",
-    "license": "MIT",
+    "license": "UNLICENSED",
     "private": true,
     "scripts": {
         "dev": "http-server . -p 8888 -c-1 --proxy http://localhost:8889?",
@@ -44,10 +44,10 @@
     ],
     "repository": {
         "type": "git",
-        "url": "https://github.com/by-be-young/P.R.T.S.TrainingSystemFrontend.git"
+        "url": "https://github.com/by-be-young/P.R.T.S.TrainingSystem.git"
     },
     "bugs": {
-        "url": "https://github.com/by-be-young/P.R.T.S.TrainingSystemFrontend/issues"
+        "url": "https://github.com/by-be-young/P.R.T.S.TrainingSystem/issues"
     },
-    "homepage": "https://github.com/by-be-young/P.R.T.S.TrainingSystemFrontend#readme"
+    "homepage": "https://github.com/by-be-young/P.R.T.S.TrainingSystem#readme"
 }

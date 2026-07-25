@@ -4,6 +4,8 @@ import com.hourai.prts.entity.ExamDetail;
 import com.hourai.prts.entity.ExamRecord;
 import com.hourai.prts.entity.Question;
 import com.hourai.prts.entity.UserAnswer;
+import com.hourai.prts.dto.ExamQuestionResultDTO;
+import com.hourai.prts.dto.ExamSubmissionResultDTO;
 import com.hourai.prts.repository.ExamDetailRepository;
 import com.hourai.prts.repository.ExamRecordRepository;
 import com.hourai.prts.repository.QuestionRepository;
@@ -47,9 +49,10 @@ public class ExamService {
     }
 
     @Transactional
-    public ExamRecord submitExam(Long userId, Map<Long, Integer> answers, Integer duration) {
+    public ExamSubmissionResultDTO submitExam(Long userId, Map<Long, Integer> answers, Integer duration) {
         int correctCount = 0;
-        int total = answers.size();
+        int total = 0;
+        List<ExamQuestionResultDTO> questionResults = new ArrayList<>();
 
         for (Map.Entry<Long, Integer> entry : answers.entrySet()) {
             Long questionId = entry.getKey();
@@ -58,15 +61,10 @@ public class ExamService {
             Optional<Question> qOpt = questionRepository.findById(questionId);
             if (qOpt.isPresent()) {
                 Question q = qOpt.get();
+                total++;
                 int correctAnswer = Integer.parseInt(q.getAnswer());
                 boolean isCorrect = (selectedAnswer == correctAnswer);
                 if (isCorrect) correctCount++;
-
-                ExamDetail detail = new ExamDetail();
-                detail.setExamId(null);
-                detail.setQuestionId(questionId);
-                detail.setSelectedAnswer(String.valueOf(selectedAnswer));
-                detail.setIsCorrect(isCorrect);
 
                 UserAnswer ua = new UserAnswer();
                 ua.setUserId(userId);
@@ -75,6 +73,9 @@ public class ExamService {
                 ua.setIsCorrect(isCorrect);
                 ua.setCreatedAt(LocalDateTime.now());
                 userAnswerRepository.save(ua);
+
+                questionResults.add(new ExamQuestionResultDTO(
+                        questionId, selectedAnswer, correctAnswer, isCorrect, q.getAnalysis()));
             }
         }
 
@@ -89,7 +90,25 @@ public class ExamService {
         record.setScore(score);
         record.setDuration(duration);
         record.setCreatedAt(LocalDateTime.now());
-        return examRecordRepository.save(record);
+        ExamRecord savedRecord = examRecordRepository.save(record);
+
+        List<ExamDetail> details = questionResults.stream().map(result -> {
+            ExamDetail detail = new ExamDetail();
+            detail.setExamId(savedRecord.getId());
+            detail.setQuestionId(result.getId());
+            detail.setSelectedAnswer(String.valueOf(result.getSelectedAnswer()));
+            detail.setIsCorrect(result.getCorrect());
+            return detail;
+        }).toList();
+        examDetailRepository.saveAll(details);
+
+        ExamSubmissionResultDTO result = new ExamSubmissionResultDTO();
+        result.setExamId(savedRecord.getId());
+        result.setScore(savedRecord.getScore());
+        result.setTotalQuestions(total);
+        result.setCorrectCount(correctCount);
+        result.setQuestions(questionResults);
+        return result;
     }
 
     public List<ExamRecord> getHistory(int page, int size) {

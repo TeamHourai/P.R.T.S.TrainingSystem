@@ -45,17 +45,20 @@ public class AdminController {
     }
 
     @PostMapping("/user/permission")
-    public ResponseEntity<Result<Map<String, Object>>> setPermission(@RequestParam Long actorId,
-                                                                     @RequestParam Long targetId,
+    public ResponseEntity<Result<Map<String, Object>>> setPermission(@RequestParam Long targetId,
                                                                      @RequestParam String makeAdmin,
                                                                      Authentication auth,
                                                                      HttpServletRequest request) {
-        // 审计以实际登录者为准（auth.principal），而非前端传入的 actorId
-        Long realActorId = auth != null ? (Long) auth.getPrincipal() : actorId;
+        if (auth == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Result.fail(ResultCode.UNAUTHORIZED, "未登录或登录已过期"));
+        }
+        // 权限判断和审计都只能信任服务端认证上下文，禁止前端指定操作者。
+        Long realActorId = (Long) auth.getPrincipal();
         String ip = IpUtils.getClientIp(request);
         try {
             boolean makeAdminBool = "true".equals(makeAdmin) || "1".equals(makeAdmin);
-            boolean changed = userService.setAdminStatus(actorId, targetId, makeAdminBool);
+            boolean changed = userService.setAdminStatus(realActorId, targetId, makeAdminBool);
             String msg = changed
                     ? (makeAdminBool ? "已设为管理员" : "已降为普通用户")
                     : "状态未发生变化";

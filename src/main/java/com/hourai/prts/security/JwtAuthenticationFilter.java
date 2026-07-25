@@ -50,10 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
             return bearerToken.substring(7);
         }
-        // Also support old format "user-{id}" for backwards compatibility
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("user-")) {
-            return bearerToken; // Will fail JWT validation → falls through to no auth
-        }
         return null;
     }
 }

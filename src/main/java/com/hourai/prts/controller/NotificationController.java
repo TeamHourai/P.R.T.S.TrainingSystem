@@ -18,7 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 import java.util.stream.Collectors;
@@ -26,6 +28,9 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api/v1")
 public class NotificationController {
+
+    private static final DateTimeFormatter DATE_TIME_FORMATTER =
+            DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
     private final AnnouncementRepository announcementRepository;
     private final NotificationStateRepository notificationStateRepository;
@@ -42,7 +47,9 @@ public class NotificationController {
     // ===== 公告 =====
     @GetMapping("/announcements")
     public ResponseEntity<Result<Map<String, Object>>> listAnnouncements() {
-        List<Announcement> list = announcementRepository.findAllByOrderByIdDesc();
+        List<Announcement> list = announcementRepository.findAllByOrderByIdDesc().stream()
+                .filter(this::isActive)
+                .toList();
         List<Map<String, Object>> result = list.stream().map(a -> {
             Map<String, Object> m = new HashMap<>();
             m.put("id", a.getId());
@@ -91,7 +98,7 @@ public class NotificationController {
         a.setTitle(safeTitle);
         a.setContent(safeContent);
         a.setImportant("true".equals(body.get("important")) || "1".equals(body.get("important")));
-        a.setCreatedAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        a.setCreatedAt(LocalDateTime.now().format(DATE_TIME_FORMATTER));
         a.setCreatedBy(actorId.toString());
         a.setExpiresAt(body.get("expiresAt"));
         a = announcementRepository.save(a);
@@ -115,19 +122,30 @@ public class NotificationController {
         }
         Long userId = (Long) auth.getPrincipal();
 
-        List<Announcement> announcements = announcementRepository.findAllByOrderByIdDesc();
+        List<Announcement> announcements = announcementRepository.findAllByOrderByIdDesc().stream()
+                .filter(this::isActive)
+                .toList();
         List<NotificationState> states = notificationStateRepository.findByUserId(userId);
         Map<Long, NotificationState> stateMap = states.stream()
                 .collect(Collectors.toMap(NotificationState::getNotificationId, s -> s));
 
-        List<Map<String, Object>> notifications = announcements.stream()
+        List<Announcement> visibleAnnouncements = announcements.stream()
+                .filter(a -> {
+                    NotificationState ns = stateMap.get(a.getId());
+                    return ns == null || !Boolean.TRUE.equals(ns.getIsHidden());
+                })
                 .filter(a -> {
                     if (!unreadOnly) return true;
                     NotificationState ns = stateMap.get(a.getId());
-                    return ns == null || !ns.getIsRead();
+                    return ns == null || !Boolean.TRUE.equals(ns.getIsRead());
                 })
-                .skip((long) (page - 1) * size)
-                .limit(size)
+                .toList();
+
+        int safePage = Math.max(page, 1);
+        int safeSize = Math.min(Math.max(size, 1), 100);
+        List<Map<String, Object>> notifications = visibleAnnouncements.stream()
+                .skip((long) (safePage - 1) * safeSize)
+                .limit(safeSize)
                 .map(a -> {
                     Map<String, Object> m = new HashMap<>();
                     m.put("id", a.getId());
@@ -142,16 +160,16 @@ public class NotificationController {
                 })
                 .collect(Collectors.toList());
 
-        long unreadCount = announcements.stream()
+        long unreadCount = visibleAnnouncements.stream()
                 .filter(a -> {
                     NotificationState ns = stateMap.get(a.getId());
-                    return ns == null || !ns.getIsRead();
+                    return ns == null || !Boolean.TRUE.equals(ns.getIsRead());
                 }).count();
 
         Map<String, Object> data = Map.of(
                 "notifications", notifications,
                 "unreadCount", unreadCount,
-                "hasMore", (page * size) < announcements.size()
+                "hasMore", (safePage * safeSize) < visibleAnnouncements.size()
         );
         return ResponseEntity.ok(Result.success(data));
     }
@@ -164,13 +182,17 @@ public class NotificationController {
         Long userId = (Long) auth.getPrincipal();
         // 与 /notifications 列表一致：无状态记录（ns==null）视为未读，
         // 而非仅统计已有 NotificationState 行（否则新公告会被漏算为 0）。
-        List<Announcement> announcements = announcementRepository.findAllByOrderByIdDesc();
+        List<Announcement> announcements = announcementRepository.findAllByOrderByIdDesc().stream()
+                .filter(this::isActive)
+                .toList();
         Map<Long, NotificationState> stateMap = notificationStateRepository.findByUserId(userId).stream()
                 .collect(Collectors.toMap(NotificationState::getNotificationId, s -> s));
         long count = announcements.stream()
                 .filter(a -> {
                     NotificationState ns = stateMap.get(a.getId());
-                    return ns == null || !ns.getIsRead();
+                    return ns == null
+                            || (!Boolean.TRUE.equals(ns.getIsRead())
+                            && !Boolean.TRUE.equals(ns.getIsHidden()));
                 })
                 .count();
         return ResponseEntity.ok(Result.success(Map.of("unreadCount", count)));
@@ -192,7 +214,7 @@ public class NotificationController {
                     return n;
                 });
         ns.setIsRead(true);
-        ns.setReadAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        ns.setReadAt(LocalDateTime.now().format(DATE_TIME_FORMATTER));
         notificationStateRepository.save(ns);
         return ResponseEntity.ok(Result.success("已标记为已读", null));
     }
@@ -205,7 +227,7 @@ public class NotificationController {
                     .body(Result.fail(ResultCode.UNAUTHORIZED, "未登录或登录已过期"));
         }
         Long userId = (Long) auth.getPrincipal();
-        for (Announcement a : announcementRepository.findAll()) {
+        for (Announcement a : announcementRepository.findAll().stream().filter(this::isActive).toList()) {
             NotificationState ns = notificationStateRepository.findByUserIdAndNotificationId(userId, a.getId())
                     .orElseGet(() -> {
                         NotificationState n = new NotificationState();
@@ -214,7 +236,7 @@ public class NotificationController {
                         return n;
                     });
             ns.setIsRead(true);
-            ns.setReadAt(LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+            ns.setReadAt(LocalDateTime.now().format(DATE_TIME_FORMATTER));
             notificationStateRepository.save(ns);
         }
         return ResponseEntity.ok(Result.success("已全部标记为已读", null));
@@ -260,5 +282,25 @@ public class NotificationController {
             notificationStateRepository.save(ns);
         }
         return ResponseEntity.ok(Result.success("已隐藏全部", null));
+    }
+
+    /**
+     * 未设置过期时间或过期时间晚于当前时间的公告才对外可见。
+     * 兼容项目现有的 yyyy-MM-dd HH:mm:ss 与 ISO-8601 两种格式；
+     * 历史脏数据无法解析时保留展示，避免误删有效公告。
+     */
+    private boolean isActive(Announcement announcement) {
+        String expiresAt = announcement.getExpiresAt();
+        if (expiresAt == null || expiresAt.isBlank()) return true;
+        String value = expiresAt.trim();
+        try {
+            return LocalDateTime.parse(value, DATE_TIME_FORMATTER).isAfter(LocalDateTime.now());
+        } catch (DateTimeParseException ignored) {
+            try {
+                return OffsetDateTime.parse(value).isAfter(OffsetDateTime.now());
+            } catch (DateTimeParseException ignoredAgain) {
+                return true;
+            }
+        }
     }
 }

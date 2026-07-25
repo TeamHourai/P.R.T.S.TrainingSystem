@@ -92,13 +92,9 @@ document.addEventListener('DOMContentLoaded', function () {
             },
             // 提交试卷
             async submitExam() {
-                // 先计算分数 & 展示结果
+                // 先展示提交状态；最终分数和答案以后端判分结果为准。
                 this.showResult = true;
-                let total = 0;
-                for (const section of this.examPaper) {
-                    total += this.calculateSectionScore(section);
-                }
-                this.totalScore = total;
+                this.totalScore = 0;
 
                 // 如果后端支持提交（用于回填正确答案/解析/记录），则提交一次。
                 // 不阻塞 UI：失败也不影响本地展示。
@@ -113,14 +109,8 @@ document.addEventListener('DOMContentLoaded', function () {
                                 }
                             }
                         }
-                        // userId 可选：若你有登录体系，可从 localStorage/sessionStorage 取
-                        let userId = null;
-                        try {
-                            const ui = JSON.parse(localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo') || 'null');
-                            if (ui && ui.id) userId = ui.id;
-                        } catch (e) { /* ignore */ }
-
-                        const res = await examApi.submitExamAnswers(userId, answers);
+                        // 用户身份由后端从 JWT 中获取，客户端不再提交 userId。
+                        const res = await examApi.submitExamAnswers(answers);
                         // 若后端返回了纠正后的题目数据（例如 correctAnswer/analysis），可在这里合并回 examPaper
                         // 保持兼容：仅在字段存在时覆盖
                         if (res && Array.isArray(res.questions)) {
@@ -139,6 +129,9 @@ document.addEventListener('DOMContentLoaded', function () {
                                     if (serverQ.type !== undefined) q.type = serverQ.type;
                                 }
                             }
+                        }
+                        if (res && res.score !== undefined) {
+                            this.totalScore = Number(res.score) || 0;
                         }
                     }
                 } catch (e) {

@@ -2,6 +2,8 @@ package com.hourai.prts.controller;
 
 import com.hourai.prts.common.Result;
 import com.hourai.prts.common.ResultCode;
+import com.hourai.prts.dto.ExamPaperQuestionDTO;
+import com.hourai.prts.dto.ExamSubmissionResultDTO;
 import com.hourai.prts.dto.QuestionDTO;
 import com.hourai.prts.entity.*;
 import com.hourai.prts.repository.*;
@@ -41,24 +43,35 @@ public class ExamController {
     }
 
     @GetMapping("/exam/paper")
-    public ResponseEntity<Result<List<QuestionDTO>>> generatePaper() {
+    public ResponseEntity<Result<List<ExamPaperQuestionDTO>>> generatePaper() {
         List<Question> paper = examService.generatePaper();
-        List<QuestionDTO> dtos = paper.stream().map(QuestionService::toDTO).collect(Collectors.toList());
+        List<ExamPaperQuestionDTO> dtos = paper.stream()
+                .map(QuestionService::toExamPaperDTO)
+                .collect(Collectors.toList());
         return ResponseEntity.ok(Result.success(dtos));
     }
 
     @PostMapping("/exam/submit")
-    public ResponseEntity<Result<Map<String, Object>>> submitExam(@RequestParam Long userId,
-                                                                  @RequestParam String answers,
-                                                                  @RequestParam(required = false) Integer duration) {
-        if (userId == null || answers == null || answers.isEmpty()) {
+    public ResponseEntity<Result<ExamSubmissionResultDTO>> submitExam(
+            @RequestParam String answers,
+            @RequestParam(required = false) Integer duration,
+            Authentication auth) {
+        if (auth == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(Result.fail(ResultCode.UNAUTHORIZED, "未登录或登录已过期"));
+        }
+        if (answers == null || answers.isEmpty()) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                     .body(Result.fail(ResultCode.BAD_REQUEST, "缺少必填字段"));
         }
         Map<Long, Integer> answerMap = parseAnswers(answers);
-        ExamRecord record = examService.submitExam(userId, answerMap, duration);
-        Map<String, Object> data = Map.of("examId", record.getId(), "score", record.getScore().intValue());
-        return ResponseEntity.ok(Result.success(data));
+        if (answerMap.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(Result.fail(ResultCode.BAD_REQUEST, "答案格式不正确"));
+        }
+        Long userId = (Long) auth.getPrincipal();
+        ExamSubmissionResultDTO result = examService.submitExam(userId, answerMap, duration);
+        return ResponseEntity.ok(Result.success(result));
     }
 
     @GetMapping("/exam/history")
@@ -143,19 +156,6 @@ public class ExamController {
         wrongVisibilityRepository.save(wv);
 
         return ResponseEntity.ok(Result.success(Map.of("questionId", questionId)));
-    }
-
-    @GetMapping("/user/{id}/wrong")
-    public ResponseEntity<Result<List<QuestionDTO>>> getUserWrongQuestions(@PathVariable Long id) {
-        List<UserAnswer> wrongAnswers = userAnswerRepository.findByUserIdAndIsCorrectFalse(id);
-        Set<Long> seenIds = new HashSet<>();
-        List<Question> wrongQuestions = new ArrayList<>();
-        for (UserAnswer ua : wrongAnswers) {
-            if (!seenIds.add(ua.getQuestionId())) continue;
-            questionRepository.findById(ua.getQuestionId()).ifPresent(wrongQuestions::add);
-        }
-        List<QuestionDTO> dtos = wrongQuestions.stream().map(QuestionService::toDTO).collect(Collectors.toList());
-        return ResponseEntity.ok(Result.success(dtos));
     }
 
     private Map<Long, Integer> parseAnswers(String s) {

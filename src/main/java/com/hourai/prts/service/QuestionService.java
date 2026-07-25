@@ -1,6 +1,7 @@
 package com.hourai.prts.service;
 
 import com.hourai.prts.dto.QuestionDTO;
+import com.hourai.prts.dto.ExamPaperQuestionDTO;
 import com.hourai.prts.entity.OnboardingQuestion;
 import com.hourai.prts.entity.Question;
 import com.hourai.prts.repository.OnboardingQuestionRepository;
@@ -118,6 +119,21 @@ public class QuestionService {
     }
 
     // ===== DTO Conversion =====
+    public static ExamPaperQuestionDTO toExamPaperDTO(Question q) {
+        ExamPaperQuestionDTO dto = new ExamPaperQuestionDTO();
+        dto.setId(q.getId());
+        dto.setType(q.getType());
+        dto.setDifficulty(q.getDifficulty());
+        dto.setCategory(q.getCategory());
+        dto.setResource(q.getResource());
+        dto.setQuestion(q.getQuestion());
+        dto.setPicture(q.getHasPicture());
+        dto.setPictureUrl(q.getHasPicture() != null && q.getHasPicture()
+                ? "/images/" + q.getId() + ".png" : q.getPictureUrl());
+        dto.setOptions(q.getOptions() != null ? Arrays.asList(q.getOptions().split("\\|")) : List.of());
+        return dto;
+    }
+
     public static QuestionDTO toDTO(Question q) {
         QuestionDTO dto = new QuestionDTO();
         dto.setId(q.getId());

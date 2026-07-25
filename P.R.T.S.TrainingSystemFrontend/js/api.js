@@ -71,9 +71,8 @@
         // ---------- 考试 ----------
         exam: {
             paper: function () { return PRTS.get('/exam/paper'); },
-            submit: function (userId, answers, duration) {
+            submit: function (answers, duration) {
                 var body = new URLSearchParams();
-                body.append('userId', userId);
                 if (typeof answers === 'object' && !Array.isArray(answers)) {
                     answers = Object.keys(answers).map(function (k) { return k + ':' + answers[k]; }).join(',');
                 }
@@ -94,11 +93,10 @@
         // ---------- 管理 ----------
         admin: {
             users: function (q) { return PRTS.get('/admin/users', q ? { q: q } : {}); },
-            setPermission: function (actorId, targetId, makeAdmin) {
+            setPermission: function (targetId, makeAdmin) {
                 var body = new URLSearchParams();
-                body.append('actor_id', actorId);
-                body.append('target_id', targetId);
-                body.append('make_admin', makeAdmin ? 'true' : 'false');
+                body.append('targetId', targetId);
+                body.append('makeAdmin', makeAdmin ? 'true' : 'false');
                 return PRTS.post('/admin/user/permission', null, { formBody: body.toString() });
             },
             auditLogs: function (page, size) {
@@ -127,7 +125,7 @@
             trainingRecords: function () { return PRTS.get('/user/training-records'); },
             saveTrainingRecord: function (r) { return PRTS.put('/user/training-records', r); },
             clearTrainingRecords: function () { return PRTS.del('/user/training-records'); },
-            wrongQuestions: function (userId) { return PRTS.get('/user/' + userId + '/wrong'); }
+        wrongQuestions: function () { return PRTS.get('/answers/wrong'); }
         },
 
         // ---------- 系统 ----------
@@ -176,11 +174,8 @@
     };
     window.answerApi = {
         submitAnswer: function (questionId, questionType, selectedOption) {
-            var ui = PRTS.getUserInfo() || {};
-            var userId = ui.id || 0;
             var answers = questionId + ':' + selectedOption;
             var body = new URLSearchParams();
-            body.append('userId', userId);
             body.append('answers', answers);
             return PRTS.post('/exam/submit', null, { formBody: body.toString() });
         },

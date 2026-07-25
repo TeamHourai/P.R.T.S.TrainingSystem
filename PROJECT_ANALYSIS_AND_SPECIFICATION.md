@@ -17,8 +17,8 @@
 │              Spring Boot 3.2                 │
 │  ┌──────────────────────────────────────┐   │
 │  │        Security Layer                │   │
-│  │  JwtAuthFilter → LegacyTokenFilter   │   │
-│  │  BCrypt + JWT (HMAC-SHA512)          │   │
+│  │  RateLimit → XSS → JwtAuthFilter     │   │
+│  │  BCrypt + HMAC-signed JWT            │   │
 │  └──────────────────────────────────────┘   │
 │  ┌──────────────────────────────────────┐   │
 │  │        Controller Layer (7)          │   │

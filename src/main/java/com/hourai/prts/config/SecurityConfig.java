@@ -31,13 +31,49 @@ public class SecurityConfig {
             .cors(cors -> {})  // uses corsConfigurationSource bean from CorsConfig
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                // Admin-only endpoints
+                // CORS 预检与无需登录的公开接口
+                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                .requestMatchers(HttpMethod.POST,
+                        "/api/v1/auth/register",
+                        "/api/v1/auth/login").permitAll()
+                .requestMatchers(HttpMethod.GET,
+                        "/ping",
+                        "/api/v1/ping",
+                        "/images/**",
+                        "/api/v1/announcements",
+                        "/api/v1/questions",
+                        "/api/v1/questions/*",
+                        "/api/v1/training/questions",
+                        "/api/v1/training/questions/*",
+                        "/api/v1/keywords",
+                        "/api/v1/stats/question/*",
+                        "/api/v1/stats/system").permitAll()
+
+                // 管理端及题库写操作
                 .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .requestMatchers("/admin/**").hasRole("ADMIN")
-                // All other requests (GET/POST/PUT/DELETE) are public
-                // Auth is handled via JwtAuthenticationFilter (optional for most endpoints)
-                .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                .anyRequest().permitAll()
+                .requestMatchers(HttpMethod.POST,
+                        "/api/v1/questions",
+                        "/api/v1/training/questions").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.PUT,
+                        "/api/v1/questions/*",
+                        "/api/v1/training/questions/*").hasRole("ADMIN")
+                .requestMatchers(HttpMethod.DELETE,
+                        "/api/v1/questions/*",
+                        "/api/v1/training/questions/*").hasRole("ADMIN")
+
+                // 用户私有数据与正式考试
+                .requestMatchers(
+                        "/api/v1/auth/profile",
+                        "/api/v1/auth/logout",
+                        "/api/v1/exam/**",
+                        "/api/v1/answers/**",
+                        "/api/v1/user/**",
+                        "/api/v1/notifications/**",
+                        "/api/v1/stats/user").authenticated()
+
+                // 未显式列入权限矩阵的接口默认拒绝
+                .anyRequest().denyAll()
             )
             .addFilterBefore(xssFilter, UsernamePasswordAuthenticationFilter.class)
             .addFilterBefore(rateLimitFilter, XssFilter.class)

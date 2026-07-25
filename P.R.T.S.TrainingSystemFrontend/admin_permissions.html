@@ -360,7 +360,6 @@
         }
 
         function changePermission(targetId, makeAdmin, username) {
-            const actorId = document.getElementById('actorId').value;
             const actionText = makeAdmin ? "设为管理员" : "降为普通用户";
 
             if (typeof uiModal !== 'undefined') {
@@ -369,17 +368,17 @@
                     cancelText: '取消'
                 }).then(confirmed => {
                     if (confirmed) {
-                        performChangePermission(actorId, targetId, makeAdmin);
+                        performChangePermission(targetId, makeAdmin);
                     }
                 });
             } else {
                 if (confirm(`确定要将用户 "${username}" (ID:${targetId}) ${actionText} 吗？`)) {
-                    performChangePermission(actorId, targetId, makeAdmin);
+                    performChangePermission(targetId, makeAdmin);
                 }
             }
         }
 
-        async function performChangePermission(actorId, targetId, makeAdmin) {
+        async function performChangePermission(targetId, makeAdmin) {
             if (!window.adminApi || typeof adminApi.setPermission !== 'function') {
                 if (typeof uiModal !== 'undefined') uiModal.error('API 客户端未加载，请刷新页面重试');
                 else alert('API 客户端未加载，请刷新页面重试');
@@ -388,7 +387,7 @@
             try {
                 // adminApi.setPermission 走统一请求层，自动携带 JWT 并解包信封；
                 // 非 200 会抛错，进入 catch。
-                await adminApi.setPermission(actorId, targetId, makeAdmin);
+                await adminApi.setPermission(targetId, makeAdmin);
                 if (typeof uiModal !== 'undefined') uiModal.success('操作成功');
                 else alert('操作成功');
                 searchUsers(); // 刷新列表

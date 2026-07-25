@@ -160,6 +160,20 @@ API 基址由 `P.R.T.S.TrainingSystemFrontend/js/config.js` 中的 `getApiBaseUr
 
 接口响应由后端统一封装为 `code`、`message`、`data` 和 `success` 字段。完整路由以各控制器源码为准。
 
+## 自动化测试
+
+```powershell
+mvn test
+```
+
+测试分为三层：
+
+- 单元测试：覆盖 JWT 签发、验签、篡改和过期，用户注册与权限规则，考试判分及输入清洗。
+- Web 安全切片测试：验证题库公开读取、普通用户拒绝写入、管理员允许写入。
+- H2 集成测试：以 MySQL 兼容模式启动完整 Spring 上下文，贯通注册登录、JWT、权限矩阵、JPA 持久化、考试提交和通知过滤。
+
+集成测试使用 `src/test/resources/application-test.yml` 中的临时内存数据库，不连接或修改开发环境 MySQL。
+
 ## 接口权限矩阵
 
 | 权限级别 | 接口范围 |

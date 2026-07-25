@@ -38,11 +38,11 @@
                     .catch(function (err) { return { success: false, message: (err && err.message) || '登录失败' }; });
             },
             logout: function () {
+                // JWT 为无状态令牌，当前后端没有 Token 黑名单。
+                // 退出只需清除客户端凭证；清除后再请求受保护的 logout 只会制造 403。
                 PRTS.clearAuth();
-                return PRTS.post('/auth/logout', {}).catch(function () { return {}; });
+                return Promise.resolve({ success: true });
             },
-            profile: function () { return PRTS.get('/auth/profile'); },
-            checkLogin: function () { return PRTS.get('/auth/profile').then(function (u) { return !!u; }).catch(function () { return false; }); },
             getCurrentUser: function () { return PRTS.get('/auth/profile'); }
         },
 
@@ -111,7 +111,6 @@
         },
         notifications: {
             list: function (params) { return PRTS.get('/notifications', params); },
-            unreadCount: function () { return PRTS.get('/notifications/unread-count'); },
             markRead: function (id) { return PRTS.put('/notifications/' + id + '/read'); },
             markAllRead: function () { return PRTS.put('/notifications/read-all'); },
             hide: function (id) { return PRTS.del('/notifications/' + id); },
@@ -148,7 +147,6 @@
     // ===================== 向后兼容别名 =====================
     var a = api;
     window.userApi = {
-        checkLoginStatus: a.auth.checkLogin,
         login: function (u, p, r) { return a.auth.login(u, p, r); },
         register: function (u, p, e) { return a.auth.register(u, p, e); },
         logout: a.auth.logout,
@@ -203,7 +201,6 @@
     };
     window.notificationApi = {
         getNotifications: a.notifications.list,
-        getUnreadCount: a.notifications.unreadCount,
         markAsRead: a.notifications.markRead,
         markAllAsRead: a.notifications.markAllRead,
         deleteNotification: a.notifications.hide,

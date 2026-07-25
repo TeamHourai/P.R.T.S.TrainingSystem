@@ -1,0 +1,5 @@
+caseName,username,password,email,expectedStatus
+username-too-short,ab,Test123456,short@example.com,400
+password-too-short,apifox_short,123,bad-password@example.com,400
+invalid-email,apifox_bad_email,Test123456,not-an-email,400
+invalid-username,apifox!invalid,Test123456,invalid-name@example.com,400

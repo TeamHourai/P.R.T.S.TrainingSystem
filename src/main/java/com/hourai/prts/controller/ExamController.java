@@ -21,6 +21,12 @@ import java.util.*;
 
 import java.util.stream.Collectors;
 
+/**
+ * 正式考试、历史记录和当前用户错题接口。
+ *
+ * <p>所有用户私有数据都以 Authentication principal 为归属依据，
+ * 不接受客户端指定 userId。
+ */
 @RestController
 @RequestMapping("/api/v1")
 public class ExamController {

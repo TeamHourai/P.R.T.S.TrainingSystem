@@ -13,17 +13,18 @@
     <link rel="stylesheet" href="css/exam/responsive.css">
     <link rel="stylesheet" href="css/exam/result.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>[v-cloak] { display: none !important; }</style>
 
     <!-- 移除 Supabase 相关脚本：项目当前未提供 js/supabase-config.js 与 js/database.js，导致 404/ MIME 报错 -->
 
     <!-- 全局API配置（用于设置 window.API_BASE_URL） -->
-    <script src="js/config.js"></script>
+    <script src="js/config.js?v=20260725-session-flow-v2"></script>
 
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <script src="js/vendor/vue-2.6.14.min.js?v=20260725-local-vue"></script>
 </head>
 
 <body>
-    <div id="app" class="exam-wrapper">
+    <div id="app" class="exam-wrapper" v-cloak>
         <!-- 顶部导航 -->
         <div class="exam-header">
             <div class="header-left">
@@ -261,11 +262,10 @@
     </div>
 
     <!-- API client (config.js + api.js provides window.api + all legacy aliases) -->
-    <script src="js/config.js"></script>
-    <script src="js/utils/common.js"></script>
-    <script src="js/api.js"></script>
+    <script src="js/utils/common.js?v=20260725-session-flow-v2"></script>
+    <script src="js/api.js?v=20260725-session-flow-v2"></script>
     <!-- Exam page logic -->
-    <script src="js/exam-frontend.js"></script>
+    <script src="js/exam-frontend.js?v=20260725-session-flow-v2"></script>
 </body>
 
 </html>

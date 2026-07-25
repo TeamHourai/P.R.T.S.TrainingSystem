@@ -10,6 +10,12 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * 用户注册、密码验证和管理员权限变更的业务服务。
+ *
+ * <p>所有密码在持久化前使用 PasswordEncoder 单向哈希；权限变更的操作者 ID
+ * 必须来自已经验证的 Spring Security principal。
+ */
 @Service
 public class UserService {
     private final UserRepository userRepository;
@@ -61,6 +67,7 @@ public class UserService {
         User actor = userRepository.findById(actorId).orElseThrow();
         if (!actor.getIsAdmin()) throw new RuntimeException("not admin");
         User target = userRepository.findById(targetId).orElseThrow();
+        // 超级管理员固定为 id=1；普通管理员可以提升用户，但不能降级管理员。
         if (!makeAdmin && !actorId.equals(1L)) throw new RuntimeException("only super admin can demote");
         if (target.getIsAdmin() == makeAdmin) return false;
         target.setIsAdmin(makeAdmin);

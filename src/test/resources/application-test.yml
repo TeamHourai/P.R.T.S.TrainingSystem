@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    # H2 仅用于自动化测试；MySQL 模式可提前暴露一部分方言兼容问题。
+    url: jdbc:h2:mem:prts_test;MODE=MySQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+  flyway:
+    # 集成测试由 Hibernate 根据实体创建临时表，不修改真实 MySQL 数据库。
+    enabled: false
+
+app:
+  data:
+    import-on-startup: false
+  jwt:
+    # 仅供测试使用的 32 字节 Base64 密钥。
+    secret: MDEyMzQ1Njc4OWFiY2RlZjAxMjM0NTY3ODlhYmNkZWY=
+    expiration-ms: 60000

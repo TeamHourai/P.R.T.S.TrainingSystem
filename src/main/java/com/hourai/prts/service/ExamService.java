@@ -19,6 +19,12 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * 正式考试的组卷、判分、记录和统计服务。
+ *
+ * <p>交卷事务同时写入考试汇总、用户答题行为和考试明细，任一步骤失败都会回滚，
+ * 防止出现分数已保存但答题明细缺失的不一致状态。
+ */
 @Service
 public class ExamService {
     private final QuestionRepository questionRepository;
@@ -34,6 +40,10 @@ public class ExamService {
         this.userAnswerRepository = userAnswerRepository;
     }
 
+    /**
+     * 按 5 种题型和 5 个难度组合各随机抽取一道题。
+     * 某个组合没有候选题时跳过，因此实际题量可能少于 25。
+     */
     public List<Question> generatePaper() {
         List<Question> paper = new ArrayList<>();
         Random rng = new Random();
@@ -48,6 +58,13 @@ public class ExamService {
         return paper;
     }
 
+    /**
+     * 使用数据库中的正确答案判分，客户端只负责提交选择结果。
+     *
+     * @param userId   从已验证 JWT principal 中取得的当前用户 ID
+     * @param answers  题目 ID 到用户选项的映射
+     * @param duration 前端统计的答题用时（秒）
+     */
     @Transactional
     public ExamSubmissionResultDTO submitExam(Long userId, Map<Long, Integer> answers, Integer duration) {
         int correctCount = 0;

@@ -15,6 +15,11 @@ import org.springframework.web.bind.annotation.*;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * 当前用户的答题偏好和培训进度接口。
+ *
+ * <p>用户 ID 始终从 JWT 认证上下文获取，避免横向越权读取或修改他人数据。
+ */
 @RestController
 @RequestMapping("/api/v1/user")
 public class UserSettingsController {

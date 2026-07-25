@@ -66,31 +66,27 @@ window._appMethods2 = {
         }
     },
     async loadExamStats() {
-        // ...existing code...
+        if (!this.isLoggedIn) {
+            this.examStats = { totalAttempts: 0, averageScore: 0 };
+            return;
+        }
         if (window.examApi) {
-            const history = await examApi.getExamHistory({ page: 1, size: 100 });
-            if (history && history.exams) {
-                const totalAttempts = history.total || history.exams.length;
-                const totalScore = history.exams.reduce((sum, exam) => sum + (exam.score || 0), 0);
+            try {
+                const history = await examApi.getExamHistory({ page: 1, size: 100 });
+                // 当前后端直接返回考试记录数组，同时兼容旧版 {exams,total} 结构。
+                const exams = Array.isArray(history)
+                    ? history
+                    : (history && Array.isArray(history.exams) ? history.exams : []);
+                const totalAttempts = history && history.total ? history.total : exams.length;
+                const totalScore = exams.reduce((sum, exam) => sum + (exam.score || 0), 0);
                 const averageScore = totalAttempts > 0 ? totalScore / totalAttempts : 0;
                 this.examStats = { totalAttempts, averageScore };
+            } catch (error) {
+                // 登录状态刚好失效时保持空统计，不把鉴权错误升级成首页初始化弹窗。
+                this.examStats = { totalAttempts: 0, averageScore: 0 };
             }
         } else {
-            this.examStats = { totalAttempts: 1234, averageScore: 78.5 };
+            this.examStats = { totalAttempts: 0, averageScore: 0 };
         }
-    },
-    loadSystemData() {
-        // ...existing code...
-        this.updateVersions = [
-            { id: 1, number: 'v2.0.0', date: '2024-01-01', title: '系统全面升级', content: '博士考核系统v2.0正式上线...' },
-            { id: 2, number: 'v1.5.0', date: '2023-12-01', title: '新增培训模块', content: '新增入职培训模块...' }
-        ];
-        this.selectedVersion = this.updateVersions[0] || {};
-        this.systemTips = `
-            <p>1. 使用前请先登录账号</p>
-            <p>2. 建议从入职培训开始学习</p>
-            <p>3. 错题本会自动记录答错的题目</p>
-            <p>4. 全真模拟考试限时15分钟</p>
-        `;
     }
 };

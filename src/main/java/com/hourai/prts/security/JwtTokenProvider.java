@@ -9,6 +9,12 @@ import javax.crypto.SecretKey;
 import java.util.Base64;
 import java.util.Date;
 
+/**
+ * JWT 的签发与校验组件。
+ *
+ * <p>密钥只保存在服务端。Token 的 payload 可以被客户端解码查看，因此这里只写入
+ * 用户标识和角色，不写入密码等敏感数据；只有签名验证通过后才能信任其中的 claims。
+ */
 @Component
 public class JwtTokenProvider {
 

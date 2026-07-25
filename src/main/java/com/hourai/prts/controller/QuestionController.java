@@ -14,6 +14,12 @@ import java.util.*;
 
 import java.util.stream.Collectors;
 
+/**
+ * 正式题库与培训题库接口。
+ *
+ * <p>读取接口可公开访问，新增、修改和删除由 Spring Security 权限矩阵
+ * 统一限制为管理员。
+ */
 @RestController
 @RequestMapping("/api/v1")
 public class QuestionController {

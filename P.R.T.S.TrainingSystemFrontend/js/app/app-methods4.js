@@ -394,6 +394,18 @@ window._appMethods4 = {
         }
         console.log(String(message));
     },
+    resetNotificationUi() {
+        // 页面跳转、退出登录或 BFCache 恢复时统一丢弃瞬时弹窗状态。
+        // 请求序号递增后，离开页面前发出的响应即使晚到也不会再回填数据。
+        this.showSystemNotice = false;
+        this.showNoticeDetail = false;
+        this.currentNoticeDetail = null;
+        this.notifications = [];
+        this.unreadCount = 0;
+        this.hasMoreNotifications = false;
+        this.loadingNotifications = false;
+        this.notifReqSeq = (this.notifReqSeq || 0) + 1;
+    },
     openSystemNotice() {
         if (!this.isLoggedIn) {
             this.showError('请先登录后查看系统公告');
@@ -406,33 +418,6 @@ window._appMethods4 = {
         this.loadingNotifications = true;
         this.showSystemNotice = true;
         this.loadNotifications();
-    },
-    // 登录后自动检测未读公告并弹窗（每个浏览器会话仅自动弹一次；
-    // 公告标记为已读后 unreadCount 归零，后续登录不再弹出）
-    async checkLoginAnnouncements() {
-        if (!this.isLoggedIn) return;
-        try {
-            if (sessionStorage.getItem('__login_announcement_shown__')) return;
-        } catch (e) { /* sessionStorage 不可用时忽略 */ }
-        // 立即标记「本会话已检测过」（在加载之前）。否则用户在 loadNotifications
-        // 加载期间导航离开（如进编辑器），标记未设→返回首页时再次弹窗（概率性触发）。
-        // 前置后：每会话至多弹一次，与加载是否完成无关。
-        try { sessionStorage.setItem('__login_announcement_shown__', '1'); } catch (e) { /* ignore */ }
-        if (!window.notificationApi || typeof window.notificationApi.getNotifications !== 'function') return;
-        try {
-            // 单次加载未读公告：unreadCount 与 notifications 来自同一请求，
-            // 避免「getUnreadCount 决定开窗 + loadNotifications 加载列表」两调用竞态
-            // 导致 count>0 但列表为空时弹窗开而内容为空。
-            this.systemNoticeTab = 'unread';
-            this.noticePage = 1;
-            await this.loadNotifications();   // 弹窗未显示，后台加载并设置 unreadCount/notifications
-            if (this.unreadCount > 0) {
-                // 数据已就绪，直接开窗展示（showSystemNotice watcher 已移除自动加载，不会重复请求）
-                this.showSystemNotice = true;
-            }
-        } catch (e) {
-            console.warn('登录未读公告检测失败', e);
-        }
     },
     startExam() {
         if (!this.isLoggedIn) {
@@ -473,8 +458,7 @@ window._appMethods4 = {
             questions: 'editor.html',
             training: 'training-editor.html'
         };
-        // 在当前页面内打开（同标签页导航），不再新开标签页，
-        // 保证 sessionStorage（含登录公告标记）在同一次会话内连续，避免返回首页时状态丢失。
+        // 管理页面使用同标签页导航，返回首页时会创建干净的 Vue 状态。
         window.location.href = map[type];
     },
     goToAnnouncementEditor() {

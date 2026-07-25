@@ -13,56 +13,39 @@ new Vue({
     async mounted() {
         // ...existing code from mounted...
         try {
-            // 防止登录/退出后 reload 标记导致循环：启动后立即清理
-            try {
-                const k1 = sessionStorage.getItem('__refresh_after_login__');
-                const k2 = sessionStorage.getItem('__refresh_after_logout__');
-                if (k1 || k2) {
-                    sessionStorage.removeItem('__refresh_after_login__');
-                    sessionStorage.removeItem('__refresh_after_logout__');
+            // 弹窗属于瞬时 UI，不能跨页面导航或 BFCache 恢复。
+            // pagehide 在页面进入往返缓存前执行；pageshow.persisted 则覆盖浏览器
+            // 直接恢复旧 Vue 实例、不会重新执行 mounted 的情况。
+            const resetNotificationUi = () => {
+                if (typeof this.resetNotificationUi === 'function') {
+                    this.resetNotificationUi();
                 }
-            } catch (e) {
-                // ignore
-            }
+            };
+            resetNotificationUi();
+            window.addEventListener('pagehide', resetNotificationUi);
+            window.addEventListener('pageshow', event => {
+                if (event.persisted) resetNotificationUi();
+            });
 
             console.log('博士考核系统初始化...');
             await this.checkLoginStatus();
-            // 登录后自动检测未读公告（有未读则弹窗，每会话一次）
-            if (this.isLoggedIn && typeof this.checkLoginAnnouncements === 'function') {
-                this.checkLoginAnnouncements();
-            }
-            // 登录后拉取用户答题设置
-            if (typeof this.loadAnswerSettings === 'function') {
-                await this.loadAnswerSettings();
-            }
-            await this.loadQuestions();
-            await this.loadTrainingQuestions();
-
-            // 从后端加载入职培训记录（替代 localStorage）
-            if (this.isLoggedIn && window.trainingRecordsApi && typeof window.trainingRecordsApi.get === 'function') {
-                try {
-                    const res = await window.trainingRecordsApi.get();
-                    if (res && res.success && res.records) {
-                        // 前端内部结构为 { [id]: { attempts, correct, lastAt } }
-                        const mapped = {};
-                        Object.keys(res.records).forEach(k => {
-                            const r = res.records[k];
-                            mapped[k] = {
-                                attempts: r.attempts || 0,
-                                correct: !!r.correct,
-                                lastAt: r.lastAt || 0
-                            };
-                        });
-                        this.trainingRecords = mapped;
-                    }
-                } catch (e) {
-                    console.warn('加载 trainingRecords 失败', e);
+            // 公共题库互不依赖，单项失败不能触发全局模态框或阻断首页。
+            const publicResults = await Promise.allSettled([
+                this.loadQuestions(),
+                this.loadTrainingQuestions()
+            ]);
+            publicResults.forEach((result, index) => {
+                if (result.status === 'rejected') {
+                    console.warn(index === 0 ? '正式题库加载失败' : '培训题库加载失败', result.reason);
                 }
-            }
+            });
 
             this.updateCategories();
-            await this.loadExamStats();
-            this.loadSystemData();
+            if (this.isLoggedIn) {
+                await this.loadUserData();
+            } else {
+                this.examStats = { totalAttempts: 0, averageScore: 0 };
+            }
             console.log('系统初始化完成');
             document.addEventListener('click', (event) => {
                 const sidebar = document.querySelector('.sidebar');
@@ -77,9 +60,8 @@ new Vue({
             });
         } catch (error) {
             console.error('应用初始化失败:', error);
-            // 限流（429）已在请求层给出区分性提示，此处不再重复弹「初始化失败」
-            if (error && error.rateLimited) return;
-            this.showError('系统初始化失败，请刷新页面重试');
+            // 初始化失败仅记录日志。登录、退出和页面导航不应产生全局错误弹窗；
+            // 具体功能在用户主动操作时再显示针对性的错误。
         }
     }
 });

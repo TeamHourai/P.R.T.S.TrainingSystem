@@ -33,18 +33,20 @@
 
     <!-- 图标库 -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vue 挂载前隐藏模板，防止 v-if 尚未生效时所有模态框直接显示。 -->
+    <style>[v-cloak] { display: none !important; }</style>
 
     <!-- 全局API配置 -->
-    <script src="js/config.js"></script>
+    <script src="js/config.js?v=20260725-session-flow-v2"></script>
 
-    <!-- Vue.js -->
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.14/dist/vue.js"></script>
+    <!-- Vue 必须使用本地文件；CDN 不可用时 v-if 模态框会全部裸露。 -->
+    <script src="js/vendor/vue-2.6.14.min.js?v=20260725-local-vue"></script>
 
     <!-- 移除原来的 api-service.js，改为按正确顺序加载 axios + request + apiapp -->
 </head>
 
 <body>
-    <div id="app">
+    <div id="app" v-cloak>
         <!-- 移动端菜单切换 -->
         <button class="mobile-menu-toggle" @click="toggleSidebar">
             <i class="fas fa-bars"></i>
@@ -101,7 +103,7 @@
                     <i class="fas fa-bullhorn"></i><span>系统公告</span>
                 </div>
                 <p>博士考核系统 v2.0</p>
-                <p>© 2025 罗德岛制药</p>
+                <p>© 2025 TeamHourai</p>
             </div>
         </div>
 
@@ -733,21 +735,21 @@
     </div>
 
     <!-- Unified API client (replaces all old js/api/*.js + apiapp.js + request.js + user.js) -->
-    <script src="js/utils/common.js"></script>
-    <script src="js/api.js"></script>
+    <script src="js/utils/common.js?v=20260725-session-flow-v2"></script>
+    <script src="js/api.js?v=20260725-session-flow-v2"></script>
 
     <!-- UI helpers -->
-    <script src="js/components/modal.js"></script>
+    <script src="js/components/modal.js?v=20260725-session-flow-v2"></script>
     <!-- 通知/公告数据格式化（生成 formattedContent/formattedTime/typeInfo） -->
-    <script src="js/utils/notification-helper.js"></script>
-    <script src="js/app/app-data.js"></script>
-    <script src="js/app/app-computed.js"></script>
-    <script src="js/app/app-watch.js"></script>
-    <script src="js/app/app-methods1.js"></script>
-    <script src="js/app/app-methods2.js"></script>
-    <script src="js/app/app-methods3.js"></script>
-    <script src="js/app/app-methods4.js"></script>
-    <script src="js/app/app-main.js"></script>
+    <script src="js/utils/notification-helper.js?v=20260725-session-flow-v2"></script>
+    <script src="js/app/app-data.js?v=20260725-session-flow-v2"></script>
+    <script src="js/app/app-computed.js?v=20260725-session-flow-v2"></script>
+    <script src="js/app/app-watch.js?v=20260725-session-flow-v2"></script>
+    <script src="js/app/app-methods1.js?v=20260725-session-flow-v2"></script>
+    <script src="js/app/app-methods2.js?v=20260725-session-flow-v2"></script>
+    <script src="js/app/app-methods3.js?v=20260725-session-flow-v2"></script>
+    <script src="js/app/app-methods4.js?v=20260725-session-flow-v2"></script>
+    <script src="js/app/app-main.js?v=20260725-session-flow-v2"></script>
 </body>
 
 </html>

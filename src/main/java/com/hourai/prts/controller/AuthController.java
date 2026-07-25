@@ -17,6 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Map;
 import java.util.Optional;
 
+/**
+ * 认证接口：注册、登录、退出和当前用户资料。
+ *
+ * <p>登录成功后签发 JWT；后续请求通过 Bearer Token 恢复用户身份。
+ */
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {

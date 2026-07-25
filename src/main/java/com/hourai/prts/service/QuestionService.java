@@ -14,6 +14,12 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * 正式题库与入职培训题库的查询、维护和 DTO 转换服务。
+ *
+ * <p>正式考试必须使用 {@link ExamPaperQuestionDTO}，避免在交卷前泄露答案；
+ * 练习和管理场景才使用包含答案与解析的 {@link QuestionDTO}。
+ */
 @Service
 public class QuestionService {
     private final QuestionRepository questionRepository;
@@ -119,6 +125,9 @@ public class QuestionService {
     }
 
     // ===== DTO Conversion =====
+    /**
+     * 转换为安全发卷模型，只返回作答所需字段。
+     */
     public static ExamPaperQuestionDTO toExamPaperDTO(Question q) {
         ExamPaperQuestionDTO dto = new ExamPaperQuestionDTO();
         dto.setId(q.getId());

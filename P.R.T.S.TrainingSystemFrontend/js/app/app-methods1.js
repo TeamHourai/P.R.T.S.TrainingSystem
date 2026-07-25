@@ -1,33 +1,37 @@
 window._appMethods1 = {
     // ============ 用户认证相关方法 ============
     async checkLoginStatus() {
-        // ...existing code...
         const token = localStorage.getItem('token') || sessionStorage.getItem('token');
         if (!token) {
             this.isLoggedIn = false;
-            return;
+            this.userInfo = {};
+            this.isAdmin = false;
+            return false;
         }
-        if (window.userApi && typeof userApi.checkLoginStatus === 'function') {
-            const isLoggedIn = await userApi.checkLoginStatus();
-            this.isLoggedIn = isLoggedIn;
-            if (isLoggedIn) {
-                const user = await userApi.getCurrentUser();
-                if (user) {
-                    this.userInfo = user;
-                    this.isAdmin = user.isAdmin || false;
-                }
+
+        try {
+            if (!window.userApi || typeof userApi.getCurrentUser !== 'function') {
+                throw new Error('用户接口未初始化');
             }
-        } else {
-            const userData = localStorage.getItem('userInfo') || sessionStorage.getItem('userInfo');
-            this.isLoggedIn = !!userData;
-            if (userData) {
-                this.userInfo = JSON.parse(userData);
-                this.isAdmin = this.userInfo.isAdmin || false;
+            // 只请求一次 profile，同时完成 Token 校验和用户资料恢复。
+            const user = await userApi.getCurrentUser();
+            if (!user || user.id == null) throw new Error('登录状态无效');
+            this.userInfo = user;
+            this.isAdmin = user.isAdmin === true;
+            this.isLoggedIn = true;
+            return true;
+        } catch (error) {
+            // 失效 Token 必须立即清除，避免后续公共请求继续携带旧身份。
+            if (window.api && typeof window.api.clearAuth === 'function') {
+                window.api.clearAuth();
             }
+            this.isLoggedIn = false;
+            this.userInfo = {};
+            this.isAdmin = false;
+            return false;
         }
     },
     async handleLogin() {
-        // ...existing code...
         if (!this.authUsername || !this.authPassword) {
             this.showError('请输入用户名和密码');
             return;
@@ -40,39 +44,8 @@ window._appMethods1 = {
             this.showAuthModal = false;
             this.authUsername = '';
             this.authPassword = '';
+            // 登录成功后只加载一次用户私有数据，不再依赖 watcher 或整页刷新。
             await this.loadUserData();
-
-            // 登录后拉取入职培训记录
-            if (window.trainingRecordsApi && typeof window.trainingRecordsApi.get === 'function') {
-                try {
-                    const res = await window.trainingRecordsApi.get();
-                    if (res && res.success && res.records) {
-                        const mapped = {};
-                        Object.keys(res.records).forEach(k => {
-                            const r = res.records[k];
-                            mapped[k] = {
-                                attempts: r.attempts || 0,
-                                correct: !!r.correct,
-                                lastAt: r.lastAt || 0
-                            };
-                        });
-                        this.trainingRecords = mapped;
-                    }
-                } catch (e) {
-                    console.warn('登录后加载 trainingRecords 失败', e);
-                }
-            }
-
-            // 登录后自动刷新页面（防止状态不同步）
-            try {
-                sessionStorage.setItem('__refresh_after_login__', String(Date.now()));
-                window.location.reload();
-                return;
-            } catch (e) {
-                // ignore
-            }
-
-            // 登录成功不弹窗
             return;
         } else {
             this.showError(result.message || '登录失败');
@@ -101,7 +74,6 @@ window._appMethods1 = {
         }
     },
     async handleLogout() {
-        // ...existing code...
         await userApi.logout();
         this.isLoggedIn = false;
         this.userInfo = {};
@@ -109,43 +81,44 @@ window._appMethods1 = {
         this.wrongQuestions = [];
         this.wrongQuestionsDetail = [];
         this.trainingRecords = {};
-
-        // 清除登录公告弹窗标记，使下次登录重新检测未读公告
-        try { sessionStorage.removeItem('__login_announcement_shown__'); } catch (e) { /* ignore */ }
-
-        // 退出登录成功不弹窗
-
-        // 退出登录后自动刷新页面
-        try {
-            sessionStorage.setItem('__refresh_after_logout__', String(Date.now()));
-            window.location.reload();
-        } catch (e) {
-            // ignore
+        this.examStats = { totalAttempts: 0, averageScore: 0 };
+        this.answerSettings = { autoSubmit: false, autoNextCorrect: false };
+        if (typeof this.resetNotificationUi === 'function') {
+            this.resetNotificationUi();
         }
     },
     async loadUserData() {
-        // ...existing code...
-        await this.loadWrongQuestions();
-        await this.loadExamStats();
-
-        // 登录后也刷新一次培训记录（防止外部调用 loadUserData 时遗漏）
+        if (!this.isLoggedIn) return;
+        // 私有数据彼此独立：单项失败只记录日志，不触发全局错误弹窗，
+        // 也不能阻断其他数据加载。
+        const tasks = [
+            this.loadWrongQuestions(),
+            this.loadExamStats(),
+            this.loadAnswerSettings(),
+            this.loadTrainingRecords()
+        ];
+        const results = await Promise.allSettled(tasks);
+        results.forEach((result, index) => {
+            if (result.status === 'rejected') {
+                const names = ['错题', '考试统计', '答题设置', '培训记录'];
+                console.warn(`${names[index]}加载失败`, result.reason);
+            }
+        });
+    },
+    async loadTrainingRecords() {
         if (window.trainingRecordsApi && typeof window.trainingRecordsApi.get === 'function') {
-            try {
-                const res = await window.trainingRecordsApi.get();
-                if (res && res.success && res.records) {
-                    const mapped = {};
-                    Object.keys(res.records).forEach(k => {
-                        const r = res.records[k];
-                        mapped[k] = {
-                            attempts: r.attempts || 0,
-                            correct: !!r.correct,
-                            lastAt: r.lastAt || 0
-                        };
-                    });
-                    this.trainingRecords = mapped;
-                }
-            } catch (e) {
-                console.warn('loadUserData: load trainingRecords failed', e);
+            const res = await window.trainingRecordsApi.get();
+            if (res && res.success && res.records) {
+                const mapped = {};
+                Object.keys(res.records).forEach(k => {
+                    const r = res.records[k];
+                    mapped[k] = {
+                        attempts: r.attempts || 0,
+                        correct: !!r.correct,
+                        lastAt: r.lastAt || 0
+                    };
+                });
+                this.trainingRecords = mapped;
             }
         }
     },

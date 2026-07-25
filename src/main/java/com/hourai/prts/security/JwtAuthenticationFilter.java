@@ -15,6 +15,13 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * 将请求头中的 Bearer JWT 转换为 Spring Security 认证上下文。
+ *
+ * <p>principal 统一保存用户 ID，Controller 应从 Authentication 获取当前用户，
+ * 不能信任客户端额外提交的 userId。无 Token 或 Token 无效时保持匿名身份，
+ * 最终是否允许访问由 {@code SecurityConfig} 的权限矩阵决定。
+ */
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 

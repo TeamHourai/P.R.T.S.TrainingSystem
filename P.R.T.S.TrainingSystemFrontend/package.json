@@ -14,18 +14,20 @@
         "format": "prettier --write \"**/*.{js,html,css}\" --ignore-path .prettierignore",
         "lint": "eslint js/**/*.js --fix",
         "clean": "rm -rf node_modules",
-        "test": "echo '无测试配置'",
+        "test": "node --test test/*.test.js",
+        "test:e2e:refresh": "node test/refresh-modal.e2e.js",
         "start": "npm run dev:full"
     },
     "dependencies": {
-        "axios": "^1.6.0"
+        "axios": "^1.6.0",
+        "vue": "2.6.14"
     },
     "devDependencies": {
+        "concurrently": "^8.2.2",
+        "eslint": "^8.53.0",
         "http-server": "^14.1.1",
         "json-server": "^1.0.0-alpha.23",
-        "concurrently": "^8.2.2",
-        "prettier": "^3.0.3",
-        "eslint": "^8.53.0"
+        "prettier": "^3.0.3"
     },
     "browserslist": [
         "> 1%",

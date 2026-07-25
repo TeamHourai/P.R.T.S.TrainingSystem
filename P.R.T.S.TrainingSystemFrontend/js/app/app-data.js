@@ -51,9 +51,6 @@ window._appData = {
     // 系统公告
     showSystemNotice: false,
     systemNoticeTab: 'unread', // 默认改为 'unread'
-    selectedVersion: {},
-    updateVersions: [],
-    systemTips: '',
     // ================== 系统公告/通知中心相关 ==================
     notifications: [],
     unreadCount: 0,

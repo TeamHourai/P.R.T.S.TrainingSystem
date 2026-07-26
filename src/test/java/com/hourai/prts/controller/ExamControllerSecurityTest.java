@@ -40,11 +40,11 @@ class ExamControllerSecurityTest {
         ExamSubmissionResultDTO result = new ExamSubmissionResultDTO();
         result.setExamId(100L);
         result.setScore(BigDecimal.valueOf(100));
-        when(examService.submitExam(eq(42L), anyMap(), eq(30))).thenReturn(result);
+        when(examService.submitExam(eq(42L), eq(9L), anyMap(), eq(30))).thenReturn(result);
 
-        controller.submitExam("1:2", 30, authentication);
+        controller.submitExam(9L, "1:2", 30, authentication);
 
-        verify(examService).submitExam(42L, Map.of(1L, 2), 30);
+        verify(examService).submitExam(42L, 9L, Map.of(1L, 2), 30);
     }
 
     @Test

@@ -7,6 +7,7 @@ document.addEventListener('DOMContentLoaded', function () {
     new Vue({
         el: '#app',
         data: {
+            paperId: null, // 服务端试卷快照 ID，决定交卷时的完整题目集合
             examPaper: [], // 题目分组
             currentQuestionNumber: 1,
             showResult: false,
@@ -110,7 +111,8 @@ document.addEventListener('DOMContentLoaded', function () {
                             }
                         }
                         // 用户身份由后端从 JWT 中获取，客户端不再提交 userId。
-                        const res = await examApi.submitExamAnswers(answers);
+                        const res = await examApi.submitExamAnswers(
+                            this.paperId, answers, this.elapsedTime);
                         // 若后端返回了纠正后的题目数据（例如 correctAnswer/analysis），可在这里合并回 examPaper
                         // 保持兼容：仅在字段存在时覆盖
                         if (res && Array.isArray(res.questions)) {
@@ -320,26 +322,8 @@ document.addEventListener('DOMContentLoaded', function () {
             },
 
             restartExam() {
-                // reset state without full page reload (more stable under dev servers)
-                try {
-                    this.showResult = false;
-                    this.showQuestionDetailModal = false;
-                    this.currentDetailQuestion = {};
-                    this.totalScore = 0;
-                    this.answeredCount = 0;
-                    this.currentQuestionNumber = 1;
-                    for (const sec of this.examPaper) {
-                        for (const q of sec.questions) {
-                            q.userAnswer = null;
-                        }
-                    }
-                    // reset timer
-                    this.elapsedTime = 0;
-                    this.remainingTime = 900;
-                } catch (e) {
-                    // fallback
-                    window.location.reload();
-                }
+                // 已提交的 paperId 不能重复使用，刷新后向服务端申请新试卷。
+                window.location.reload();
             },
 
             goBack() {
@@ -357,9 +341,10 @@ document.addEventListener('DOMContentLoaded', function () {
         mounted() {
             // 获取试卷数据
             if (window.examApi && typeof examApi.generateExamPaper === 'function') {
-                examApi.generateExamPaper(25).then(data => {
-                    // 假设后端返回一维题目数组，前端分组
-                    if (Array.isArray(data)) {
+                examApi.generateExamPaper().then(data => {
+                    const questions = data && Array.isArray(data.questions) ? data.questions : [];
+                    this.paperId = data ? data.paperId : null;
+                    if (questions.length > 0 && this.paperId != null) {
                         // 按 type 分组
                         const typeMap = {
                             1: '干员调配与特性化决策',
@@ -369,7 +354,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             5: '作战环境与档案类记录'
                         };
                         const group = {};
-                        for (const q of data) {
+                        for (const q of questions) {
                             if (!group[q.type]) group[q.type] = [];
                             group[q.type].push({
                                 ...q,

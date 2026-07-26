@@ -2,6 +2,7 @@ package com.hourai.prts.controller;
 
 import com.hourai.prts.common.Result;
 import com.hourai.prts.common.ResultCode;
+import com.hourai.prts.dto.ExamPaperDTO;
 import com.hourai.prts.dto.ExamPaperQuestionDTO;
 import com.hourai.prts.dto.ExamSubmissionResultDTO;
 import com.hourai.prts.dto.QuestionDTO;
@@ -49,34 +50,24 @@ public class ExamController {
     }
 
     @GetMapping("/exam/paper")
-    public ResponseEntity<Result<List<ExamPaperQuestionDTO>>> generatePaper() {
-        List<Question> paper = examService.generatePaper();
-        List<ExamPaperQuestionDTO> dtos = paper.stream()
-                .map(QuestionService::toExamPaperDTO)
-                .collect(Collectors.toList());
-        return ResponseEntity.ok(Result.success(dtos));
+    public ResponseEntity<Result<ExamPaperDTO>> generatePaper(Authentication auth) {
+        Long userId = (Long) auth.getPrincipal();
+        return ResponseEntity.ok(Result.success(examService.generatePaper(userId)));
     }
 
     @PostMapping("/exam/submit")
     public ResponseEntity<Result<ExamSubmissionResultDTO>> submitExam(
-            @RequestParam String answers,
+            @RequestParam Long paperId,
+            @RequestParam(defaultValue = "") String answers,
             @RequestParam(required = false) Integer duration,
             Authentication auth) {
         if (auth == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
                     .body(Result.fail(ResultCode.UNAUTHORIZED, "未登录或登录已过期"));
         }
-        if (answers == null || answers.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Result.fail(ResultCode.BAD_REQUEST, "缺少必填字段"));
-        }
         Map<Long, Integer> answerMap = parseAnswers(answers);
-        if (answerMap.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body(Result.fail(ResultCode.BAD_REQUEST, "答案格式不正确"));
-        }
         Long userId = (Long) auth.getPrincipal();
-        ExamSubmissionResultDTO result = examService.submitExam(userId, answerMap, duration);
+        ExamSubmissionResultDTO result = examService.submitExam(userId, paperId, answerMap, duration);
         return ResponseEntity.ok(Result.success(result));
     }
 

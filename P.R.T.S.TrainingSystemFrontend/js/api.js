@@ -71,11 +71,12 @@
         // ---------- 考试 ----------
         exam: {
             paper: function () { return PRTS.get('/exam/paper'); },
-            submit: function (answers, duration) {
+            submit: function (paperId, answers, duration) {
                 var body = new URLSearchParams();
                 if (typeof answers === 'object' && !Array.isArray(answers)) {
                     answers = Object.keys(answers).map(function (k) { return k + ':' + answers[k]; }).join(',');
                 }
+                body.append('paperId', paperId);
                 body.append('answers', answers);
                 if (duration) body.append('duration', duration);
                 return PRTS.post('/exam/submit', null, { formBody: body.toString() });

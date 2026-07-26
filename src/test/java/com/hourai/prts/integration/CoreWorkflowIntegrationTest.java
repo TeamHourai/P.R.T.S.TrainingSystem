@@ -122,16 +122,20 @@ class CoreWorkflowIntegrationTest {
                 .andExpect(status().isOk());
 
         Question question = questionRepository.findAll().get(0);
-        mockMvc.perform(get("/api/v1/exam/paper")
+        String paperResponse = mockMvc.perform(get("/api/v1/exam/paper")
                         .header("Authorization", "Bearer " + ordinaryToken))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data[0].answer").doesNotExist())
-                .andExpect(jsonPath("$.data[0].analysis").doesNotExist());
+                .andExpect(jsonPath("$.data.questions[0].answer").doesNotExist())
+                .andExpect(jsonPath("$.data.questions[0].analysis").doesNotExist())
+                .andReturn().getResponse().getContentAsString();
+        long paperId = objectMapper.readTree(paperResponse)
+                .path("data").path("paperId").asLong();
 
         mockMvc.perform(post("/api/v1/exam/submit")
                         .header("Authorization", "Bearer " + ordinaryToken)
                         // 即使客户端夹带其他 userId，后端也只使用 JWT principal。
                         .param("userId", String.valueOf(admin.getId()))
+                        .param("paperId", String.valueOf(paperId))
                         .param("answers", question.getId() + ":2")
                         .param("duration", "20")
                         .contentType(MediaType.APPLICATION_FORM_URLENCODED))
